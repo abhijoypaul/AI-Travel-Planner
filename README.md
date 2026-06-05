@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # AI Travel Planner
 
 A modern full-stack AI-powered travel planning web application. Generate personalized itineraries, visualize trips on Google Maps, and manage your travel with smart recommendations.
@@ -149,3 +150,6 @@ Use [MongoDB Atlas](https://www.mongodb.com/atlas) for production database.
 ## License
 
 MIT
+=======
+# AI-Travel-Planner
+>>>>>>> 06400a0d19efd6a09beda261085b3c63f9cd21c6
