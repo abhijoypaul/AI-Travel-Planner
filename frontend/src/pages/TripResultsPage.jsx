@@ -83,7 +83,7 @@ export function TripResultsPage() {
     setPhotoLoading(true);
     setLocationPhoto(null);
     try {
-      const params = new URLSearchParams({ name: loc.name });
+      const params = new URLSearchParams({ name: loc.name, exact: "true" });
       if (loc.lat) params.set("lat", loc.lat);
       if (loc.lng) params.set("lng", loc.lng);
       const res = await fetch(`${API_URL}/place-photo?${params}`);
@@ -204,7 +204,7 @@ export function TripResultsPage() {
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left Column (8/12) */}
-          <div className="lg:col-span-8 space-y-5">
+          <div className="lg:col-span-8 space-y-5 lg:h-[calc(100vh-140px)] lg:overflow-y-auto lg:pr-2 custom-scrollbar">
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-4 h-11 rounded-xl p-1" style={{ background: "#eef0f6" }}>
@@ -283,7 +283,7 @@ export function TripResultsPage() {
           </div>
 
           {/* Right Column (4/12) - STICKY CONTAINER */}
-          <div className="lg:col-span-4 space-y-5 lg:sticky lg:top-6 lg:self-start">
+          <div className="lg:col-span-4 space-y-5 lg:h-[calc(100vh-140px)] lg:overflow-y-auto lg:pr-2 lg:sticky lg:top-0 custom-scrollbar">
             {/* Map Panel */}
             <div ref={mapSectionRef} className="wander-card overflow-hidden">
               {/* Map Header */}

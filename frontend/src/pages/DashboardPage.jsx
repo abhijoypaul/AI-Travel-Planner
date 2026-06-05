@@ -256,9 +256,29 @@ export function DashboardPage() {
 
   const latestTrip = data?.savedTrips?.[0] || null;
 
-  // Slideshow logic
-  const photos = getDestinationPhotos(latestTrip?.destination || "Discover");
+  // Dynamic Pexels photo states
+  const [galleryPhotos, setGalleryPhotos] = useState([]);
+  const [recPhotos, setRecPhotos] = useState({});
+  const [itinPhotos, setItinPhotos] = useState({});
   const [slideIndex, setSlideIndex] = useState(0);
+
+  // Fetch slideshow gallery photos from Pexels (via backend)
+  useEffect(() => {
+    const dest = latestTrip?.destination || "Explore Travel";
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+    fetch(`${API_URL}/place-photo?name=${encodeURIComponent(dest)}&limit=4`)
+      .then(res => res.json())
+      .then(resData => {
+        if (resData.urls && resData.urls.length > 0) {
+          setGalleryPhotos(resData.urls);
+        } else if (resData.url) {
+          setGalleryPhotos([resData.url]);
+        }
+      })
+      .catch(err => console.error("Failed to fetch gallery photos:", err));
+  }, [latestTrip]);
+
+  const photos = galleryPhotos.length > 0 ? galleryPhotos : getDestinationPhotos(latestTrip?.destination || "Discover");
 
   useEffect(() => {
     if (photos.length <= 1) return;
@@ -311,8 +331,48 @@ export function DashboardPage() {
     }));
   };
 
+  // Fetch recommendation photos from Pexels (via backend)
+  useEffect(() => {
+    const items = getRecommendedItems();
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+    items.forEach((item) => {
+      if (recPhotos[item.name]) return;
+      fetch(`${API_URL}/place-photo?name=${encodeURIComponent(item.name)}`)
+        .then(res => res.json())
+        .then(resData => {
+          if (resData.url) {
+            setRecPhotos(prev => ({ ...prev, [item.name]: resData.url }));
+          }
+        })
+        .catch(err => console.error("Failed to fetch recommendation photo:", err));
+    });
+  }, [activeFilter, latestTrip, data]);
+
+  // Fetch itinerary day items photos from Pexels (via backend)
+  useEffect(() => {
+    if (!latestTrip || !latestTrip.itinerary) return;
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+    latestTrip.itinerary.forEach(day => {
+      const items = getDayItems(day);
+      items.forEach(item => {
+        if (itinPhotos[item.name]) return;
+        fetch(`${API_URL}/place-photo?name=${encodeURIComponent(item.name)}`)
+          .then(res => res.json())
+          .then(resData => {
+            if (resData.url) {
+              setItinPhotos(prev => ({ ...prev, [item.name]: resData.url }));
+            }
+          })
+          .catch(err => console.error("Failed to fetch itinerary item photo:", err));
+      });
+    });
+  }, [latestTrip]);
+
   const currentItinerary = latestTrip?.itinerary || [];
-  const currentRecommendations = getRecommendedItems();
+  const currentRecommendations = getRecommendedItems().map(item => ({
+    ...item,
+    img: recPhotos[item.name] || item.img
+  }));
 
   if (loading) {
     return (
@@ -604,21 +664,19 @@ export function DashboardPage() {
 
           {/* Right Column (4/12) — AI Itinerary */}
           <div className="lg:col-span-4">
-            <div className="wander-card p-5 h-full flex flex-col bg-white">
-              {/* Header */}
-              <div className="flex items-center justify-between mb-5">
-                <h2 className="text-base font-bold text-slate-900">Your AI Itinerary</h2>
-                {latestTrip && (
+            {latestTrip ? (
+              <div className="wander-card p-5 h-full flex flex-col bg-white">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-5">
+                  <h2 className="text-base font-bold text-slate-900">Your AI Itinerary</h2>
                   <Link to="/itinerary" className="text-xs font-bold text-[#6366f1] hover:text-violet-655 transition-colors">
                     View Full Itinerary
                   </Link>
-                )}
-              </div>
+                </div>
 
-              {/* Timeline */}
-              <div className="flex-1 space-y-2 overflow-y-auto hide-scrollbar">
-                {latestTrip ? (
-                  currentItinerary.map((day) => {
+                {/* Timeline */}
+                <div className="flex-1 space-y-2 overflow-y-auto hide-scrollbar">
+                  {currentItinerary.map((day) => {
                     const dayItems = getDayItems(day);
                     return (
                       <div
@@ -636,7 +694,7 @@ export function DashboardPage() {
                             <div
                               className={`h-1.5 w-1.5 rounded-full flex-shrink-0 ${day.day === 1 ? "bg-[#6366f1]" : "bg-slate-350"}`}
                             />
-                            <span className="text-sm font-bold text-slate-800">
+                            <span className="text-sm font-bold text-slate-850">
                               Day {day.day}
                             </span>
                             {day.date && (
@@ -663,7 +721,7 @@ export function DashboardPage() {
                                 <DayBadge color={item.color} />
                                 <div className="h-10 w-10 rounded-xl overflow-hidden flex-shrink-0 border border-slate-200">
                                   <img
-                                    src={getPlacePhoto(item.name, item.type)}
+                                    src={itinPhotos[item.name] || getPlacePhoto(item.name, item.type)}
                                     alt={item.name}
                                     className="h-full w-full object-cover"
                                   />
@@ -689,89 +747,65 @@ export function DashboardPage() {
                         )}
                       </div>
                     );
-                  })
-                ) : (
-                  SAMPLE_ITINERARY.map((day) => (
-                    <div
-                      key={day.day}
-                      className="border border-slate-100 rounded-xl overflow-hidden"
-                    >
-                      {/* Day header */}
-                      <button
-                        className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors"
-                        onClick={() =>
-                          setOpenDay((prev) => (prev === day.day ? null : day.day))
-                        }
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <div
-                            className={`h-1.5 w-1.5 rounded-full flex-shrink-0 ${day.day === 1 ? "bg-[#6366f1]" : "bg-slate-350"}`}
-                          />
-                          <span className="text-sm font-bold text-slate-850">
-                            Day {day.day}
-                          </span>
-                          <span className="text-xs text-slate-500 font-bold">
-                            • {day.date}
-                          </span>
-                        </div>
-                        {openDay === day.day ? (
-                          <ChevronDown className="h-4 w-4 text-slate-650" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4 text-slate-650" />
-                        )}
-                      </button>
+                  })}
+                </div>
 
-                      {/* Day content (expanded) */}
-                      {openDay === day.day && day.items.length > 0 && (
-                        <div className="px-4 pb-3 space-y-3 border-t border-slate-100 pt-3">
-                          {day.items.map((item, j) => (
-                            <div key={j} className="flex items-center gap-3">
-                              <DayBadge color={item.color} />
-                              <div className="h-10 w-10 rounded-xl overflow-hidden flex-shrink-0 border border-slate-200">
-                                <img
-                                  src={item.img}
-                                  alt={item.name}
-                                  className="h-full w-full object-cover"
-                                />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs font-bold text-slate-800 truncate">
-                                  {item.name}
-                                </p>
-                                <div className="flex items-center gap-1 text-[10px] text-slate-500 font-semibold">
-                                  <Clock className="h-2.5 w-2.5" />
-                                  {item.time}
-                                </div>
-                              </div>
-                              <CatBadge cat={item.cat} color={item.color} />
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                {/* AI Tip */}
+                <div className="mt-4 rounded-xl bg-[#f8f8ff] border border-[#e0e7ff] p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center flex-shrink-0 shadow-sm animate-pulse-slow">
+                      <Bot className="h-4 w-4 text-white" />
                     </div>
-                  ))
-                )}
-              </div>
-
-              {/* AI Tip */}
-              <div className="mt-4 rounded-xl bg-[#f8f8ff] border border-[#e0e7ff] p-4">
-                <div className="flex items-start gap-3">
-                  <div className="h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center flex-shrink-0 shadow-sm animate-pulse-slow">
-                    <Bot className="h-4 w-4 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs font-bold text-slate-800 mb-1">
-                      AI Tip for your trip
-                    </p>
-                    <p className="text-[11px] text-slate-705 leading-relaxed font-medium">
-                      {latestTrip
-                        ? `Enjoy your stay in ${latestTrip.destination}! Make sure to explore local restaurants in the afternoon to get authentic dishes.`
-                        : "Visit Montmartre early morning to avoid crowds and get the best photos!"}
-                    </p>
+                    <div className="flex-1">
+                      <p className="text-xs font-bold text-slate-800 mb-1">
+                        AI Tip for your trip
+                      </p>
+                      <p className="text-[11px] text-slate-705 leading-relaxed font-medium">
+                        Enjoy your stay in {latestTrip.destination}! Make sure to explore local restaurants in the afternoon to get authentic dishes.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="px-1 mb-2">
+                  <h2 className="text-base font-bold text-slate-900">Why Plan with VoyagerAI?</h2>
+                  <p className="text-xs text-slate-550 mt-1">Discover the benefits of planning your next adventure with our smart assistant.</p>
+                </div>
+                
+                {[
+                  {
+                    icon: Sparkles,
+                    title: "AI-Powered Planning",
+                    desc: "Instantly generate complete, customized day-by-day plans built around your budget and travel style.",
+                    bgClass: "bg-indigo-50 text-indigo-655 border border-indigo-100/70"
+                  },
+                  {
+                    icon: MapPin,
+                    title: "Route Optimization",
+                    desc: "Visualize your entire trip on interactive maps with optimized paths that save you travel time.",
+                    bgClass: "bg-orange-50 text-orange-655 border border-orange-100/70"
+                  },
+                  {
+                    icon: Wallet,
+                    title: "Expense Management",
+                    desc: "Keep travel costs under control with integrated real-time budgeting and currency conversion.",
+                    bgClass: "bg-teal-50 text-teal-655 border border-teal-100/70"
+                  }
+                ].map((adv, idx) => (
+                  <div key={idx} className="wander-card p-4.5 bg-white hover:border-indigo-100 hover:shadow-md transition-all duration-300 flex items-start gap-4">
+                    <div className={`h-9 w-9 rounded-xl flex items-center justify-center flex-shrink-0 ${adv.bgClass}`}>
+                      <adv.icon className="h-4.5 w-4.5" />
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-bold text-slate-900 mb-1">{adv.title}</h3>
+                      <p className="text-[11px] text-slate-500 leading-relaxed font-medium">{adv.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

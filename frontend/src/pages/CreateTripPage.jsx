@@ -12,6 +12,7 @@ import {
   Plane,
 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
+import { PexelsImage } from "@/components/ui/PexelsImage";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -375,8 +376,9 @@ export function CreateTripPage() {
                   }`}
                   style={{ transitionProperty: "opacity, transform" }}
                 >
-                  <img
-                    src={img.url}
+                  <PexelsImage
+                    query={img.title}
+                    fallbackUrl={img.url}
                     alt={img.title}
                     className="w-full h-full object-cover"
                   />

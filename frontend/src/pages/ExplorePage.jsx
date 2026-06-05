@@ -14,6 +14,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
+import { PexelsImage } from "@/components/ui/PexelsImage";
 
 const CATEGORIES = [
   { key: "all", label: "All", icon: Globe },
@@ -98,8 +99,9 @@ export function ExplorePage() {
               className="wander-card overflow-hidden group cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
             >
               <div className="relative h-44 overflow-hidden">
-                <img
-                  src={`${dest.img}?auto=format&fit=crop&q=80&w=500`}
+                <PexelsImage
+                  query={dest.name}
+                  fallbackUrl={`${dest.img}?auto=format&fit=crop&q=80&w=500`}
                   alt={dest.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />

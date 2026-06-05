@@ -20,14 +20,14 @@ router.get('/health', (req, res) => {
 });
 
 router.get('/place-photo', async (req, res) => {
-  const { name, lat, lng } = req.query;
+  const { name, lat, lng, limit = 1, exact } = req.query;
 
   // CORS — allow frontend dev server
   res.setHeader('Access-Control-Allow-Origin', '*');
 
   if (!name) return res.status(400).json({ message: 'name param required' });
 
-  console.log(`[place-photo] Searching for: "${name}"`);
+  console.log(`[place-photo] Searching for: "${name}" (limit: ${limit}, exact: ${exact})`);
 
   // Scenic Unsplash fallback images list
   const fallbacks = [
@@ -40,7 +40,40 @@ router.get('/place-photo', async (req, res) => {
   const fallbackUrl = fallbacks[hash % fallbacks.length];
 
   try {
-    // 1. Google Places API first (if key configured)
+    const skipPexels = exact === 'true';
+
+    // 0. Pexels API first (if key configured and not skipped)
+    const pexelsApiKey = process.env.PEXELS_API_KEY;
+    if (pexelsApiKey && !skipPexels) {
+      try {
+        console.log(`[place-photo] Querying Pexels API for "${name}"`);
+        const limitNum = parseInt(limit) || 1;
+        const { data: pexelsData } = await axios.get('https://api.pexels.com/v1/search', {
+          params: { query: name, per_page: limitNum },
+          headers: { Authorization: pexelsApiKey },
+          timeout: 4500,
+        });
+        
+        if (limitNum > 1) {
+          const urls = pexelsData.photos?.map(p => p.src?.large2x || p.src?.large || p.src?.original).filter(Boolean) || [];
+          console.log(`[place-photo] Found ${urls.length} Pexels photos`);
+          return res.json({ urls, source: 'Pexels' });
+        }
+
+        const photo = pexelsData.photos?.[0];
+        if (photo) {
+          const url = photo.src?.large2x || photo.src?.large || photo.src?.original;
+          if (url) {
+            console.log(`[place-photo] Found Pexels photo: ${url}`);
+            return res.json({ url, title: name, source: `Pexels (Photo by ${photo.photographer})` });
+          }
+        }
+      } catch (pErr) {
+        console.error('[place-photo] Pexels API error:', pErr?.message);
+      }
+    }
+
+    // 1. Google Places API (if key configured)
     const mapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
     if (mapsApiKey) {
       try {

@@ -4,6 +4,8 @@ import { Layout } from '@/components/layout/Layout'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { DashboardPreview } from '@/components/landing/DashboardPreview'
+import { PexelsImage } from '@/components/ui/PexelsImage'
+import { useState, useEffect } from 'react'
 
 const features = [
   { icon: Sparkles, title: 'AI-Powered Itineraries', desc: 'GPT-4 builds personalized day-by-day plans from your preferences, budget, and travel style.' },
@@ -32,173 +34,163 @@ const testimonials = [
 ]
 
 export function LandingPage() {
+  const [bgUrl, setBgUrl] = useState("https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=2000");
+
+  useEffect(() => {
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+    fetch(`${API_URL}/utility/place-photo?name=scenic%20stars%20mountains`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.url) setBgUrl(data.url);
+      })
+      .catch(err => console.error("Failed to fetch landing background:", err));
+  }, []);
+
   return (
-    <Layout fullBleed hideFooter>
-      {/* Hero */}
-      <section className="relative overflow-hidden pb-8 pt-12 sm:pt-20">
-        <div className="orbit-ring hidden sm:block" />
-        <div className="page-container relative text-center">
-          <h1 className="mx-auto max-w-4xl text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">
-            Your personal AI that plans your trip —{' '}
-            <span className="text-gradient-cyan">effortlessly.</span>
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-400">
-            VoyagerAI organizes your itinerary, maps your routes, and keeps every detail
-            in one calm, intelligent workspace — so you can focus on the journey.
-          </p>
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link to="/register">
-              <Button size="lg" className="w-full min-w-[200px] sm:w-auto">
-                Start Free <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-            <Link to="/create-trip">
-              <Button size="lg" variant="outline" className="w-full min-w-[200px] sm:w-auto">
-                <Play className="h-5 w-5 fill-current" /> Watch Demo
-              </Button>
-            </Link>
-          </div>
-
-          <DashboardPreview />
-        </div>
-      </section>
-
-      {/* Features */}
-      <section id="features" className="relative py-24">
-        <div className="page-container">
-          <div className="mb-14 text-center">
-            <h2 className="section-heading">Core intelligence</h2>
-            <p className="section-subheading mt-3">
-              Everything you need to travel smarter — powered by AI and live maps.
+    <Layout hideSidebar>
+      <div 
+        className="min-h-screen text-slate-100 relative overflow-hidden" 
+        style={{
+          background: `linear-gradient(180deg, rgba(10, 15, 30, 0.9) 0%, rgba(15, 23, 42, 0.96) 100%), url('${bgUrl}')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundAttachment: "fixed"
+        }}
+      >
+        {/* Hero */}
+        <section className="relative overflow-hidden pb-16 pt-16 sm:pt-24">
+          <div className="orbit-ring hidden sm:block" />
+          <div className="page-container relative text-center">
+            <h1 className="mx-auto max-w-4xl text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl drop-shadow-md">
+              Your personal AI that plans your trip —{' '}
+              <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">effortlessly.</span>
+            </h1>
+            <p className="mx-auto mt-6 max-w-2xl text-base sm:text-lg leading-relaxed text-slate-300 drop-shadow-sm font-medium">
+              VoyagerAI organizes your itinerary, maps your routes, and keeps every detail
+              in one calm, intelligent workspace — so you can focus on the journey.
             </p>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {features.map((f) => (
-              <Card key={f.title} className="group border-white/10 hover:border-cyan-500/30 hover:shadow-[0_0_30px_rgb(34_211_238/0.08)]">
-                <CardContent className="p-6">
-                  <div className="icon-box-cyan mb-5 h-12 w-12">
-                    <f.icon className="h-6 w-6" />
-                  </div>
-                  <h3 className="mb-2 font-semibold text-white">{f.title}</h3>
-                  <p className="text-sm leading-relaxed text-slate-400">{f.desc}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section id="how-it-works" className="relative py-24">
-        <div className="page-container">
-          <div className="mb-14 text-center">
-            <h2 className="section-heading">How it works</h2>
-            <p className="section-subheading mt-3">Four steps from dream destination to ready-to-go itinerary</p>
-          </div>
-          <div className="relative grid gap-8 md:grid-cols-4">
-            <div className="absolute left-[12.5%] right-[12.5%] top-7 hidden h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent md:block" />
-            {steps.map((s) => (
-              <div key={s.step} className="relative text-center">
-                <div className="relative z-10 mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-500/30 bg-cyan-500/10 text-lg font-bold text-cyan-300 shadow-[0_0_25px_rgb(34_211_238/0.2)]">
-                  {s.step}
-                </div>
-                <h3 className="mb-2 font-semibold text-white">{s.title}</h3>
-                <p className="text-sm leading-relaxed text-slate-400">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Designed for */}
-      <section id="designed-for" className="relative py-24">
-        <div className="page-container">
-          <div className="mb-14 text-center">
-            <h2 className="section-heading">Designed for every traveler</h2>
-            <p className="section-subheading mt-3">Tailored pacing and recommendations for how you explore</p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-3">
-            {audiences.map((a) => (
-              <Card key={a.title} className="text-center">
-                <CardContent className="p-8">
-                  <div className="icon-box-cyan mx-auto mb-4 h-14 w-14">
-                    <a.icon className="h-7 w-7" />
-                  </div>
-                  <h3 className="mb-2 text-xl font-semibold text-white">{a.title}</h3>
-                  <p className="text-sm text-slate-400">{a.desc}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="relative py-24">
-        <div className="page-container">
-          <div className="mb-14 text-center">
-            <h2 className="section-heading">Loved by travelers</h2>
-            <p className="section-subheading mt-3">Real stories from explorers around the world</p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-3">
-            {testimonials.map((t) => (
-              <Card key={t.name}>
-                <CardContent className="p-6">
-                  <div className="mb-4 flex gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-                  <p className="mb-6 leading-relaxed text-slate-300">&ldquo;{t.text}&rdquo;</p>
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 text-xs font-bold text-slate-950">
-                      {t.initials}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-white">{t.name}</p>
-                      <p className="text-sm text-cyan-400">{t.trip}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Why VoyagerAI */}
-      <section id="why-voyager" className="relative py-24">
-        <div className="page-container">
-          <Card className="glass-panel-glow overflow-hidden border-cyan-500/20">
-            <CardContent className="px-6 py-16 text-center sm:px-12">
-              <h2 className="text-3xl font-bold text-white sm:text-4xl">Why VoyagerAI?</h2>
-              <p className="mx-auto mt-4 max-w-xl text-lg text-slate-400">
-                Calm, intelligent trip planning — no spreadsheets, no scattered tabs.
-                One beautiful space for your entire journey.
-              </p>
-              <Link to="/register" className="mt-8 inline-block">
-                <Button size="lg">
-                  Create Free Account <ArrowRight className="h-5 w-5" />
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Link to="/register">
+                <Button size="lg" className="w-full min-w-[200px] sm:w-auto bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-cyan-500/20">
+                  Start Free <ArrowRight className="h-5 w-5 ml-1" />
                 </Button>
               </Link>
-              <div className="mt-10 flex flex-wrap justify-center gap-8 text-sm text-slate-400">
-                {['Free to start', 'AI itineraries', 'Live maps', 'PDF export'].map((item) => (
-                  <span key={item} className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgb(34_211_238/0.8)]" />
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+            </div>
 
-      <footer className="relative border-t border-white/5 py-8">
-        <div className="page-container text-center text-sm text-slate-500">
-          © {new Date().getFullYear()} VoyagerAI. All rights reserved.
-        </div>
-      </footer>
+            <DashboardPreview />
+          </div>
+        </section>
+
+        {/* Gallery of Beautiful Places */}
+        <section className="py-12 bg-black/10">
+          <div className="page-container">
+            <div className="mb-10 text-center">
+              <span className="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-xs font-bold text-cyan-300 uppercase tracking-widest">
+                Visual Voyage
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mt-3">Explore the World's Wonders</h2>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                { title: "Mount Fuji, Japan", url: "https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&q=80&w=800", desc: "Majestic volcanic peak" },
+                { title: "Northern Lights, Iceland", url: "https://images.unsplash.com/photo-1579033461380-adb47c3eb938?auto=format&fit=crop&q=80&w=800", desc: "Dancing aurora borealis" },
+                { title: "Al Khazneh, Petra", url: "https://images.unsplash.com/photo-1589825693876-e5f0f585d87a?auto=format&fit=crop&q=80&w=800", desc: "Ancient rose-red city" },
+                { title: "Machu Picchu, Peru", url: "https://images.unsplash.com/photo-1526392060635-9d6019884377?auto=format&fit=crop&q=80&w=800", desc: "Historic Incan citadel" }
+              ].map((place, idx) => (
+                <div key={idx} className="relative group h-64 overflow-hidden rounded-2xl border border-white/10 shadow-md">
+                  <PexelsImage 
+                    query={place.title}
+                    fallbackUrl={place.url}
+                    alt={place.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/20 to-transparent" />
+                  <div className="absolute bottom-5 left-5 right-5 z-10">
+                    <p className="text-sm font-bold text-white leading-tight">{place.title}</p>
+                    <p className="text-[11px] text-cyan-300 font-semibold mt-1">{place.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Features (Core Intelligence) */}
+        <section id="features" className="relative py-20 bg-black/20">
+          <div className="page-container">
+            <div className="mb-14 text-center">
+              <h2 className="text-3xl font-extrabold text-white">Core Intelligence</h2>
+              <p className="mt-3 text-slate-300 max-w-xl mx-auto font-medium">
+                Everything you need to travel smarter — powered by AI and live maps.
+              </p>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {features.map((f) => (
+                <Card key={f.title} className="group border-white/10 glass-panel-dark hover:border-cyan-500/30 hover:shadow-[0_0_30px_rgba(34,211,238,0.06)] transition-all">
+                  <CardContent className="p-6">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400 mb-5 border border-cyan-500/20">
+                      <f.icon className="h-5 w-5" />
+                    </div>
+                    <h3 className="mb-2 font-bold text-white text-base">{f.title}</h3>
+                    <p className="text-xs leading-relaxed text-slate-300 font-medium">{f.desc}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* How it works */}
+        <section id="how-it-works" className="relative py-20 bg-black/10">
+          <div className="page-container">
+            <div className="mb-14 text-center">
+              <h2 className="text-3xl font-extrabold text-white">How It Works</h2>
+              <p className="mt-3 text-slate-300 max-w-xl mx-auto font-medium">Four steps from dream destination to ready-to-go itinerary</p>
+            </div>
+            <div className="relative grid gap-8 md:grid-cols-4">
+              <div className="absolute left-[12.5%] right-[12.5%] top-7 hidden h-px bg-gradient-to-r from-transparent via-cyan-500/40 to-transparent md:block" />
+              {steps.map((s) => (
+                <div key={s.step} className="relative text-center">
+                  <div className="relative z-10 mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-500/30 bg-cyan-500/10 text-lg font-bold text-cyan-300 shadow-[0_0_25px_rgba(34,211,238,0.15)]">
+                    {s.step}
+                  </div>
+                  <h3 className="mb-2 font-bold text-white text-sm">{s.title}</h3>
+                  <p className="text-xs leading-relaxed text-slate-300 font-medium">{s.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Designed for every traveler */}
+        <section id="designed-for" className="relative py-20 bg-black/20">
+          <div className="page-container">
+            <div className="mb-14 text-center">
+              <h2 className="text-3xl font-extrabold text-white">Designed for Every Traveler</h2>
+              <p className="mt-3 text-slate-300 max-w-xl mx-auto font-medium">Tailored pacing and recommendations for how you explore</p>
+            </div>
+            <div className="grid gap-6 md:grid-cols-3">
+              {audiences.map((a) => (
+                <Card key={a.title} className="text-center border-white/10 glass-panel-dark hover:border-cyan-500/20 transition-colors">
+                  <CardContent className="p-8">
+                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                      <a.icon className="h-6 w-6" />
+                    </div>
+                    <h3 className="mb-2 text-lg font-bold text-white">{a.title}</h3>
+                    <p className="text-xs text-slate-300 leading-relaxed font-medium">{a.desc}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <footer className="relative border-t border-white/5 py-10 bg-slate-950/80">
+          <div className="page-container text-center text-xs text-slate-450 font-medium">
+            © {new Date().getFullYear()} VoyagerAI. All rights reserved.
+          </div>
+        </footer>
+      </div>
     </Layout>
   )
 }

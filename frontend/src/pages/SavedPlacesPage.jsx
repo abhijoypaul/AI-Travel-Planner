@@ -11,6 +11,7 @@ import {
   Filter,
 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
+import { PexelsImage } from "@/components/ui/PexelsImage";
 
 const CATEGORIES = ["All", "Attractions", "Restaurants", "Hotels", "Experiences"];
 
@@ -99,8 +100,9 @@ export function SavedPlacesPage() {
                 <div key={place.id} className="wander-card overflow-hidden group hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                   {/* Image */}
                   <div className="relative h-44 overflow-hidden">
-                    <img
-                      src={`${place.img}?auto=format&fit=crop&q=80&w=500`}
+                    <PexelsImage
+                      query={place.name}
+                      fallbackUrl={`${place.img}?auto=format&fit=crop&q=80&w=500`}
                       alt={place.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
