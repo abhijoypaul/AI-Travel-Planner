@@ -47,13 +47,22 @@ const formatReviews = (val) => {
 
 export function SavedPlacesPage() {
   const [activeCategory, setActiveCategory] = useState("All");
-  const [saved, setSaved] = useState(SAVED_PLACES);
+  const [saved, setSaved] = useState([]);
   const [savedDetails, setSavedDetails] = useState({});
 
   useEffect(() => {
     // Fetch real place details from backend on mount
     const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-    saved.forEach((place) => {
+    const stored = localStorage.getItem("savedPlaces");
+    let initialSaved = SAVED_PLACES;
+    if (stored) {
+      initialSaved = JSON.parse(stored);
+    } else {
+      localStorage.setItem("savedPlaces", JSON.stringify(SAVED_PLACES));
+    }
+    setSaved(initialSaved);
+
+    initialSaved.forEach((place) => {
       fetch(`${API_URL}/place-details?name=${encodeURIComponent(place.name)}`)
         .then(res => res.json())
         .then(detailsData => {
@@ -76,7 +85,11 @@ export function SavedPlacesPage() {
       ? saved
       : saved.filter((p) => p.cat === activeCategory);
 
-  const remove = (id) => setSaved((prev) => prev.filter((p) => p.id !== id));
+  const remove = (id) => {
+    const updated = saved.filter((p) => p.id !== id);
+    setSaved(updated);
+    localStorage.setItem("savedPlaces", JSON.stringify(updated));
+  };
 
   return (
     <Layout>
@@ -110,7 +123,7 @@ export function SavedPlacesPage() {
               {cat}
               {cat !== "All" && (
                 <span className="ml-1.5 text-[10px] opacity-60">
-                  ({SAVED_PLACES.filter((p) => p.cat === cat).length})
+                  ({saved.filter((p) => p.cat === cat).length})
                 </span>
               )}
             </button>

@@ -229,7 +229,51 @@ export function DashboardPage() {
   const [activeFilter, setActiveFilter] = useState("attractions");
   const [openDay, setOpenDay] = useState(1);
   const [liked, setLiked] = useState({});
+  const [savedPlaces, setSavedPlaces] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const stored = localStorage.getItem("savedPlaces");
+    if (stored) {
+      setSavedPlaces(JSON.parse(stored));
+    } else {
+      const defaultSaved = [
+        { id: 1, name: "Eiffel Tower", location: "Paris, France", cat: "Attractions", rating: "4.8", reviews: "32k", img: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f", note: "Visit at sunset for best photos" },
+        { id: 2, name: "Le Jules Verne", location: "Paris, France", cat: "Restaurants", rating: "4.6", reviews: "2.1k", img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4", note: "Book 2 weeks in advance" },
+        { id: 3, name: "Hôtel Plaza Athénée", location: "Paris, France", cat: "Hotels", rating: "4.9", reviews: "8.4k", img: "https://images.unsplash.com/photo-1582719508461-905c673771fd", note: "Eiffel Tower view rooms available" },
+        { id: 4, name: "Louvre Museum", location: "Paris, France", cat: "Attractions", rating: "4.7", reviews: "28k", img: "https://images.unsplash.com/photo-1503152394-c571994fd383", note: "Book skip-the-line tickets" },
+        { id: 5, name: "Seine River Cruise", location: "Paris, France", cat: "Experiences", rating: "4.9", reviews: "15k", img: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a", note: "Evening cruise is magical" },
+        { id: 6, name: "Montmartre Walking Tour", location: "Paris, France", cat: "Experiences", rating: "4.8", reviews: "6.2k", img: "https://images.unsplash.com/photo-1554939437-ecc492c67b78", note: "Go early morning for fewer crowds" },
+      ];
+      setSavedPlaces(defaultSaved);
+      localStorage.setItem("savedPlaces", JSON.stringify(defaultSaved));
+    }
+  }, []);
+
+  const isLiked = (name) => {
+    return savedPlaces.some(p => p.name.toLowerCase() === name.toLowerCase());
+  };
+
+  const handleToggleLike = (item) => {
+    let list = [...savedPlaces];
+    const index = list.findIndex(p => p.name.toLowerCase() === item.name.toLowerCase());
+    if (index > -1) {
+      list.splice(index, 1);
+    } else {
+      list.push({
+        id: Date.now(),
+        name: item.name,
+        location: item.desc || item.address || "Travel Zone",
+        cat: item.cat || (item.type ? (item.type === "attraction" ? "Attractions" : item.type === "restaurant" ? "Restaurants" : "Hotels") : "Experiences"),
+        rating: item.rating || "4.5",
+        reviews: item.reviews || "120",
+        img: item.img || "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800",
+        note: "Liked from Dashboard Recommendations"
+      });
+    }
+    setSavedPlaces(list);
+    localStorage.setItem("savedPlaces", JSON.stringify(list));
+  };
 
   // Search widget state
   const [destination, setDestination] = useState("");
@@ -504,7 +548,7 @@ export function DashboardPage() {
                 type="number"
                 value={budget}
                 onChange={(e) => setBudget(e.target.value)}
-                placeholder="100000"
+                placeholder="0"
                 min="0"
                 className="flex-1 min-w-0 text-[13px] font-bold text-slate-800 placeholder:text-slate-400 placeholder:font-normal bg-transparent outline-none"
               />
@@ -698,11 +742,11 @@ export function DashboardPage() {
                         className="recommended-badge"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setLiked((prev) => ({ ...prev, [i]: !prev[i] }));
+                          handleToggleLike(item);
                         }}
                       >
                         <Heart
-                          className={`h-3.5 w-3.5 transition-colors ${liked[i] ? "fill-red-500 text-red-500" : ""}`}
+                          className={`h-3.5 w-3.5 transition-colors ${isLiked(item.name) ? "fill-red-500 text-red-500" : ""}`}
                         />
                       </button>
                     </div>

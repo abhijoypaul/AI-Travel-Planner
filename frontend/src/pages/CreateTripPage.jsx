@@ -118,7 +118,7 @@ export function CreateTripPage() {
     destination: searchParams.get("destination") || "",
     startDate: durationDays > 0 ? today.toISOString().split("T")[0] : "",
     endDate: defaultEnd,
-    budget: parseInt(searchParams.get("budget") || "2000"),
+    budget: parseInt(searchParams.get("budget") || "0"),
     travelers: parseInt(searchParams.get("travelers") || "2"),
     travelStyle: "adventure",
     interests: [],
@@ -336,7 +336,7 @@ export function CreateTripPage() {
                               setForm({ ...form, budget: Number(e.target.value) })
                             }
                             required
-                            min={100}
+                            min={0}
                           />
                         </div>
                         <select
