@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Search,
@@ -36,12 +36,93 @@ const DESTINATIONS = [
   { name: "Patagonia, Chile", rating: "4.8", reviews: "31k", cat: "mountain", desc: "Dramatic end-of-the-world landscapes", img: "https://images.unsplash.com/photo-1501854140801-50d01698950b", trending: false },
 ];
 
+const formatReviews = (val) => {
+  if (val === undefined || val === null) return "0";
+  if (typeof val === "string" && (val.includes("k") || val.includes("m"))) return val;
+  const num = parseInt(val.toString().replace(/,/g, ""), 10);
+  if (isNaN(num)) return val.toString();
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1).replace(/\.0$/, "") + "m";
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1).replace(/\.0$/, "") + "k";
+  }
+  return num.toString();
+};
+
 export function ExplorePage() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [liked, setLiked] = useState({});
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [exploreDetails, setExploreDetails] = useState({});
 
-  const filtered = DESTINATIONS.filter((d) => {
+  // Fetch real reviews and ratings for static destinations on mount
+  useEffect(() => {
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+    DESTINATIONS.forEach((dest) => {
+      if (exploreDetails[dest.name]) return;
+      fetch(`${API_URL}/place-details?name=${encodeURIComponent(dest.name)}`)
+        .then(res => res.json())
+        .then(detailsData => {
+          if (detailsData) {
+            setExploreDetails(prev => ({
+              ...prev,
+              [dest.name]: {
+                rating: detailsData.rating,
+                reviewCount: detailsData.reviewCount
+              }
+            }));
+          }
+        })
+        .catch(err => console.error("Failed to fetch explore place details:", err));
+    });
+  }, []);
+
+  // Fetch real search results from Google Places API via backend
+  useEffect(() => {
+    if (!searchQuery.trim() || searchQuery.trim().length < 3) {
+      setSearchResults([]);
+      return;
+    }
+
+    const delayDebounce = setTimeout(() => {
+      setSearching(true);
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+      fetch(`${API_URL}/explore-search?query=${encodeURIComponent(searchQuery)}`)
+        .then(res => res.json())
+        .then(data => {
+          setSearchResults(data || []);
+        })
+        .catch(err => console.error("Explore search failed:", err))
+        .finally(() => setSearching(false));
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchQuery]);
+
+  // Dynamically add a destination card if query has no exact match in the static list
+  const trimmedQuery = searchQuery.trim();
+  const hasExactMatch = DESTINATIONS.some(
+    (d) => d.name.toLowerCase() === trimmedQuery.toLowerCase()
+  );
+
+  const dynamicDestinations = [...DESTINATIONS];
+  if (trimmedQuery.length > 2 && !hasExactMatch) {
+    dynamicDestinations.push({
+      name: trimmedQuery,
+      rating: "4.8",
+      reviews: "1,200",
+      cat: "trending",
+      desc: `Explore the attractions and culture of ${trimmedQuery}`,
+      img: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800",
+      trending: true,
+      isDynamic: true
+    });
+  }
+
+  const filtered = dynamicDestinations.filter((d) => {
     const matchesCat =
       activeCategory === "all" ||
       (activeCategory === "trending" ? d.trending : d.cat === activeCategory);
@@ -51,6 +132,10 @@ export function ExplorePage() {
       d.desc.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCat && matchesSearch;
   });
+
+  const displayedDestinations = searchQuery.trim().length >= 3 && searchResults.length > 0
+    ? searchResults
+    : filtered;
 
   return (
     <Layout>
@@ -92,66 +177,82 @@ export function ExplorePage() {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-          {filtered.map((dest, i) => (
-            <div
-              key={i}
-              className="wander-card overflow-hidden group cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
-            >
-              <div className="relative h-44 overflow-hidden">
-                <PexelsImage
-                  query={dest.name}
-                  fallbackUrl={`${dest.img}?auto=format&fit=crop&q=80&w=500`}
-                  alt={dest.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                />
-                {dest.trending && (
-                  <div className="absolute top-3 left-3 flex items-center gap-1 px-2.5 py-1 bg-[#6366f1] text-white rounded-lg text-[10px] font-bold shadow-sm">
-                    <TrendingUp className="h-3 w-3" />
-                    Trending
+        {searching ? (
+          <div className="col-span-full py-16 flex flex-col items-center justify-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
+            <p className="text-sm text-slate-505 mt-3 font-semibold">Searching the world via Google Maps...</p>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+              {displayedDestinations.map((dest, i) => {
+                const details = exploreDetails[dest.name] || {};
+                const displayRating = details.rating ? details.rating.toFixed(1) : dest.rating;
+                const displayReviews = formatReviews(details.reviewCount !== undefined ? details.reviewCount : dest.reviews);
+
+                return (
+                  <div
+                    key={i}
+                    className="wander-card overflow-hidden group cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                  >
+                    <div className="relative h-44 overflow-hidden">
+                      <PexelsImage
+                        query={dest.name}
+                        fallbackUrl={`${dest.img}?auto=format&fit=crop&q=80&w=500`}
+                        alt={dest.name}
+                        exact={true}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      />
+                      {dest.trending && (
+                        <div className="absolute top-3 left-3 flex items-center gap-1 px-2.5 py-1 bg-[#6366f1] text-white rounded-lg text-[10px] font-bold shadow-sm">
+                          <TrendingUp className="h-3 w-3" />
+                          Trending
+                        </div>
+                      )}
+                      <button
+                        className="recommended-badge"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setLiked((prev) => ({ ...prev, [i]: !prev[i] }));
+                        }}
+                      >
+                        <Heart className={`h-3.5 w-3.5 ${liked[i] ? "fill-red-500 text-red-500" : ""}`} />
+                      </button>
+                    </div>
+
+                    <div className="p-4">
+                      <h3 className="font-bold text-slate-900 text-sm mb-1 truncate">{dest.name}</h3>
+                      <div className="flex items-center gap-1 mb-2">
+                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                        <span className="text-xs font-bold text-slate-800">{displayRating}</span>
+                        <span className="text-[10px] text-slate-400">({displayReviews})</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 mb-3 truncate">{dest.desc}</p>
+                      <Link to={`/create-trip?destination=${encodeURIComponent(dest.name)}`}>
+                        <button className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl bg-indigo-50 text-indigo-600 text-xs font-bold hover:bg-indigo-100 transition-colors">
+                          <Sparkles className="h-3.5 w-3.5" />
+                          Plan Trip Here
+                        </button>
+                      </Link>
+                    </div>
                   </div>
-                )}
+                );
+              })}
+            </div>
+
+            {displayedDestinations.length === 0 && (
+              <div className="wander-card p-16 text-center">
+                <Search className="h-12 w-12 text-slate-300 mx-auto mb-3" />
+                <p className="text-slate-500 font-medium">No destinations found for "{searchQuery}"</p>
                 <button
-                  className="recommended-badge"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setLiked((prev) => ({ ...prev, [i]: !prev[i] }));
-                  }}
+                  onClick={() => { setSearchQuery(""); setActiveCategory("all"); }}
+                  className="mt-3 text-sm text-indigo-600 font-semibold hover:underline"
                 >
-                  <Heart className={`h-3.5 w-3.5 ${liked[i] ? "fill-red-500 text-red-500" : ""}`} />
+                  Clear filters
                 </button>
               </div>
-
-              <div className="p-4">
-                <h3 className="font-bold text-slate-900 text-sm mb-1 truncate">{dest.name}</h3>
-                <div className="flex items-center gap-1 mb-2">
-                  <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                  <span className="text-xs font-bold text-slate-800">{dest.rating}</span>
-                  <span className="text-[10px] text-slate-400">({dest.reviews} reviews)</span>
-                </div>
-                <p className="text-[11px] text-slate-500 mb-3 truncate">{dest.desc}</p>
-                <Link to="/create-trip">
-                  <button className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl bg-indigo-50 text-indigo-600 text-xs font-bold hover:bg-indigo-100 transition-colors">
-                    <Sparkles className="h-3.5 w-3.5" />
-                    Plan Trip Here
-                  </button>
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {filtered.length === 0 && (
-          <div className="wander-card p-16 text-center">
-            <Search className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-            <p className="text-slate-500 font-medium">No destinations found for "{searchQuery}"</p>
-            <button
-              onClick={() => { setSearchQuery(""); setActiveCategory("all"); }}
-              className="mt-3 text-sm text-indigo-600 font-semibold hover:underline"
-            >
-              Clear filters
-            </button>
-          </div>
+            )}
+          </>
         )}
       </div>
     </Layout>

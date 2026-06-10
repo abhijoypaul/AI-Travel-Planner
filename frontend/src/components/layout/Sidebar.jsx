@@ -12,6 +12,7 @@ import {
   Plus,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import logoVideo from '@/assets/logo.mp4'
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
@@ -35,15 +36,22 @@ export function Sidebar() {
     (path === '/dashboard' && location.pathname.startsWith('/trip'))
 
   return (
-    <aside className="sidebar-gradient flex h-full w-[260px] flex-col p-5 text-white/70 overflow-y-auto hide-scrollbar">
+    <aside className="sidebar-gradient flex h-screen max-h-screen w-[260px] flex-col p-5 text-white/70 overflow-y-auto custom-scrollbar">
       {/* Brand */}
       <div className="mb-8 flex items-center gap-3 px-2 pt-2">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/20 backdrop-blur-md shadow-lg">
-          <Plane className="h-5 w-5 text-white fill-white" />
+        <div className="relative flex h-10 w-10 items-center justify-center rounded-xl overflow-hidden shadow-lg">
+          <video
+            src={logoVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="h-10 w-10 object-cover"
+          />
         </div>
         <span className="text-xl font-bold tracking-normal text-white flex items-center gap-1">
-          <span>Wander</span>
-          <span className="font-light opacity-80">AI</span>
+          <span>Odyssey</span>
+          <span className="font-light opacity-80">X</span>
         </span>
       </div>
 

@@ -1,16 +1,33 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Mail, Lock, Plane } from 'lucide-react'
+import { Mail, Lock } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { authAPI } from '@/services/api'
+import logoVideo from '@/assets/logo.mp4'
+
+const BACKGROUNDS = [
+  "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80", // Maldives Beach
+  "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1920&q=80", // Lake & mountains boat
+  "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1920&q=80", // Paris Eiffel Tower
+  "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1920&q=80", // Sydney Harbour Bridge
+  "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1920&q=80"  // Amalfi Coast Positano
+];
 
 export function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [bgIndex, setBgIndex] = useState(0)
   const { login } = useAuth()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBgIndex((prev) => (prev + 1) % BACKGROUNDS.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -31,15 +48,28 @@ export function LoginPage() {
   }
 
   return (
-    <div className="auth-bg">
-      <div className="auth-card animate-fade-in-up">
+    <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden bg-slate-900">
+      {/* Background Slideshow */}
+      {BACKGROUNDS.map((bg, idx) => (
+        <div
+          key={bg}
+          className="absolute inset-0 transition-opacity duration-1000 ease-in-out bg-cover bg-center"
+          style={{
+            backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.45)), url(${bg})`,
+            opacity: idx === bgIndex ? 1 : 0,
+            zIndex: 0
+          }}
+        />
+      ))}
+
+      <div className="relative z-10 auth-card animate-fade-in-up">
         {/* Brand */}
         <div className="flex flex-col items-center mb-8">
-          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg mb-4">
-            <Plane className="h-7 w-7 text-white fill-white" />
+          <div className="h-14 w-14 rounded-2xl overflow-hidden shadow-lg mb-4">
+            <video src={logoVideo} autoPlay loop muted playsInline className="h-full w-full object-cover" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900">Welcome back</h1>
-          <p className="text-sm text-slate-500 mt-1">Sign in to your WanderAI account</p>
+          <p className="text-sm text-slate-500 mt-1">Sign in to your OdysseyX account</p>
         </div>
 
         {/* Error */}

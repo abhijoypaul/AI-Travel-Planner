@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { tripAPI } from "@/services/api";
+import { useNotification } from "@/context/NotificationContext";
 
 const TRAVEL_STYLES = [
   "adventure",
@@ -80,6 +81,24 @@ export function CreateTripPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [slideIndex, setSlideIndex] = useState(0);
+  const { addNotification } = useNotification();
+  const [selectedCurrency, setSelectedCurrency] = useState(localStorage.getItem('currency') || 'INR');
+  const currencySymbols = {
+    USD: '$',
+    EUR: '€',
+    GBP: '£',
+    JPY: '¥',
+    AUD: 'A$',
+    INR: '₹',
+    CAD: 'C$',
+    THB: '฿'
+  };
+  const currencySymbol = currencySymbols[selectedCurrency] || '₹';
+
+  const handleCurrencyChange = (newCurrency) => {
+    setSelectedCurrency(newCurrency);
+    localStorage.setItem('currency', newCurrency);
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -120,6 +139,11 @@ export function CreateTripPage() {
     setLoading(true);
     try {
       const { data } = await tripAPI.generate(form);
+      addNotification(
+        "Itinerary Generated!",
+        `AI successfully planned your trip to ${form.destination}.`,
+        "success"
+      );
       navigate(`/trip/${data._id}`);
     } catch (err) {
       setError(
@@ -132,22 +156,55 @@ export function CreateTripPage() {
   };
 
   if (loading) {
+    const loaderStyles = `
+      @keyframes infiniteLoading {
+        0% { transform: translateX(-100%) scaleX(0.5); }
+        50% { transform: translateX(0%) scaleX(1); }
+        100% { transform: translateX(100%) scaleX(0.5); }
+      }
+      .animate-infinite-loading {
+        animation: infiniteLoading 2.2s infinite ease-in-out;
+        width: 100%;
+        transform-origin: left;
+      }
+    `;
+
     return (
       <Layout>
-        <div className="flex flex-col items-center justify-center py-24 text-center animate-fade-in-up">
-          <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg mb-6">
-            <Sparkles className="h-8 w-8 text-white animate-pulse" />
+        <style>{loaderStyles}</style>
+        <div className="flex flex-col items-center justify-center py-28 text-center max-w-lg mx-auto animate-fade-in-up">
+          {/* Animated Floating Plane with glowing path */}
+          <div className="relative w-40 h-40 mb-8 flex items-center justify-center">
+            {/* Pulsing outer glow */}
+            <div className="absolute inset-0 rounded-full bg-indigo-500/10 animate-ping" style={{ animationDuration: '3s' }} />
+            {/* Pulsing intermediate ring */}
+            <div className="absolute w-32 h-32 rounded-full border border-indigo-200/50 border-dashed animate-spin" style={{ animationDuration: '15s' }} />
+            {/* Rotating inner ring */}
+            <div className="absolute w-24 h-24 rounded-full border-2 border-dashed border-violet-500/40 animate-spin" style={{ animationDuration: '8s', animationDirection: 'reverse' }} />
+            
+            {/* Core Glowing Card */}
+            <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-xl shadow-indigo-500/30">
+              <Plane className="h-7 w-7 text-white animate-bounce" style={{ animationDuration: '2s' }} />
+            </div>
+
+            {/* Small floating sparkles around */}
+            <Sparkles className="absolute top-4 right-4 h-5 w-5 text-amber-400 animate-pulse" />
+            <Sparkles className="absolute bottom-6 left-2 h-4 w-4 text-cyan-400 animate-pulse" style={{ animationDelay: '0.5s' }} />
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">
+
+          {/* Loading Title */}
+          <h2 className="text-2xl font-extrabold text-slate-900 mb-2 tracking-tight">
             AI is crafting your itinerary…
           </h2>
-          <p className="text-slate-500 mb-10">
-            Finding attractions and optimizing routes
+          <p className="text-sm text-slate-500 font-semibold h-6 flex items-center justify-center">
+            <span className="animate-pulse text-indigo-600 font-bold">
+              Finding attractions and optimizing routes
+            </span>
           </p>
-          <div className="w-full max-w-sm space-y-3">
-            <Skeleton className="h-4 w-full rounded-full" />
-            <Skeleton className="h-4 w-4/5 rounded-full mx-auto" />
-            <Skeleton className="h-4 w-3/5 rounded-full mx-auto" />
+
+          {/* Premium Loading Progress Bar */}
+          <div className="w-64 mt-8 h-1.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200/60 p-0.5">
+            <div className="h-full rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-infinite-loading" />
           </div>
         </div>
       </Layout>
@@ -263,21 +320,39 @@ export function CreateTripPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
                       <Label className="text-sm font-semibold text-slate-700 mb-2 block">
-                        Budget ($)
+                        Budget ({currencySymbol})
                       </Label>
-                      <div className="relative">
-                        <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-400" />
-                        <input
-                          id="budget"
-                          type="number"
-                          className="input-field pl-11"
-                          value={form.budget}
-                          onChange={(e) =>
-                            setForm({ ...form, budget: Number(e.target.value) })
-                          }
-                          required
-                          min={100}
-                        />
+                      <div className="relative flex gap-2">
+                        <div className="relative flex-1">
+                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-extrabold text-indigo-400">
+                            {currencySymbol}
+                          </span>
+                          <input
+                            id="budget"
+                            type="number"
+                            className="input-field pl-11"
+                            value={form.budget}
+                            onChange={(e) =>
+                              setForm({ ...form, budget: Number(e.target.value) })
+                            }
+                            required
+                            min={100}
+                          />
+                        </div>
+                        <select
+                          className="rounded-xl border border-slate-250 bg-white px-3 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/25 cursor-pointer"
+                          value={selectedCurrency}
+                          onChange={(e) => handleCurrencyChange(e.target.value)}
+                        >
+                          <option value="INR">INR (₹)</option>
+                          <option value="USD">USD ($)</option>
+                          <option value="EUR">EUR (€)</option>
+                          <option value="GBP">GBP (£)</option>
+                          <option value="JPY">JPY (¥)</option>
+                          <option value="AUD">AUD (A$)</option>
+                          <option value="CAD">CAD (C$)</option>
+                          <option value="THB">THB (฿)</option>
+                        </select>
                       </div>
                     </div>
                     <div>

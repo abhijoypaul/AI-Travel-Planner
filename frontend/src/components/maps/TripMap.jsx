@@ -61,6 +61,11 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
 
   // Build the map once when trip changes
   useEffect(() => {
+    window.gm_authFailure = () => {
+      setMapError(true)
+      setLoading(false)
+    }
+
     if (!MAPS_KEY) {
       setMapError(true)
       setLoading(false)
@@ -215,9 +220,13 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
     mapInstance.current.setZoom(16)
   }, [selectedLocation])
 
-  // Fallback when no API key
+  // Fallback when no API key or map error
   if (mapError || !MAPS_KEY) {
     const locations = getAllLocations()
+    const errorMessage = !MAPS_KEY 
+      ? "Add VITE_GOOGLE_MAPS_API_KEY to enable interactive maps"
+      : "Google Maps authentication failed. Please verify that your billing account is active, all required APIs (Maps JS, Places, Directions, Geocoding) are enabled, and there are no restrictive credentials constraints in the Google Cloud Console.";
+
     return (
       <div
         className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/20 bg-white/5 ${className}`}
@@ -225,8 +234,8 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
       >
         <MapPin className="h-12 w-12 text-slate-400 mb-3" />
         <p className="font-medium text-slate-300">Map Preview</p>
-        <p className="text-sm text-slate-500 mt-1 px-4 text-center">
-          Add VITE_GOOGLE_MAPS_API_KEY to enable interactive maps
+        <p className="text-sm text-red-400 mt-1 px-6 text-center leading-relaxed">
+          {errorMessage}
         </p>
         <div className="mt-4 grid gap-2 w-full max-w-sm px-4">
           {locations.slice(0, 5).map((loc, i) => (

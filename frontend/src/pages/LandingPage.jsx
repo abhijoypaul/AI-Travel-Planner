@@ -66,7 +66,7 @@ export function LandingPage() {
               <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">effortlessly.</span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-base sm:text-lg leading-relaxed text-slate-300 drop-shadow-sm font-medium">
-              VoyagerAI organizes your itinerary, maps your routes, and keeps every detail
+              OdysseyX organizes your itinerary, maps your routes, and keeps every detail
               in one calm, intelligent workspace — so you can focus on the journey.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -94,7 +94,7 @@ export function LandingPage() {
               {[
                 { title: "Mount Fuji, Japan", url: "https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&q=80&w=800", desc: "Majestic volcanic peak" },
                 { title: "Northern Lights, Iceland", url: "https://images.unsplash.com/photo-1579033461380-adb47c3eb938?auto=format&fit=crop&q=80&w=800", desc: "Dancing aurora borealis" },
-                { title: "Al Khazneh, Petra", url: "https://images.unsplash.com/photo-1589825693876-e5f0f585d87a?auto=format&fit=crop&q=80&w=800", desc: "Ancient rose-red city" },
+                { title: "Al Khazneh, Petra", url: "https://images.unsplash.com/photo-1580674684081-7617fbf3d745?auto=format&fit=crop&q=80&w=800", desc: "Ancient rose-red city" },
                 { title: "Machu Picchu, Peru", url: "https://images.unsplash.com/photo-1526392060635-9d6019884377?auto=format&fit=crop&q=80&w=800", desc: "Historic Incan citadel" }
               ].map((place, idx) => (
                 <div key={idx} className="relative group h-64 overflow-hidden rounded-2xl border border-white/10 shadow-md">
@@ -187,7 +187,7 @@ export function LandingPage() {
 
         <footer className="relative border-t border-white/5 py-10 bg-slate-950/80">
           <div className="page-container text-center text-xs text-slate-450 font-medium">
-            © {new Date().getFullYear()} VoyagerAI. All rights reserved.
+            © {new Date().getFullYear()} OdysseyX. All rights reserved.
           </div>
         </footer>
       </div>

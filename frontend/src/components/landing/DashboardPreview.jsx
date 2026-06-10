@@ -14,8 +14,8 @@ export function DashboardPreview() {
               <Plane className="h-4 w-4 text-cyan-400" />
             </span>
             <span className="text-sm font-bold tracking-normal text-white flex items-center gap-0.5">
-              <span>Voyager</span>
-              <span className="font-light opacity-80">AI</span>
+              <span>Odyssey</span>
+              <span className="font-light opacity-80">X</span>
             </span>
           </div>
           <nav className="space-y-1 text-sm">

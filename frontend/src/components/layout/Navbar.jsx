@@ -1,14 +1,15 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { Orbit, Menu, X, LogOut } from 'lucide-react'
+import { Menu, X, LogOut } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { Button } from '@/components/ui/button'
+import logoVideo from '@/assets/logo.mp4'
 
 const PUBLIC_LINKS = [
   { href: '#how-it-works', label: 'How It Works' },
   { href: '#features', label: 'Core Intelligence' },
   { href: '#designed-for', label: 'Designed For' },
-  { href: '#why-voyager', label: 'Why VoyagerAI' },
+  { href: '#why-voyager', label: 'Why OdysseyX' },
 ]
 
 export function Navbar() {
@@ -25,25 +26,30 @@ export function Navbar() {
 
   const appLinks = user
     ? [
-        { to: '/dashboard', label: 'Dashboard' },
-        { to: '/create-trip', label: 'Plan Trip' },
-        { to: '/profile', label: 'Profile' },
-      ]
+      { to: '/dashboard', label: 'Dashboard' },
+      { to: '/create-trip', label: 'Plan Trip' },
+      { to: '/profile', label: 'Profile' },
+    ]
     : []
 
   return (
     <nav className="sticky top-0 z-50 glass-nav">
       <div className="page-container flex h-16 items-center justify-between gap-4">
         <Link to="/" className="group flex shrink-0 items-center gap-2.5">
-          <span className="relative flex h-9 w-9 items-center justify-center">
+          <span className="relative flex h-10 w-10 items-center justify-center">
             <span className="absolute inset-0 rounded-full bg-cyan-400/20 blur-md glow-pulse" />
-            <span className="relative flex h-9 w-9 items-center justify-center rounded-full border border-cyan-500/40 bg-cyan-500/10 text-cyan-400">
-              <Orbit className="h-5 w-5" />
-            </span>
+            <video
+              src={logoVideo}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="relative h-10 w-10 rounded-full object-cover border border-cyan-500/40"
+            />
           </span>
           <span className="text-lg font-bold tracking-normal text-white flex items-center gap-1">
-            <span>Voyager</span>
-            <span className="text-cyan-400 font-light">AI</span>
+            <span>Odyssey</span>
+            <span className="text-cyan-400 font-light">X</span>
           </span>
         </Link>
 

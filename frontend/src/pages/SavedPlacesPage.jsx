@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Bookmark,
@@ -19,7 +19,7 @@ const SAVED_PLACES = [
   { id: 1, name: "Eiffel Tower", location: "Paris, France", cat: "Attractions", rating: "4.8", reviews: "32k", img: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f", note: "Visit at sunset for best photos" },
   { id: 2, name: "Le Jules Verne", location: "Paris, France", cat: "Restaurants", rating: "4.6", reviews: "2.1k", img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4", note: "Book 2 weeks in advance" },
   { id: 3, name: "Hôtel Plaza Athénée", location: "Paris, France", cat: "Hotels", rating: "4.9", reviews: "8.4k", img: "https://images.unsplash.com/photo-1582719508461-905c673771fd", note: "Eiffel Tower view rooms available" },
-  { id: 4, name: "Louvre Museum", location: "Paris, France", cat: "Attractions", rating: "4.7", reviews: "28k", img: "https://images.unsplash.com/photo-1597910037318-f7d1141818e8", note: "Book skip-the-line tickets" },
+  { id: 4, name: "Louvre Museum", location: "Paris, France", cat: "Attractions", rating: "4.7", reviews: "28k", img: "https://images.unsplash.com/photo-1503152394-c571994fd383", note: "Book skip-the-line tickets" },
   { id: 5, name: "Seine River Cruise", location: "Paris, France", cat: "Experiences", rating: "4.9", reviews: "15k", img: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a", note: "Evening cruise is magical" },
   { id: 6, name: "Montmartre Walking Tour", location: "Paris, France", cat: "Experiences", rating: "4.8", reviews: "6.2k", img: "https://images.unsplash.com/photo-1554939437-ecc492c67b78", note: "Go early morning for fewer crowds" },
 ];
@@ -31,9 +31,45 @@ const CAT_COLORS = {
   Experiences: { bg: "bg-emerald-50", text: "text-emerald-600" },
 };
 
+const formatReviews = (val) => {
+  if (val === undefined || val === null) return "0";
+  if (typeof val === "string" && (val.includes("k") || val.includes("m"))) return val;
+  const num = parseInt(val.toString().replace(/,/g, ""), 10);
+  if (isNaN(num)) return val.toString();
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1).replace(/\.0$/, "") + "m";
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1).replace(/\.0$/, "") + "k";
+  }
+  return num.toString();
+};
+
 export function SavedPlacesPage() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [saved, setSaved] = useState(SAVED_PLACES);
+  const [savedDetails, setSavedDetails] = useState({});
+
+  useEffect(() => {
+    // Fetch real place details from backend on mount
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+    saved.forEach((place) => {
+      fetch(`${API_URL}/place-details?name=${encodeURIComponent(place.name)}`)
+        .then(res => res.json())
+        .then(detailsData => {
+          if (detailsData) {
+            setSavedDetails(prev => ({
+              ...prev,
+              [place.name]: {
+                rating: detailsData.rating,
+                reviewCount: detailsData.reviewCount
+              }
+            }));
+          }
+        })
+        .catch(err => console.error("Failed to fetch saved place details:", err));
+    });
+  }, []);
 
   const filtered =
     activeCategory === "All"
@@ -104,6 +140,7 @@ export function SavedPlacesPage() {
                       query={place.name}
                       fallbackUrl={`${place.img}?auto=format&fit=crop&q=80&w=500`}
                       alt={place.name}
+                      exact={true}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                     <button
@@ -127,8 +164,17 @@ export function SavedPlacesPage() {
                     </div>
                     <div className="flex items-center gap-1 mb-3">
                       <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                      <span className="text-xs font-bold text-slate-800">{place.rating}</span>
-                      <span className="text-[10px] text-slate-400">({place.reviews})</span>
+                      {(() => {
+                        const details = savedDetails[place.name] || {};
+                        const displayRating = details.rating ? details.rating.toFixed(1) : place.rating;
+                        const displayReviews = details.reviewCount !== undefined ? formatReviews(details.reviewCount) : place.reviews;
+                        return (
+                          <>
+                            <span className="text-xs font-bold text-slate-800">{displayRating}</span>
+                            <span className="text-[10px] text-slate-400">({displayReviews})</span>
+                          </>
+                        );
+                      })()}
                     </div>
                     {place.note && (
                       <div className="flex items-start gap-2 p-2.5 rounded-xl bg-indigo-50 border border-indigo-100">

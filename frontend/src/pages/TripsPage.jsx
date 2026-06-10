@@ -13,6 +13,7 @@ import { Layout } from "@/components/layout/Layout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { tripAPI } from "@/services/api";
 import { formatDate } from "@/lib/utils";
+import { useNotification } from "@/context/NotificationContext";
 
 const STYLE_COLORS = {
   adventure: { bg: "bg-orange-50", text: "text-orange-600", dot: "bg-orange-400" },
@@ -27,6 +28,7 @@ const STYLE_COLORS = {
 export function TripsPage() {
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { addNotification } = useNotification();
 
   useEffect(() => {
     tripAPI.getAll()
@@ -36,9 +38,19 @@ export function TripsPage() {
   }, []);
 
   const handleDelete = async (id) => {
+    const trip = trips.find((t) => t._id === id);
     if (!confirm("Delete this trip?")) return;
-    await tripAPI.delete(id);
-    setTrips((prev) => prev.filter((t) => t._id !== id));
+    try {
+      await tripAPI.delete(id);
+      setTrips((prev) => prev.filter((t) => t._id !== id));
+      addNotification(
+        "Trip Deleted",
+        `Your trip to ${trip?.destination || "Destination"} has been successfully deleted.`,
+        "info"
+      );
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (

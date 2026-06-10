@@ -10,9 +10,17 @@ const buildPrompt = ({ destination, startDate, endDate, travelers, budget, inter
   return `Create a highly customized, realistic day-by-day travel plan for ${destination} from ${startDate} to ${endDate}.
   Travel details:
   - Travelers: ${travelers}
-  - Total Budget: $${budget}
+  - Total Budget limit / target: $${budget}
   - Travel Style: ${travelStyle || 'adventure'}
   - Core Interests: ${interestList}
+
+  CRITICAL PRICING & COST GUIDELINES:
+  1. Generate highly realistic, authentic costs for that specific destination and travel style (Luxury, Budget, Adventure, Family, Solo, Romantic) in USD.
+  2. The costs of attractions, restaurants, and hotels MUST reflect real-world prices. For example:
+     - Lodging: Budget ($30-$80/night), Standard/Adventure ($100-$250/night), Luxury ($350-$1200/night).
+     - Restaurants: Budget ($10-$25/meal), Standard ($25-$60/meal), Luxury ($80-$250+/meal).
+     - Transport: Include realistic local taxis, trains, flights, or rental car costs.
+  3. If the destination's realistic cost for this trip is LOWER than the user's maximum budget limit ($${budget}), do NOT artificially inflate the costs to match the budget. Instead, estimate the genuine realistic cost and output it in estimatedBudget.total. This will show the traveler their potential savings!
 
   CRITICAL: You must generate a distinct entries array block for EVERY single day between ${startDate} and ${endDate}. Do not hardcode a single day. Map real points of interest, authentic dining options, and actual pricing options specific to ${destination}.
 
@@ -20,7 +28,7 @@ const buildPrompt = ({ destination, startDate, endDate, travelers, budget, inter
   {
     "destination": "${destination}",
     "estimatedBudget": { 
-      "total": ${budget}, 
+      "total": number, 
       "breakdown": { "accommodation": number, "food": number, "activities": number, "transport": number } 
     },
     "travelTips": ["Dynamic tip 1 specific to area", "Dynamic tip 2"],

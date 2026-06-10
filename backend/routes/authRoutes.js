@@ -85,4 +85,41 @@ router.put('/profile', protect, async (req, res) => {
   res.json(req.user);
 });
 
+router.put('/update-password', protect, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ message: 'Current password and new password are required' });
+  }
+
+  const user = await User.findById(req.user._id).select('+password');
+  
+  if (!user.password) {
+    return res.status(400).json({ message: 'Google sign-in users do not have a password' });
+  }
+
+  const isMatch = await user.matchPassword(currentPassword);
+  if (!isMatch) {
+    return res.status(400).json({ message: 'Current password is incorrect' });
+  }
+
+  if (newPassword.length < 6) {
+    return res.status(400).json({ message: 'New password must be at least 6 characters' });
+  }
+
+  user.password = newPassword;
+  await user.save();
+
+  res.json({ message: 'Password updated successfully' });
+});
+
+router.put('/toggle-2fa', protect, async (req, res) => {
+  const { enable } = req.body;
+  
+  req.user.settings.twoFactorEnabled = !!enable;
+  await req.user.save();
+
+  res.json(req.user);
+});
+
 export default router;

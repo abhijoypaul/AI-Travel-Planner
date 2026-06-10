@@ -10,14 +10,14 @@ import { generateTripPDF } from '../services/pdfService.js';
 
 const router = express.Router();
 
-const enrichItineraryWithCoords = async (itinerary) => {
+const enrichItineraryWithCoords = async (itinerary, coords, destination) => {
   const enriched = [];
   for (const day of itinerary) {
     enriched.push({
       ...day,
-      attractions: await geocodeLocations(day.attractions || []),
-      restaurants: await geocodeLocations(day.restaurants || []),
-      hotels: await geocodeLocations(day.hotels || []),
+      attractions: await geocodeLocations(day.attractions || [], coords, destination),
+      restaurants: await geocodeLocations(day.restaurants || [], coords, destination),
+      hotels: await geocodeLocations(day.hotels || [], coords, destination),
     });
   }
   return enriched;
@@ -51,7 +51,7 @@ router.post('/generate', protect, async (req, res) => {
     const recommendations = await getRecommendations(destination, coords);
     const weather = await getWeatherForecast(coords.lat, coords.lng);
 
-    const itinerary = await enrichItineraryWithCoords(aiResult.days || []);
+    const itinerary = await enrichItineraryWithCoords(aiResult.days || [], coords, destination);
     const waypoints = collectWaypoints(itinerary);
 
     let routePolyline = '';
@@ -70,9 +70,9 @@ router.post('/generate', protect, async (req, res) => {
       travelStyle,
       interests,
       itinerary,
-      recommendedAttractions: mergeAIWithPlaces(aiResult.recommendedAttractions || [], recommendations.attractions),
-      recommendedRestaurants: mergeAIWithPlaces(aiResult.recommendedRestaurants || [], recommendations.restaurants),
-      recommendedHotels: mergeAIWithPlaces(aiResult.recommendedHotels || [], recommendations.hotels),
+      recommendedAttractions: mergeAIWithPlaces(aiResult.recommendedAttractions || [], recommendations.attractions, 'attraction'),
+      recommendedRestaurants: mergeAIWithPlaces(aiResult.recommendedRestaurants || [], recommendations.restaurants, 'restaurant'),
+      recommendedHotels: mergeAIWithPlaces(aiResult.recommendedHotels || [], recommendations.hotels, 'hotel'),
       estimatedBudget: aiResult.estimatedBudget,
       coordinates: coords,
       routePolyline,
@@ -156,9 +156,17 @@ router.patch('/:id/checklist/:itemId', protect, async (req, res) => {
 });
 
 router.get('/:id/pdf', protect, async (req, res) => {
-  const trip = await Trip.findOne({ _id: req.params.id, userId: req.user._id });
-  if (!trip) return res.status(404).json({ message: 'Trip not found' });
-  generateTripPDF(trip, res);
+  try {
+    const trip = await Trip.findOne({ _id: req.params.id, userId: req.user._id });
+    if (!trip) return res.status(404).json({ message: 'Trip not found' });
+    const currency = req.query.currency || req.user.settings?.currency || 'USD';
+    await generateTripPDF(trip, res, currency);
+  } catch (error) {
+    console.error('PDF generation error:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ message: 'Failed to generate PDF' });
+    }
+  }
 });
 
 router.post('/:id/chat', protect, async (req, res) => {

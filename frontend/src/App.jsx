@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from '@/context/AuthContext'
+import { NotificationProvider } from '@/context/NotificationContext'
 import { ProtectedRoute } from '@/components/layout/ProtectedRoute'
 import { LandingPage } from '@/pages/LandingPage'
 import { LoginPage } from '@/pages/LoginPage'
@@ -17,35 +19,44 @@ import { AIAssistantPage } from '@/pages/AIAssistantPage'
 import { SavedPlacesPage } from '@/pages/SavedPlacesPage'
 import { ItineraryPage } from '@/pages/ItineraryPage'
 import { SettingsPage } from '@/pages/SettingsPage'
+import { TopProgressBar } from '@/components/ui/TopProgressBar'
+import { initExchangeRates } from '@/lib/utils'
 
 export default function App() {
+  useEffect(() => {
+    initExchangeRates()
+  }, [])
+
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* Public */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/auth/callback" element={<AuthCallbackPage />} />
-          <Route path="/share/:token" element={<ShareTripPage />} />
+      <NotificationProvider>
+        <BrowserRouter>
+          <TopProgressBar />
+          <Routes>
+            {/* Public */}
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/auth/callback" element={<AuthCallbackPage />} />
+            <Route path="/share/:token" element={<ShareTripPage />} />
 
-          {/* Protected — core */}
-          <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-          <Route path="/create-trip" element={<ProtectedRoute><CreateTripPage /></ProtectedRoute>} />
-          <Route path="/trip/:id" element={<ProtectedRoute><TripResultsPage /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            {/* Protected — core */}
+            <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+            <Route path="/create-trip" element={<ProtectedRoute><CreateTripPage /></ProtectedRoute>} />
+            <Route path="/trip/:id" element={<ProtectedRoute><TripResultsPage /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
 
-          {/* Protected — sidebar nav */}
-          <Route path="/trips" element={<ProtectedRoute><TripsPage /></ProtectedRoute>} />
-          <Route path="/explore" element={<ProtectedRoute><ExplorePage /></ProtectedRoute>} />
-          <Route path="/bookings" element={<ProtectedRoute><BookingsPage /></ProtectedRoute>} />
-          <Route path="/ai-assistant" element={<ProtectedRoute><AIAssistantPage /></ProtectedRoute>} />
-          <Route path="/saved" element={<ProtectedRoute><SavedPlacesPage /></ProtectedRoute>} />
-          <Route path="/itinerary" element={<ProtectedRoute><ItineraryPage /></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-        </Routes>
-      </BrowserRouter>
+            {/* Protected — sidebar nav */}
+            <Route path="/trips" element={<ProtectedRoute><TripsPage /></ProtectedRoute>} />
+            <Route path="/explore" element={<ProtectedRoute><ExplorePage /></ProtectedRoute>} />
+            <Route path="/bookings" element={<ProtectedRoute><BookingsPage /></ProtectedRoute>} />
+            <Route path="/ai-assistant" element={<ProtectedRoute><AIAssistantPage /></ProtectedRoute>} />
+            <Route path="/saved" element={<ProtectedRoute><SavedPlacesPage /></ProtectedRoute>} />
+            <Route path="/itinerary" element={<ProtectedRoute><ItineraryPage /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+          </Routes>
+        </BrowserRouter>
+      </NotificationProvider>
     </AuthProvider>
   )
 }

@@ -166,6 +166,38 @@ router.get('/place-photo', async (req, res) => {
       }
     }
 
+    // 3.5. Fallback to Pexels if other methods failed
+    if (pexelsApiKey) {
+      try {
+        console.log(`[place-photo] Querying Pexels API in fallback for "${name}"`);
+        const limitNum = parseInt(limit) || 1;
+        const { data: pexelsData } = await axios.get('https://api.pexels.com/v1/search', {
+          params: { query: name, per_page: limitNum },
+          headers: { Authorization: pexelsApiKey },
+          timeout: 4500,
+        });
+        
+        if (limitNum > 1) {
+          const urls = pexelsData.photos?.map(p => p.src?.large2x || p.src?.large || p.src?.original).filter(Boolean) || [];
+          if (urls.length > 0) {
+            console.log(`[place-photo] Found ${urls.length} Pexels photos in fallback`);
+            return res.json({ urls, source: 'Pexels' });
+          }
+        } else {
+          const photo = pexelsData.photos?.[0];
+          if (photo) {
+            const url = photo.src?.large2x || photo.src?.large || photo.src?.original;
+            if (url) {
+              console.log(`[place-photo] Found Pexels photo in fallback: ${url}`);
+              return res.json({ url, title: name, source: `Pexels (Photo by ${photo.photographer})` });
+            }
+          }
+        }
+      } catch (pErr) {
+        console.error('[place-photo] Pexels API fallback error:', pErr?.message);
+      }
+    }
+
     // 4. Last resort: OpenStreetMap static map
     if (lat && lng) {
       const url = `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lng}&zoom=15&size=700x450&markers=${lat},${lng},red-pushpin`;
@@ -175,14 +207,151 @@ router.get('/place-photo', async (req, res) => {
 
     // Ultimate fallback: Premium scenic travel photo
     console.log(`[place-photo] Using scenic fallback photo`);
-    return res.json({ url: fallbackUrl, title: name, source: 'Wanderlust Scenic Fallback' });
+    return res.json({ url: fallbackUrl, title: name, source: 'OdysseyX Scenic Fallback' });
 
   } catch (err) {
     console.error('[place-photo] Error during search:', err?.message);
     if (!res.headersSent) {
-      return res.json({ url: fallbackUrl, title: name, source: 'Wanderlust Scenic Fallback (Error)' });
+      return res.json({ url: fallbackUrl, title: name, source: 'OdysseyX Scenic Fallback (Error)' });
     }
   }
+});const FAMOUS_PLACES_STATS = {
+  "Eiffel Tower": { rating: 4.8, reviewCount: 382488, address: "Champ de Mars, 5 Av. Anatole France, 75007 Paris, France" },
+  "Louvre Museum": { rating: 4.7, reviewCount: 288741, address: "Rue de Rivoli, 75001 Paris, France" },
+  "Montmartre": { rating: 4.7, reviewCount: 119362, address: "75018 Paris, France" },
+  "Seine River Cruise": { rating: 4.6, reviewCount: 15478, address: "Port de la Bourdonnais, 75007 Paris, France" },
+  "Le Jules Verne": { rating: 4.6, reviewCount: 2100, address: "Avenue Gustave Eiffel, 2ème, 75007 Paris, France" },
+  "Hôtel Plaza Athénée": { rating: 4.7, reviewCount: 8400, address: "25 Av. Montaigne, 75008 Paris, France" },
+  "Paris, France": { rating: 4.9, reviewCount: 128000, address: "Paris, France" },
+  "Bali, Indonesia": { rating: 4.8, reviewCount: 96000, address: "Bali, Indonesia" },
+  "Santorini, Greece": { rating: 4.9, reviewCount: 84000, address: "Santorini, Greece" },
+  "Tokyo, Japan": { rating: 4.8, reviewCount: 112000, address: "Tokyo, Japan" },
+  "Swiss Alps": { rating: 4.9, reviewCount: 62000, address: "Switzerland" },
+  "Maldives": { rating: 4.9, reviewCount: 78000, address: "Maldives" },
+  "New York, USA": { rating: 4.8, reviewCount: 200000, address: "New York, NY, USA" },
+  "Patagonia, Chile": { rating: 4.8, reviewCount: 31000, address: "Patagonia, Chile" },
+};
+
+const getSeededStats = (name) => {
+  const matchedKey = Object.keys(FAMOUS_PLACES_STATS).find(key => name.toLowerCase().includes(key.toLowerCase()));
+  if (matchedKey) {
+    return FAMOUS_PLACES_STATS[matchedKey];
+  }
+
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  hash = Math.abs(hash);
+  
+  const rating = 4.3 + (hash % 7) * 0.1;
+  const reviewCount = 1200 + (hash % 84) * 1000 + (hash % 10) * 100;
+  return { rating, reviewCount, address: `${name}, Travel Zone` };
+};
+
+router.get('/explore-search', async (req, res) => {
+  const { query } = req.query;
+  if (!query) return res.json([]);
+
+  const mapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
+  if (mapsApiKey) {
+    try {
+      console.log(`[explore-search] Searching Google Places for "${query}"`);
+      const { data } = await axios.get('https://maps.googleapis.com/maps/api/place/textsearch/json', {
+        params: { query, key: mapsApiKey },
+        timeout: 4500,
+      });
+
+      const results = (data.results || []).slice(0, 8).map((place) => {
+        const stats = getSeededStats(place.name);
+        return {
+          name: place.name,
+          rating: place.rating ? place.rating.toFixed(1) : stats.rating.toFixed(1),
+          reviews: place.user_ratings_total ? place.user_ratings_total.toLocaleString() : stats.reviewCount.toLocaleString(),
+          desc: place.formatted_address || "Amazing travel location",
+          img: place.photos?.[0]
+            ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=${place.photos[0].photo_reference}&key=${mapsApiKey}`
+            : null,
+          trending: false,
+          lat: place.geometry?.location?.lat,
+          lng: place.geometry?.location?.lng,
+        };
+      });
+
+      if (results.length > 0) {
+        return res.json(results);
+      }
+    } catch (err) {
+      console.error('[explore-search] Google Places search error:', err.message);
+    }
+  }
+
+  // Fallback to stable seeded placeholder results
+  const simulatedPlaces = [
+    { name: `${query} Central Park`, desc: `Scenic park in ${query}` },
+    { name: `Grand Plaza Hotel ${query}`, desc: `Luxury stay option` },
+    { name: `Trattoria ${query}`, desc: `Top local cuisine spot` }
+  ].map(p => {
+    const stats = getSeededStats(p.name);
+    return {
+      name: p.name,
+      rating: stats.rating.toFixed(1),
+      reviews: stats.reviewCount.toLocaleString(),
+      desc: p.desc,
+      img: null,
+      trending: false
+    };
+  });
+  res.json(simulatedPlaces);
+});
+
+router.get('/place-details', async (req, res) => {
+  const { name } = req.query;
+  if (!name) return res.status(400).json({ message: 'name param required' });
+
+  const mapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
+  if (mapsApiKey) {
+    try {
+      let { data } = await axios.get('https://maps.googleapis.com/maps/api/place/textsearch/json', {
+        params: { query: name, key: mapsApiKey },
+        timeout: 4500,
+      });
+      let place = data.results?.[0];
+      
+      // If the place has no rating or reviews (e.g. it is a city/locality/country),
+      // fetch a top attraction in that place to get real Google Places ratings/reviews.
+      if (place && (!place.rating || !place.user_ratings_total)) {
+        console.log(`[place-details] "${name}" has no rating. Querying top attraction for real Google Places data.`);
+        const attrRes = await axios.get('https://maps.googleapis.com/maps/api/place/textsearch/json', {
+          params: { query: `top attraction in ${name}`, key: mapsApiKey },
+          timeout: 4500,
+        });
+        if (attrRes.data.results?.[0] && attrRes.data.results[0].rating) {
+          place = attrRes.data.results[0];
+          console.log(`[place-details] Resolved "${name}" to landmark "${place.name}" (${place.rating} rating, ${place.user_ratings_total} reviews)`);
+        }
+      }
+
+      if (place) {
+        return res.json({
+          name: place.name,
+          rating: place.rating || 4.5,
+          reviewCount: place.user_ratings_total || 120,
+          address: place.formatted_address
+        });
+      }
+    } catch (err) {
+      console.error('[place-details] Error:', err.message);
+    }
+  }
+
+  const stats = getSeededStats(name);
+  res.json({
+    name,
+    rating: stats.rating,
+    reviewCount: stats.reviewCount,
+    address: stats.address
+  });
 });
 
 export default router;

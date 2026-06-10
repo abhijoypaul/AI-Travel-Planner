@@ -13,6 +13,66 @@ export function formatDate(date) {
   })
 }
 
-export function formatCurrency(amount, currency = 'USD') {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount || 0)
+const FALLBACK_RATES = {
+  USD: 1.0,
+  EUR: 0.92,
+  GBP: 0.79,
+  JPY: 156.0,
+  AUD: 1.51,
+  INR: 83.5,
+  CAD: 1.37,
+  THB: 36.5
+};
+
+export async function initExchangeRates() {
+  try {
+    const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.rates) {
+        localStorage.setItem('usd_exchange_rates', JSON.stringify(data.rates));
+        window.EXCHANGE_RATES = data.rates;
+        return;
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to fetch real-time exchange rates, using cache/fallbacks', err);
+  }
+  // Try loading from localStorage cache
+  try {
+    const cached = localStorage.getItem('usd_exchange_rates');
+    if (cached) {
+      window.EXCHANGE_RATES = JSON.parse(cached);
+      return;
+    }
+  } catch {}
+  window.EXCHANGE_RATES = FALLBACK_RATES;
+}
+
+export function formatCurrency(amount, currency) {
+  const selectedCurrency = currency || localStorage.getItem('currency') || 'INR';
+  
+  let convertedAmount = amount || 0;
+  
+  // Convert from USD to the selectedCurrency
+  const rates = window.EXCHANGE_RATES || JSON.parse(localStorage.getItem('usd_exchange_rates') || 'null') || FALLBACK_RATES;
+  const rate = rates[selectedCurrency];
+  if (rate) {
+    convertedAmount = (amount || 0) * rate;
+  }
+
+  // Format currency with proper locale
+  const localeMap = {
+    USD: 'en-US',
+    EUR: 'de-DE',
+    GBP: 'en-GB',
+    JPY: 'ja-JP',
+    AUD: 'en-AU',
+    INR: 'en-IN',
+    CAD: 'en-CA',
+    THB: 'th-TH'
+  };
+  const locale = localeMap[selectedCurrency] || 'en-US';
+
+  return new Intl.NumberFormat(locale, { style: 'currency', currency: selectedCurrency }).format(convertedAmount);
 }

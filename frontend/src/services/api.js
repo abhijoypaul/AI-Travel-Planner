@@ -32,6 +32,8 @@ export const authAPI = {
   login: (data) => api.post('/auth/login', data),
   me: () => api.get('/auth/me'),
   updateProfile: (data) => api.put('/auth/profile', data),
+  updatePassword: (data) => api.put('/auth/update-password', data),
+  toggle2FA: (data) => api.put('/auth/toggle-2fa', data),
   googleUrl: () => {
     if (API_URL.startsWith('http')) {
       return `${API_URL.replace(/\/api\/?$/, '')}/api/auth/google`
@@ -53,7 +55,10 @@ export const tripAPI = {
   chat: (id, message) => api.post(`/trips/${id}/chat`, { message }),
   nearby: (id) => api.get(`/trips/${id}/nearby`),
   getRoute: (id) => api.post(`/trips/${id}/route`),
-  downloadPDF: (id) => api.get(`/trips/${id}/pdf`, { responseType: 'blob' }),
+  downloadPDF: (id) => {
+    const currency = localStorage.getItem('currency') || 'USD';
+    return api.get(`/trips/${id}/pdf`, { responseType: 'blob', params: { currency } });
+  },
 }
 
 export const utilityAPI = {

@@ -380,11 +380,32 @@ export function TripResultsPage() {
                   </div>
                   <h2 className="text-base font-bold text-slate-900">Estimated Budget</h2>
                 </div>
-                <div className="flex items-baseline justify-between mb-4 pb-4 border-b border-slate-100">
-                  <p className="text-sm text-slate-700 font-bold">Total estimated cost</p>
-                  <p className="text-2xl font-bold text-emerald-600">
-                    {formatCurrency(budget.total)}
-                  </p>
+                <div className="space-y-3 mb-4 pb-4 border-b border-slate-100">
+                  <div className="flex items-baseline justify-between">
+                    <p className="text-sm text-slate-700 font-bold">Total estimated cost</p>
+                    <p className="text-2xl font-bold text-emerald-600">
+                      {formatCurrency(budget.total)}
+                    </p>
+                  </div>
+                  {trip.budget > budget.total && (
+                    <>
+                      <div className="flex items-baseline justify-between">
+                        <p className="text-xs text-slate-550 font-bold">Your Target Budget</p>
+                        <p className="text-sm font-bold text-slate-700">
+                          {formatCurrency(trip.budget)}
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-between bg-emerald-50/70 border border-emerald-100 rounded-xl p-3 mt-1.5">
+                        <div>
+                          <p className="text-xs font-extrabold text-emerald-800">Potential Savings</p>
+                          <p className="text-[10px] text-emerald-650 font-semibold">Under your budget limit</p>
+                        </div>
+                        <p className="text-lg font-extrabold text-emerald-700">
+                          {formatCurrency(trip.budget - budget.total)}
+                        </p>
+                      </div>
+                    </>
+                  )}
                 </div>
                 {budget.breakdown && (
                   <div className="space-y-2">

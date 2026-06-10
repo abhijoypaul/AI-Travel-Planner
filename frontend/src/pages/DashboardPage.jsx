@@ -46,7 +46,7 @@ const SAMPLE_ITINERARY = [
         name: "Louvre Museum",
         cat: "Attraction",
         color: "teal",
-        img: "https://images.unsplash.com/photo-1597910037318-f7d1141818e8?auto=format&fit=crop&q=80&w=600",
+        img: "https://images.unsplash.com/photo-1503152394-c571994fd383?auto=format&fit=crop&q=80&w=600",
       },
     ],
   },
@@ -67,7 +67,7 @@ const RECOMMENDATIONS = [
     rating: "4.7",
     reviews: "28,741",
     desc: "World's largest art museum",
-    img: "https://images.unsplash.com/photo-1597910037318-f7d1141818e8?auto=format&fit=crop&q=80&w=600",
+    img: "https://images.unsplash.com/photo-1503152394-c571994fd383?auto=format&fit=crop&q=80&w=600",
   },
   {
     name: "Montmartre",
@@ -156,7 +156,7 @@ function getPlacePhoto(name, type) {
 // Helper to resolve slideshow photo sets based on destination country
 function getDestinationPhotos(destination = "") {
   const destLower = destination.toLowerCase();
-  
+
   const library = {
     paris: [
       "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1000&auto=format&fit=crop&q=80",
@@ -173,7 +173,7 @@ function getDestinationPhotos(destination = "") {
     italy: [
       "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=1000&auto=format&fit=crop&q=80", // Rome Colosseum
       "https://images.unsplash.com/photo-1527631746610-bca00a040d60?w=1000&auto=format&fit=crop&q=80", // Venice Canals
-      "https://images.unsplash.com/photo-1533900298318-6b8da08a523e?w=1000&auto=format&fit=crop&q=80", // Amalfi Coast Positano
+      "https://images.unsplash.com/photo-1506461884574-9273f2caf746?w=1000&auto=format&fit=crop&q=80", // Amalfi Coast Positano
       "https://images.unsplash.com/photo-1528114039593-4366cc08227d?w=1000&auto=format&fit=crop&q=80"  // Florence Duomo
     ],
     london: [
@@ -214,7 +214,7 @@ function getDestinationPhotos(destination = "") {
 
   const match = Object.keys(library).find(key => destLower.includes(key));
   if (match) return library[match];
-  
+
   return [
     "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1000&auto=format&fit=crop&q=80",
     "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1000&auto=format&fit=crop&q=80",
@@ -236,6 +236,19 @@ export function DashboardPage() {
   const [budget, setBudget] = useState("");
   const [duration, setDuration] = useState("");
   const [travelers, setTravelers] = useState("");
+  const [selectedCurrency, setSelectedCurrency] = useState(localStorage.getItem('currency') || 'INR');
+
+  const currencySymbols = {
+    USD: '$',
+    EUR: '€',
+    GBP: '£',
+    JPY: '¥',
+    AUD: 'A$',
+    INR: '₹',
+    CAD: 'C$',
+    THB: '฿'
+  };
+  const currencySymbol = currencySymbols[selectedCurrency] || '₹';
 
   const handleGenerate = () => {
     const params = new URLSearchParams();
@@ -260,6 +273,7 @@ export function DashboardPage() {
   const [galleryPhotos, setGalleryPhotos] = useState([]);
   const [recPhotos, setRecPhotos] = useState({});
   const [itinPhotos, setItinPhotos] = useState({});
+  const [recDetails, setRecDetails] = useState({});
   const [slideIndex, setSlideIndex] = useState(0);
 
   // Fetch slideshow gallery photos from Pexels (via backend)
@@ -303,8 +317,16 @@ export function DashboardPage() {
   };
 
   const getRecommendedItems = () => {
-    if (!latestTrip) return RECOMMENDATIONS;
-    
+    if (!latestTrip) return RECOMMENDATIONS.map(item => {
+      const details = recDetails[item.name] || {};
+      return {
+        ...item,
+        rating: details.rating ? details.rating.toFixed(1) : item.rating,
+        reviews: details.reviewCount ? details.reviewCount.toLocaleString() : item.reviews,
+        desc: details.address || item.desc
+      };
+    });
+
     let list = [];
     let type = "attraction";
     if (activeFilter === "attractions") {
@@ -320,24 +342,51 @@ export function DashboardPage() {
       list = (latestTrip.recommendedAttractions || []).slice().reverse();
       type = "attraction";
     }
-    
-    return list.slice(0, 4).map((item) => ({
-      name: item.name,
-      rating: item.rating ? item.rating.toFixed(1) : "4.7",
-      reviews: item.reviewCount ? item.reviewCount.toLocaleString() : "980",
-      desc: item.address || "Serene travel destination place",
-      img: getPlacePhoto(item.name, type),
-      type: type
-    }));
+
+    return list.slice(0, 4).map((item) => {
+      const details = recDetails[item.name] || {};
+      return {
+        name: item.name,
+        rating: details.rating ? details.rating.toFixed(1) : (item.rating ? item.rating.toFixed(1) : "4.7"),
+        reviews: details.reviewCount ? details.reviewCount.toLocaleString() : (item.reviewCount ? item.reviewCount.toLocaleString() : "980"),
+        desc: details.address || item.address || "Serene travel destination place",
+        img: getPlacePhoto(item.name, type),
+        type: type
+      };
+    });
   };
 
-  // Fetch recommendation photos from Pexels (via backend)
+  // Fetch real ratings and reviews from Google Places (via backend place-details endpoint)
+  useEffect(() => {
+    const items = getRecommendedItems();
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+    items.forEach((item) => {
+      if (recDetails[item.name]) return;
+      fetch(`${API_URL}/place-details?name=${encodeURIComponent(item.name)}`)
+        .then(res => res.json())
+        .then(detailsData => {
+          if (detailsData) {
+            setRecDetails(prev => ({
+              ...prev,
+              [item.name]: {
+                rating: detailsData.rating,
+                reviewCount: detailsData.reviewCount,
+                address: detailsData.address
+              }
+            }));
+          }
+        })
+        .catch(err => console.error("Failed to fetch place details:", err));
+    });
+  }, [activeFilter, latestTrip, data]);
+
+  // Fetch recommendation photos from Google Places API
   useEffect(() => {
     const items = getRecommendedItems();
     const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
     items.forEach((item) => {
       if (recPhotos[item.name]) return;
-      fetch(`${API_URL}/place-photo?name=${encodeURIComponent(item.name)}`)
+      fetch(`${API_URL}/place-photo?name=${encodeURIComponent(item.name)}&exact=true`)
         .then(res => res.json())
         .then(resData => {
           if (resData.url) {
@@ -445,9 +494,9 @@ export function DashboardPage() {
           </div>
 
           {/* Budget */}
-          <div className="px-5 py-3 flex flex-col justify-center border-r border-slate-100 w-40 flex-shrink-0">
-            <p className="text-[9px] font-extrabold text-slate-455 uppercase tracking-widest mb-1">Budget ($)</p>
-            <div className="flex items-center gap-2">
+          <div className="px-5 py-3 flex flex-col justify-center border-r border-slate-100 w-52 flex-shrink-0">
+            <p className="text-[9px] font-extrabold text-slate-455 uppercase tracking-widest mb-1">Budget ({currencySymbol})</p>
+            <div className="flex items-center gap-1.5 min-w-0">
               <div className="h-7 w-7 rounded-full bg-indigo-50 flex items-center justify-center flex-shrink-0">
                 <Wallet className="h-3.5 w-3.5 text-indigo-655" />
               </div>
@@ -455,10 +504,27 @@ export function DashboardPage() {
                 type="number"
                 value={budget}
                 onChange={(e) => setBudget(e.target.value)}
-                placeholder="2000"
+                placeholder="100000"
                 min="0"
-                className="w-full min-w-0 text-[13px] font-bold text-slate-800 placeholder:text-slate-400 placeholder:font-normal bg-transparent outline-none"
+                className="flex-1 min-w-0 text-[13px] font-bold text-slate-800 placeholder:text-slate-400 placeholder:font-normal bg-transparent outline-none"
               />
+              <select
+                value={selectedCurrency}
+                onChange={(e) => {
+                  setSelectedCurrency(e.target.value);
+                  localStorage.setItem('currency', e.target.value);
+                }}
+                className="text-[11px] font-extrabold text-slate-650 bg-transparent outline-none cursor-pointer border-none p-0 focus:ring-0 flex-shrink-0"
+              >
+                <option value="INR">INR (₹)</option>
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="GBP">GBP (£)</option>
+                <option value="JPY">JPY (¥)</option>
+                <option value="AUD">AUD (A$)</option>
+                <option value="CAD">CAD (C$)</option>
+                <option value="THB">THB (฿)</option>
+              </select>
             </div>
           </div>
 
@@ -476,7 +542,7 @@ export function DashboardPage() {
                 style={{ color: duration ? "#1e293b" : "#94a3b8" }}
               >
                 <option value="" disabled>Days</option>
-                {[1,2,3,4,5,6,7,10,14,21].map((d) => (
+                {[1, 2, 3, 4, 5, 6, 7, 10, 14, 21].map((d) => (
                   <option key={d} value={d}>{d} {d === 1 ? "Day" : "Days"}</option>
                 ))}
               </select>
@@ -497,7 +563,7 @@ export function DashboardPage() {
                 style={{ color: travelers ? "#1e293b" : "#94a3b8" }}
               >
                 <option value="" disabled>Adults</option>
-                {[1,2,3,4,5,6,7,8].map((n) => (
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
                   <option key={n} value={n}>{n} {n === 1 ? "Adult" : "Adults"}</option>
                 ))}
               </select>
@@ -538,11 +604,10 @@ export function DashboardPage() {
                   <img
                     key={index}
                     src={photo}
-                    className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-in-out ${
-                      index === slideIndex ? "opacity-80 scale-100" : "opacity-0 scale-105"
-                    }`}
+                    className={`absolute inset-0 w-full h-full object-cover ${index === slideIndex ? "opacity-80 scale-100" : "opacity-0 scale-105"
+                      }`}
                     alt={`Destination Slide ${index + 1}`}
-                    style={{ transitionProperty: "opacity, transform" }}
+                    style={{ transition: "opacity 1000ms ease-in-out, transform 1000ms ease-in-out" }}
                   />
                 ))}
 
@@ -576,9 +641,8 @@ export function DashboardPage() {
                     <button
                       key={index}
                       onClick={() => setSlideIndex(index)}
-                      className={`h-1.5 rounded-full transition-all ${
-                        index === slideIndex ? "w-4.5 bg-white" : "w-1.5 bg-white/50 hover:bg-white/80"
-                      }`}
+                      className={`h-1.5 rounded-full transition-all ${index === slideIndex ? "w-4.5 bg-white" : "w-1.5 bg-white/50 hover:bg-white/80"
+                        }`}
                     />
                   ))}
                 </div>
@@ -598,11 +662,10 @@ export function DashboardPage() {
                       <button
                         key={key}
                         onClick={() => setActiveFilter(key)}
-                        className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all duration-200 ${
-                          activeFilter === key
-                            ? "bg-[#6366f1] text-white shadow-sm"
-                            : "text-slate-650 hover:text-slate-900"
-                        }`}
+                        className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all duration-200 ${activeFilter === key
+                          ? "bg-[#6366f1] text-white shadow-sm"
+                          : "text-slate-650 hover:text-slate-900"
+                          }`}
                       >
                         {label}
                       </button>
@@ -770,10 +833,10 @@ export function DashboardPage() {
             ) : (
               <div className="space-y-4">
                 <div className="px-1 mb-2">
-                  <h2 className="text-base font-bold text-slate-900">Why Plan with VoyagerAI?</h2>
+                  <h2 className="text-base font-bold text-slate-900">Why Plan with OdysseyX?</h2>
                   <p className="text-xs text-slate-550 mt-1">Discover the benefits of planning your next adventure with our smart assistant.</p>
                 </div>
-                
+
                 {[
                   {
                     icon: Sparkles,

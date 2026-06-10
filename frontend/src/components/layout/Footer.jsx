@@ -12,7 +12,7 @@ export function Footer() {
                 <Plane className="h-4 w-4 text-white fill-white" />
               </div>
               <span className="text-lg font-bold text-slate-900">
-                Wander<span className="font-light text-slate-500">AI</span>
+                Odyssey<span className="font-light text-slate-500">X</span>
               </span>
             </div>
             <p className="text-sm text-slate-500 leading-relaxed max-w-xs">
@@ -35,7 +35,7 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-8 border-t border-slate-100 pt-6 text-center text-xs text-slate-400">
-          © {new Date().getFullYear()} WanderAI. All rights reserved.
+          © {new Date().getFullYear()} OdysseyX. All rights reserved.
         </div>
       </div>
     </footer>

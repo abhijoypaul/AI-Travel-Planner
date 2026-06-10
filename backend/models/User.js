@@ -9,8 +9,12 @@ const userSchema = new mongoose.Schema(
     googleId: { type: String, sparse: true },
     avatar: { type: String },
     settings: {
-      currency: { type: String, default: 'USD' },
-      notifications: { type: Boolean, default: true },
+      currency: { type: String, default: 'INR' },
+      notificationsEmail: { type: Boolean, default: true },
+      notificationsPush: { type: Boolean, default: false },
+      notificationsMarketing: { type: Boolean, default: false },
+      theme: { type: String, default: 'light' },
+      twoFactorEnabled: { type: Boolean, default: false },
     },
   },
   { timestamps: true }

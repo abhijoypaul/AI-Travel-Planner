@@ -6,14 +6,17 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { formatCurrency } from '@/lib/utils'
 import { tripAPI } from '@/services/api'
+import { useNotification } from '@/context/NotificationContext'
 
 export function ExpenseTracker({ trip, onUpdate }) {
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ description: '', amount: '', category: 'food' })
   const [loading, setLoading] = useState(false)
+  const { addNotification } = useNotification()
 
   const total = (trip.expenses || []).reduce((sum, e) => sum + (e.amount || 0), 0)
   const budget = trip.budget || trip.estimatedBudget?.total || 0
+  const genBudget = trip.estimatedBudget?.total || 0
 
   const handleAdd = async (e) => {
     e.preventDefault()
@@ -25,6 +28,11 @@ export function ExpenseTracker({ trip, onUpdate }) {
         category: form.category,
       })
       onUpdate?.(data)
+      addNotification(
+        "Expense Logged",
+        `Added ${formatCurrency(Number(form.amount))} for "${form.description}" to your trip.`,
+        "expense"
+      )
       setForm({ description: '', amount: '', category: 'food' })
       setShowForm(false)
     } catch (err) {
@@ -45,6 +53,12 @@ export function ExpenseTracker({ trip, onUpdate }) {
         </Button>
       </CardHeader>
       <CardContent className="pt-4 bg-white">
+        {budget > genBudget && genBudget > 0 && (
+          <div className="mb-3 px-3 py-1.5 bg-emerald-50/70 border border-emerald-100 rounded-lg text-xs font-bold text-emerald-800 flex justify-between items-center">
+            <span>Potential Budget Savings:</span>
+            <span className="font-extrabold text-emerald-700">+{formatCurrency(budget - genBudget)}</span>
+          </div>
+        )}
         <div className="mb-4 flex justify-between text-sm text-slate-800 font-bold">
           <span>Spent: <strong className="text-rose-600">{formatCurrency(total)}</strong></span>
           <span>Budget: <strong className="text-slate-900">{formatCurrency(budget)}</strong></span>

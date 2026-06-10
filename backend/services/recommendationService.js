@@ -35,14 +35,27 @@ export const getRecommendations = async (destination, coordinates) => {
   };
 };
 
-export const mergeAIWithPlaces = (aiPlaces, googlePlaces) => {
-  const merged = [...aiPlaces];
+export const mergeAIWithPlaces = (aiPlaces, googlePlaces, type) => {
+  const merged = aiPlaces.map((p) => ({ ...p, type }));
 
   for (const gp of googlePlaces) {
-    const exists = merged.some(
+    const idx = merged.findIndex(
       (m) => m.name?.toLowerCase() === gp.name?.toLowerCase()
     );
-    if (!exists) merged.push(gp);
+    if (idx === -1) {
+      merged.push({ ...gp, type });
+    } else {
+      merged[idx] = {
+        ...gp,
+        ...merged[idx], // AI notes and name take preference
+        rating: gp.rating || merged[idx].rating || 0,
+        reviewCount: gp.reviewCount || merged[idx].reviewCount || 0,
+        address: gp.address || merged[idx].address,
+        placeId: gp.placeId || merged[idx].placeId,
+        lat: gp.lat || merged[idx].lat,
+        lng: gp.lng || merged[idx].lng,
+      };
+    }
   }
 
   return merged.slice(0, 10);

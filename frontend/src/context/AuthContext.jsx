@@ -8,6 +8,11 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    document.documentElement.classList.remove('dark');
+    localStorage.removeItem('theme');
+  }, []);
+
+  useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
       authAPI
@@ -21,6 +26,17 @@ export function AuthProvider({ children }) {
       setLoading(false)
     }
   }, [])
+
+  useEffect(() => {
+    if (user) {
+      if (user.settings?.currency) {
+        localStorage.setItem('currency', user.settings.currency);
+      }
+      // Force remove dark class
+      document.documentElement.classList.remove('dark');
+      localStorage.removeItem('theme');
+    }
+  }, [user]);
 
   const login = async (email, password) => {
     const { data } = await authAPI.login({ email, password })

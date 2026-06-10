@@ -19,6 +19,13 @@ function PlaceCard({ place, icon: Icon, color, onSelect }) {
             <Badge variant="outline" className="text-xs text-slate-750 font-bold border-slate-300">
               <Star className="h-3 w-3 mr-1 fill-amber-400 text-amber-400 animate-pulse" />
               {place.rating}
+              {(place.reviewCount !== undefined && place.reviewCount !== null) ? (
+                <span className="ml-1 text-[10px] text-slate-500 font-normal">
+                  ({place.reviewCount >= 1000 ? (place.reviewCount / 1000).toFixed(1).replace(/\.0$/, "") + "k" : place.reviewCount})
+                </span>
+              ) : place.reviews ? (
+                <span className="ml-1 text-[10px] text-slate-500 font-normal">({place.reviews})</span>
+              ) : null}
             </Badge>
           )}
           {place.score && <Badge variant="secondary" className="text-xs bg-indigo-50 text-indigo-850 font-bold border-indigo-100">Score: {(place.score * 100).toFixed(0)}</Badge>}
