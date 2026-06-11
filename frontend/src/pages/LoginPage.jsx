@@ -44,7 +44,7 @@ export function LoginPage() {
   }
 
   const handleGoogleLogin = () => {
-    window.location.href = authAPI.googleUrl()
+    window.location.href = authAPI.getGoogleAuthUrl()
   }
 
   return (
