@@ -34,12 +34,11 @@ export const authAPI = {
   updateProfile: (data) => api.put('/auth/profile', data),
   updatePassword: (data) => api.put('/auth/update-password', data),
   toggle2FA: (data) => api.put('/auth/toggle-2fa', data),
-  googleUrl: () => {
-    if (API_URL.startsWith('http')) {
-      return `${API_URL.replace(/\/api\/?$/, '')}/api/auth/google`
-    }
-    return 'http://localhost:5000/api/auth/google'
-  },
+  getGoogleAuthUrl() {
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  return `${API_URL.replace(/\/api\/?$/, '')}/api/auth/google`;
+}
 }
 
 export const tripAPI = {
