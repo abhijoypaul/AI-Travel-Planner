@@ -22,6 +22,19 @@ app.use('/api/auth', authRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api', utilityRoutes);
 
+// ADD THESE HERE 👇
+app.get('/', (req, res) => {
+  res.send('AI Travel Planner Backend Running');
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    message: 'Backend is healthy'
+  });
+});
+
+// Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: err.message || 'Server error' });
