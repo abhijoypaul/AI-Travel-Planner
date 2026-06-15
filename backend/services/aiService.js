@@ -65,6 +65,12 @@ const buildPrompt = ({ destination, startDate, endDate, travelers, budget, curre
   - Travel Style: ${travelStyle || 'adventure'}
   - Core Interests: ${interestList}
 
+  CRITICAL GEOGRAPHIC DISTRIBUTION & TRANSPORTATION GUIDELINES:
+  1. Geographically spread out the itinerary! Do not concentrate all activities in a single neighborhood or local area. Plan activities, attractions, and accommodations across different sub-regions, districts, or distinct parts of the destination.
+  2. Plan logical transit routes between these spread-out areas (e.g. traveling from East district to West district).
+  3. Detail the transport options (e.g. taxi, train, bus, rental car, ferry, or walking) inside the daily activities or daily tips (for example: "Take the train to the historic district (~50 INR)" or "Hire a local taxi for sightseeing").
+  4. Always include realistic estimated transport costs in the daily "estimatedCost" and the global "estimatedBudget.breakdown.transport" field in ${currencyCode}.
+
   CRITICAL PRICING & COST GUIDELINES:
   1. Generate highly realistic, authentic costs for that specific destination and travel style (Luxury, Budget, Adventure, Family, Solo, Romantic) in ${currencyCode}.
   2. Do not convert the user's budget into USD or any other currency. Treat ${budget} as ${currencyCode}, and return every numeric cost field in ${currencyCode}.

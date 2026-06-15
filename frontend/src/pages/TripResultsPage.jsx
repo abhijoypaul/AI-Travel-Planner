@@ -79,6 +79,7 @@ export function TripResultsPage() {
   };
 
   const fetchLocationPhoto = useCallback(async (loc) => {
+    if (!trip) return;
     const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
     setPhotoLoading(true);
     setLocationPhoto(null);
@@ -87,32 +88,53 @@ export function TripResultsPage() {
       if (loc.lat) params.set("lat", loc.lat);
       if (loc.lng) params.set("lng", loc.lng);
       const res = await fetch(`${API_URL}/place-photo?${params}`);
+      
+      let data = null;
       if (res.ok) {
-        const data = await res.json();
+        data = await res.json();
+      }
+
+      if (data && data.url && !data.url.includes("placeholder")) {
         setLocationPhoto({
           url: data.url,
           credit: data.source,
           title: data.title || loc.name,
         });
       } else {
-        setLocationPhoto(null);
+        // Fallback to city/town photo
+        const cityParams = new URLSearchParams({ name: trip.destination, exact: "true" });
+        const cityRes = await fetch(`${API_URL}/place-photo?${cityParams}`);
+        if (cityRes.ok) {
+          const cityData = await cityRes.json();
+          setLocationPhoto({
+            url: cityData.url,
+            credit: cityData.source,
+            title: cityData.title || trip.destination,
+          });
+        }
       }
     } catch (error) {
       console.error("Failed to fetch location photo:", error);
-      setLocationPhoto(null);
+    } finally {
+      setPhotoLoading(false);
     }
-    setPhotoLoading(false);
-  }, []);
+  }, [trip]);
 
   const handleLocationSelect = (loc) => {
     setSelectedLocation(loc);
     fetchLocationPhoto(loc);
-    if (mapSectionRef.current) {
-      const rect = mapSectionRef.current.getBoundingClientRect();
-      if (rect.top < 0 || rect.bottom > window.innerHeight) {
-        mapSectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    // Switch to itinerary tab to ensure the item is visible and can be scrolled to
+    setActiveTab("itinerary");
+
+    // Scroll to the timeline item
+    setTimeout(() => {
+      const placeId = `place-${encodeURIComponent(loc.name.toLowerCase().replace(/\s+/g, '-'))}`;
+      const element = document.getElementById(placeId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
       }
-    }
+    }, 150);
   };
 
   if (loading) {

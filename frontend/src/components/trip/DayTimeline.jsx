@@ -9,8 +9,10 @@ function LocationList({ items, icon: Icon, color, onSelect, selectedLocation, cu
     <div className="space-y-2">
       {items.map((item, i) => {
         const isSelected = selectedLocation?.name === item.name
+        const placeId = `place-${encodeURIComponent(item.name.toLowerCase().replace(/\s+/g, '-'))}`
         return (
           <button
+            id={placeId}
             key={i}
             onClick={() => onSelect?.(item)}
             className={`flex w-full items-start gap-3 rounded-lg border p-3 text-left transition-all ${
