@@ -49,15 +49,6 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
         }
       }
     }
-    for (const loc of [
-      ...(trip?.recommendedAttractions || []),
-      ...(trip?.recommendedRestaurants || []),
-      ...(trip?.recommendedHotels || []),
-    ]) {
-      if (loc.lat && loc.lng && !locations.some((l) => l.name === loc.name)) {
-        locations.push(loc)
-      }
-    }
     return locations
   }, [trip])
 
