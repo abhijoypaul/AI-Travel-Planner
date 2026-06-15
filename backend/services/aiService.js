@@ -77,7 +77,7 @@ const retryWithBackoff = async (fn, retries = 5, delay = 1000) => {
 
 const generateContentWithRetry = async (options) => {
   return await retryWithBackoff(async () => {
-    const modelName = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+    const modelName = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
     console.log(`Attempting content generation with model: ${modelName}`);
     const response = await ai.models.generateContent({
       ...options,
@@ -85,6 +85,96 @@ const generateContentWithRetry = async (options) => {
     });
     return response;
   }, 5, 1000); // Retry up to 5 times (exponential backoff)
+};
+
+const generateMockItinerary = (tripData) => {
+  const { destination, startDate, endDate, travelers, budget, currency = 'INR', interests, travelStyle } = tripData;
+  const currencyCode = String(currency || 'INR').toUpperCase();
+  
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const diffTime = Math.abs(end - start);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+  
+  const days = [];
+  for (let i = 1; i <= diffDays; i++) {
+    const currentDate = new Date(start);
+    currentDate.setDate(start.getDate() + (i - 1));
+    const dateStr = currentDate.toISOString().split('T')[0];
+    
+    days.push({
+      day: i,
+      date: dateStr,
+      title: `Exploring the highlights of ${destination}`,
+      activities: [
+        `Morning: Visit the central historical spots and main landmark in ${destination}.`,
+        `Afternoon: Try local specialties at a traditional lunch spot, then tour the popular arts district.`,
+        `Evening: Dinner at a highly-rated local restaurant and a walk around the city center.`
+      ],
+      attractions: [
+        {
+          name: `${destination} Landmark Spot`,
+          address: `Central District, ${destination}`,
+          estimatedCost: Math.round(budget * 0.05),
+          time: "09:00 AM",
+          notes: "Arrive early to beat the crowds!"
+        }
+      ],
+      restaurants: [
+        {
+          name: `The ${destination} Kitchen`,
+          address: `Downtown Area, ${destination}`,
+          estimatedCost: Math.round(budget * 0.03),
+          time: "01:00 PM",
+          notes: "Famous for its local traditional dishes."
+        }
+      ],
+      hotels: [
+        {
+          name: `${destination} Grand Resort & Hotel`,
+          address: `Luxury Avenue, ${destination}`,
+          estimatedCost: Math.round(budget * 0.15),
+          notes: "Comfortable stay with excellent ratings."
+        }
+      ],
+      estimatedCost: Math.round(budget * 0.23),
+      travelTime: "45 mins total transit",
+      tips: ["Keep some local currency cash handy.", "Comfortable walking shoes are recommended."]
+    });
+  }
+  
+  return {
+    destination,
+    currency: currencyCode,
+    estimatedBudget: {
+      total: Math.round(budget * 0.8),
+      breakdown: {
+        accommodation: Math.round(budget * 0.4),
+        food: Math.round(budget * 0.2),
+        activities: Math.round(budget * 0.1),
+        transport: Math.round(budget * 0.1)
+      }
+    },
+    travelTips: [
+      `Plan your local transport in advance in ${destination}.`,
+      `Try to visit top spots early in the morning.`
+    ],
+    checklist: [
+      "Check weather forecast",
+      "Pack essential travel documents",
+      "Confirm hotel bookings"
+    ],
+    days,
+    recommendedAttractions: [
+      { name: `${destination} Culture Museum`, address: `Museum Quarter, ${destination}`, notes: "Great for learning history." }
+    ],
+    recommendedRestaurants: [
+      { name: `Bistro ${destination}`, address: `Food Street, ${destination}`, notes: "Great ambiance and local wine." }
+    ],
+    recommendedHotels: [
+      { name: `Central Plaza Inn`, address: `Midtown, ${destination}`, notes: "Convenient location near transit." }
+    ]
+  };
 };
 
 const buildPrompt = ({ destination, startDate, endDate, travelers, budget, currency = 'INR', interests, travelStyle }) => {
@@ -165,6 +255,13 @@ export const generateItinerary = async (tripData) => {
     return JSON.parse(text);
   } catch (error) {
     console.error("Gemini AI Studio Error:", error.message || error);
+    
+    const isQuotaExceeded = error.message?.includes('429') || error.message?.includes('quota') || error.message?.includes('RESOURCE_EXHAUSTED');
+    if (isQuotaExceeded) {
+      console.warn("Quota limit hit. Generating a high-quality fallback mock itinerary...");
+      return generateMockItinerary(tripData);
+    }
+    
     throw new Error(`Gemini connection failed: ${error.message || error}`);
   }
 };
@@ -175,7 +272,6 @@ export const chatWithAssistant = async (message, tripContext) => {
       throw new Error("Missing GEMINI_API_KEY");
     }
 
-    // Stringify the current itinerary data so the AI knows exactly what trip the user is looking at
     const contextString = tripContext
       ? `Current Itinerary Context: ${JSON.stringify(tripContext)}`
       : "No trip context available yet.";
@@ -203,6 +299,10 @@ export const chatWithAssistant = async (message, tripContext) => {
     return response.text;
   } catch (error) {
     console.error("Gemini Chat Error:", error.message || error);
+    const isQuotaExceeded = error.message?.includes('429') || error.message?.includes('quota') || error.message?.includes('RESOURCE_EXHAUSTED');
+    if (isQuotaExceeded) {
+      return "Hi there! It looks like our AI service is currently receiving a lot of traffic (API quota exhausted). I'm temporarily running in fallback mode, but please ask me anything and I'll do my best to help you with your plans!";
+    }
     return "Sorry, I'm having trouble connecting to my brain right now. Please try messaging me again in a moment!";
   }
 };
