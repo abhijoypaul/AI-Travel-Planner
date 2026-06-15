@@ -33,6 +33,40 @@ const collectWaypoints = (itinerary) => {
   return waypoints;
 };
 
+const parseTravelTips = (tips) => {
+  if (!tips) return [];
+  let rawTips = [];
+  if (Array.isArray(tips)) {
+    rawTips = tips;
+  } else if (typeof tips === 'string') {
+    rawTips = [tips];
+  } else {
+    try {
+      rawTips = [JSON.stringify(tips)];
+    } catch {
+      rawTips = [];
+    }
+  }
+
+  const cleaned = [];
+  for (const tip of rawTips) {
+    if (typeof tip === 'string') {
+      const parts = tip.split(/\n+/);
+      for (let part of parts) {
+        part = part.replace(/^[-*•\d\.\s]+/, '').trim();
+        if (part) {
+          cleaned.push(part);
+        }
+      }
+    } else if (tip && typeof tip === 'object') {
+      // If tip is an object (e.g. { tip: "..." }), extract values
+      const values = Object.values(tip).filter(v => typeof v === 'string');
+      cleaned.push(...values);
+    }
+  }
+  return cleaned;
+};
+
 router.post('/generate', protect, async (req, res) => {
   try {
     const {
@@ -88,7 +122,7 @@ router.post('/generate', protect, async (req, res) => {
       coordinates: coords,
       routePolyline,
       weather,
-      travelTips: aiResult.travelTips || [],
+      travelTips: parseTravelTips(aiResult.travelTips),
       checklist: (aiResult.checklist || []).map((item) => ({ item, completed: false })),
       shareToken: crypto.randomBytes(16).toString('hex'),
     });

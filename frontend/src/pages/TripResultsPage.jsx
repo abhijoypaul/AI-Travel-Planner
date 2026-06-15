@@ -293,14 +293,17 @@ export function TripResultsPage() {
                   <h2 className="text-base font-bold text-slate-900">Travel Tips</h2>
                 </div>
                 <ul className="grid gap-2.5 sm:grid-cols-2">
-                  {trip.travelTips.map((tip, i) => (
-                    <li key={i} className="flex items-start gap-2.5 text-sm text-slate-750 font-medium">
-                      <div className="h-5 w-5 rounded-full bg-indigo-50 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <Plus className="h-3 w-3 text-indigo-500" />
-                      </div>
-                      {tip}
-                    </li>
-                  ))}
+                  {trip.travelTips.map((tip, i) => {
+                    const tipText = typeof tip === 'string' ? tip : (tip?.tip || JSON.stringify(tip));
+                    return (
+                      <li key={i} className="flex items-start gap-2.5 text-sm text-slate-750 font-medium">
+                        <div className="h-5 w-5 rounded-full bg-indigo-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Plus className="h-3 w-3 text-indigo-500" />
+                        </div>
+                        {tipText}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             )}
