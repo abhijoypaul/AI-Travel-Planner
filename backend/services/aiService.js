@@ -177,6 +177,56 @@ const generateMockItinerary = (tripData) => {
     });
   }
   
+  const destLower = destination.toLowerCase();
+  let customTips = [
+    `Plan your local transport routes and purchase passes in advance in ${destination}.`,
+    `Try to visit the top popular sightseeing spots early in the morning to beat the crowds.`,
+    `Make reservations for popular restaurants and attractions ahead of time.`,
+    `Keep some local cash (${currencyCode}) handy, as smaller vendors might not accept cards.`
+  ];
+
+  if (destLower.includes("japan") || destLower.includes("tokyo") || destLower.includes("kyoto") || destLower.includes("osaka")) {
+    customTips = [
+      "Purchase a Suica or Pasmo IC Card for seamless train and bus travel.",
+      "Many traditional restaurants and temples are cash-only, so always carry Japanese Yen.",
+      "Respect local etiquette: avoid eating or speaking loudly while riding public transit.",
+      "Rent a Pocket Wi-Fi or set up an eSIM before arrival for constant navigation access.",
+      "Tipping is not customary in Japan; exceptional service is standard and included."
+    ];
+  } else if (destLower.includes("france") || destLower.includes("paris")) {
+    customTips = [
+      "Learn a few basic French phrases like 'Bonjour' and 'Merci'—it goes a long way with locals.",
+      "Validate your metro/bus tickets immediately upon boarding to avoid hefty fines.",
+      "Always say 'Bonjour' when entering shops or ordering food.",
+      "Watch out for pickpockets in crowded tourist spots like the Eiffel Tower and Louvre.",
+      "Water is free in restaurants; ask for a 'carafe d'eau' instead of bottled water."
+    ];
+  } else if (destLower.includes("italy") || destLower.includes("rome") || destLower.includes("florence") || destLower.includes("venice")) {
+    customTips = [
+      "Dress appropriately when visiting churches: cover shoulders and knees.",
+      "Validate your train or bus tickets at the station machine before boarding.",
+      "Copin (coperto) is a standard cover charge added to sit-down restaurant bills.",
+      "Carry reusable water bottles; Rome has hundreds of public drinking fountains (nasoni).",
+      "Avoid eating or drinking near historical monuments to respect conservation laws."
+    ];
+  } else if (destLower.includes("india") || destLower.includes("delhi") || destLower.includes("mumbai") || destLower.includes("taj mahal")) {
+    customTips = [
+      "Only drink bottled or purified water; avoid ice in local street establishments.",
+      "Carry cash (INR) as local markets and auto-rickshaws rarely accept card payment.",
+      "Dress modestly when entering religious sites and remove footwear where required.",
+      "Download ride-hailing apps like Uber or Ola for safe and reliable city transportation.",
+      "Be prepared to negotiate/haggle politely at local street markets."
+    ];
+  } else if (destLower.includes("uk") || destLower.includes("london") || destLower.includes("england")) {
+    customTips = [
+      "Use contactless payment or Oyster cards on London Underground and buses.",
+      "Always stand on the right side of the escalators in Tube stations.",
+      "Check the weather daily and carry a compact umbrella or raincoat.",
+      "Service charges (usually 12.5%) are often added automatically to restaurant bills.",
+      "Keep to the left side when walking on busy sidewalks."
+    ];
+  }
+
   return {
     destination,
     currency: currencyCode,
@@ -189,10 +239,7 @@ const generateMockItinerary = (tripData) => {
         transport: Math.round(budget * 0.1)
       }
     },
-    travelTips: [
-      `Plan your local transport in advance in ${destination}.`,
-      `Try to visit top spots early in the morning.`
-    ],
+    travelTips: customTips,
     checklist: [
       "Check weather forecast",
       "Pack essential travel documents",
