@@ -77,10 +77,11 @@ const retryWithBackoff = async (fn, retries = 5, delay = 1000) => {
 
 const generateContentWithRetry = async (options) => {
   return await retryWithBackoff(async () => {
-    console.log("Attempting content generation with model: gemini-2.5-flash");
+    const modelName = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+    console.log(`Attempting content generation with model: ${modelName}`);
     const response = await ai.models.generateContent({
       ...options,
-      model: 'gemini-2.5-flash'
+      model: modelName
     });
     return response;
   }, 5, 1000); // Retry up to 5 times (exponential backoff)
