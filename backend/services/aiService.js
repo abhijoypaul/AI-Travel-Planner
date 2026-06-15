@@ -279,6 +279,10 @@ const buildPrompt = ({ destination, startDate, endDate, travelers, budget, curre
   1. DO NOT REPEAT the same attractions, restaurants, hotels, or activities across different days. Every day must feature completely different, unique real-world places, names, dining options, and sights specific to ${destination}.
   2. DO NOT use placeholder names from the blueprint (like "Real Landmark Name" or "Real Eatery Name"). Replace them with actual, specific names of tourist spots, restaurants, and hotels in ${destination}.
 
+  CRITICAL TRAVEL TIPS GUIDELINES:
+  1. The "travelTips" field at the end must contain highly specific, actionable advice directly related to the generated itinerary, the locations chosen, and the specific timing of the visits (for example: "To visit Nara Park on Day 2, start by 9:00 AM when the deer are most active and crowds are thin," or "Buy train tickets by 8:30 AM on Day 3 for the scenic route").
+  2. Do not output generic advice. Ensure every tip is tightly coupled with your generated daily activities and locations.
+
   CRITICAL PRICING & COST GUIDELINES:
   1. Generate highly realistic, authentic costs for that specific destination and travel style (Luxury, Budget, Adventure, Family, Solo, Romantic) in ${currencyCode}.
   2. Do not convert the user's budget into USD or any other currency. Treat ${budget} as ${currencyCode}, and return every numeric cost field in ${currencyCode}.
