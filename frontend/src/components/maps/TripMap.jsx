@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { MapPin, Loader2 } from 'lucide-react'
+import { formatCurrency } from '@/lib/utils'
 
 const MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 
@@ -37,6 +38,7 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
   const polylineRef = useRef(null)
   const [mapError, setMapError] = useState(false)
   const [loading, setLoading] = useState(true)
+  const currency = trip?.currency || localStorage.getItem('currency') || 'INR'
 
   const getAllLocations = useCallback(() => {
     const locations = []
@@ -168,7 +170,7 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
         <strong style="font-size:14px">${loc.name}</strong>
         ${loc.address ? `<p style="font-size:12px;color:#64748b;margin:4px 0 0">${loc.address}</p>` : ''}
         ${loc.rating ? `<p style="font-size:12px;margin:4px 0 0">⭐ ${loc.rating}</p>` : ''}
-        ${loc.estimatedCost ? `<p style="font-size:12px;color:#059669;margin:4px 0 0">~$${loc.estimatedCost}</p>` : ''}
+        ${loc.estimatedCost ? `<p style="font-size:12px;color:#059669;margin:4px 0 0">~${formatCurrency(loc.estimatedCost, currency)}</p>` : ''}
         ${loc.type ? `<span style="display:inline-block;margin-top:6px;padding:2px 8px;border-radius:9999px;font-size:11px;background:${TYPE_COLORS[loc.type] || '#64748b'}22;color:${TYPE_COLORS[loc.type] || '#64748b'};font-weight:600;text-transform:capitalize">${loc.type}</span>` : ''}
       </div>`
     infoWindowRef.current.setContent(content)

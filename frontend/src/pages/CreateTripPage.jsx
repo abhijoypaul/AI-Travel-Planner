@@ -138,7 +138,10 @@ export function CreateTripPage() {
     setError("");
     setLoading(true);
     try {
-      const { data } = await tripAPI.generate(form);
+      const { data } = await tripAPI.generate({
+        ...form,
+        currency: selectedCurrency,
+      });
       addNotification(
         "Itinerary Generated!",
         `AI successfully planned your trip to ${form.destination}.`,

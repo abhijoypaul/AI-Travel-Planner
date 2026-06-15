@@ -17,6 +17,7 @@ export function ExpenseTracker({ trip, onUpdate }) {
   const total = (trip.expenses || []).reduce((sum, e) => sum + (e.amount || 0), 0)
   const budget = trip.budget || trip.estimatedBudget?.total || 0
   const genBudget = trip.estimatedBudget?.total || 0
+  const currency = trip.currency || localStorage.getItem('currency') || 'INR'
 
   const handleAdd = async (e) => {
     e.preventDefault()
@@ -30,7 +31,7 @@ export function ExpenseTracker({ trip, onUpdate }) {
       onUpdate?.(data)
       addNotification(
         "Expense Logged",
-        `Added ${formatCurrency(Number(form.amount))} for "${form.description}" to your trip.`,
+        `Added ${formatCurrency(Number(form.amount), currency)} for "${form.description}" to your trip.`,
         "expense"
       )
       setForm({ description: '', amount: '', category: 'food' })
@@ -56,13 +57,13 @@ export function ExpenseTracker({ trip, onUpdate }) {
         {budget > genBudget && genBudget > 0 && (
           <div className="mb-3 px-3 py-1.5 bg-emerald-50/70 border border-emerald-100 rounded-lg text-xs font-bold text-emerald-800 flex justify-between items-center">
             <span>Potential Budget Savings:</span>
-            <span className="font-extrabold text-emerald-700">+{formatCurrency(budget - genBudget)}</span>
+            <span className="font-extrabold text-emerald-700">+{formatCurrency(budget - genBudget, currency)}</span>
           </div>
         )}
         <div className="mb-4 flex justify-between text-sm text-slate-800 font-bold">
-          <span>Spent: <strong className="text-rose-600">{formatCurrency(total)}</strong></span>
-          <span>Budget: <strong className="text-slate-900">{formatCurrency(budget)}</strong></span>
-          <span>Remaining: <strong className="text-emerald-600">{formatCurrency(budget - total)}</strong></span>
+          <span>Spent: <strong className="text-rose-600">{formatCurrency(total, currency)}</strong></span>
+          <span>Budget: <strong className="text-slate-900">{formatCurrency(budget, currency)}</strong></span>
+          <span>Remaining: <strong className="text-emerald-600">{formatCurrency(budget - total, currency)}</strong></span>
         </div>
         <div className="mb-4 h-2.5 rounded-full bg-slate-100 border border-slate-200 overflow-hidden">
           <div
@@ -77,7 +78,7 @@ export function ExpenseTracker({ trip, onUpdate }) {
               <Input className="bg-white border-slate-250 text-slate-800 font-medium" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
             </div>
             <div>
-              <Label className="text-slate-800 font-bold text-xs mb-1 block">Amount ($)</Label>
+              <Label className="text-slate-800 font-bold text-xs mb-1 block">Amount ({currency})</Label>
               <Input type="number" className="bg-white border-slate-250 text-slate-800 font-medium" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} required />
             </div>
             <Button type="submit" size="sm" className="w-full bg-indigo-650 text-white font-bold" disabled={loading}>{loading ? 'Adding...' : 'Save Expense'}</Button>
@@ -87,7 +88,7 @@ export function ExpenseTracker({ trip, onUpdate }) {
           {(trip.expenses || []).map((exp) => (
             <div key={exp._id} className="flex justify-between border-b border-slate-100 py-1.5 text-sm text-slate-800 font-bold">
               <span>{exp.description} <span className="text-slate-500 font-medium text-xs">({exp.category})</span></span>
-              <span className="font-bold text-slate-900">{formatCurrency(exp.amount)}</span>
+              <span className="font-bold text-slate-900">{formatCurrency(exp.amount, currency)}</span>
             </div>
           ))}
           {!trip.expenses?.length && <p className="text-sm text-slate-650 py-4 text-center font-medium">No expenses tracked yet</p>}

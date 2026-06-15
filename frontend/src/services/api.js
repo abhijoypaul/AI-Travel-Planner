@@ -54,10 +54,7 @@ export const tripAPI = {
   chat: (id, message) => api.post(`/trips/${id}/chat`, { message }),
   nearby: (id) => api.get(`/trips/${id}/nearby`),
   getRoute: (id) => api.post(`/trips/${id}/route`),
-  downloadPDF: (id) => {
-    const currency = localStorage.getItem('currency') || 'USD';
-    return api.get(`/trips/${id}/pdf`, { responseType: 'blob', params: { currency } });
-  },
+  downloadPDF: (id) => api.get(`/trips/${id}/pdf`, { responseType: 'blob' }),
 }
 
 export const utilityAPI = {

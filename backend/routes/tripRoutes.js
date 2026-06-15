@@ -35,13 +35,23 @@ const collectWaypoints = (itinerary) => {
 
 router.post('/generate', protect, async (req, res) => {
   try {
-    const { destination, startDate, endDate, budget, travelers, travelStyle, interests } = req.body;
+    const {
+      destination,
+      startDate,
+      endDate,
+      budget,
+      currency = req.user.settings?.currency || 'INR',
+      travelers,
+      travelStyle,
+      interests,
+    } = req.body;
 
     const aiResult = await generateItinerary({
       destination,
       startDate,
       endDate,
       budget,
+      currency,
       travelers,
       travelStyle,
       interests,
@@ -66,6 +76,7 @@ router.post('/generate', protect, async (req, res) => {
       startDate,
       endDate,
       budget,
+      currency,
       travelers,
       travelStyle,
       interests,
@@ -159,7 +170,7 @@ router.get('/:id/pdf', protect, async (req, res) => {
   try {
     const trip = await Trip.findOne({ _id: req.params.id, userId: req.user._id });
     if (!trip) return res.status(404).json({ message: 'Trip not found' });
-    const currency = req.query.currency || req.user.settings?.currency || 'USD';
+    const currency = trip.currency || req.query.currency || req.user.settings?.currency || 'INR';
     await generateTripPDF(trip, res, currency);
   } catch (error) {
     console.error('PDF generation error:', error);
@@ -175,6 +186,7 @@ router.post('/:id/chat', protect, async (req, res) => {
   const reply = await chatWithAssistant(req.body.message, {
     destination: trip.destination,
     budget: trip.budget,
+    currency: trip.currency || req.user.settings?.currency || 'INR',
     dates: { start: trip.startDate, end: trip.endDate },
   });
   res.json({ reply });

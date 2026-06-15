@@ -5,28 +5,30 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY.trim()
 });
 
-const buildPrompt = ({ destination, startDate, endDate, travelers, budget, interests, travelStyle }) => {
+const buildPrompt = ({ destination, startDate, endDate, travelers, budget, currency = 'INR', interests, travelStyle }) => {
   const interestList = Array.isArray(interests) ? interests.join(', ') : interests;
+  const currencyCode = String(currency || 'INR').toUpperCase();
   return `Create a highly customized, realistic day-by-day travel plan for ${destination} from ${startDate} to ${endDate}.
   Travel details:
   - Travelers: ${travelers}
-  - Total Budget limit / target: $${budget}
+  - Total Budget limit / target: ${currencyCode} ${budget}
+  - Currency for every price and budget field: ${currencyCode}
   - Travel Style: ${travelStyle || 'adventure'}
   - Core Interests: ${interestList}
 
   CRITICAL PRICING & COST GUIDELINES:
-  1. Generate highly realistic, authentic costs for that specific destination and travel style (Luxury, Budget, Adventure, Family, Solo, Romantic) in USD.
-  2. The costs of attractions, restaurants, and hotels MUST reflect real-world prices. For example:
-     - Lodging: Budget ($30-$80/night), Standard/Adventure ($100-$250/night), Luxury ($350-$1200/night).
-     - Restaurants: Budget ($10-$25/meal), Standard ($25-$60/meal), Luxury ($80-$250+/meal).
-     - Transport: Include realistic local taxis, trains, flights, or rental car costs.
-  3. If the destination's realistic cost for this trip is LOWER than the user's maximum budget limit ($${budget}), do NOT artificially inflate the costs to match the budget. Instead, estimate the genuine realistic cost and output it in estimatedBudget.total. This will show the traveler their potential savings!
+  1. Generate highly realistic, authentic costs for that specific destination and travel style (Luxury, Budget, Adventure, Family, Solo, Romantic) in ${currencyCode}.
+  2. Do not convert the user's budget into USD or any other currency. Treat ${budget} as ${currencyCode}, and return every numeric cost field in ${currencyCode}.
+  3. The costs of attractions, restaurants, and hotels MUST reflect real-world prices in ${currencyCode}. For example, if ${currencyCode} is INR, output Indian Rupee amounts such as 2500 instead of dollar-based amounts.
+  4. Transport costs must also be realistic in ${currencyCode}, including local taxis, trains, flights, or rental car costs where applicable.
+  5. If the destination's realistic cost for this trip is LOWER than the user's maximum budget limit (${currencyCode} ${budget}), do NOT artificially inflate the costs to match the budget. Instead, estimate the genuine realistic cost and output it in estimatedBudget.total. This will show the traveler their potential savings!
 
   CRITICAL: You must generate a distinct entries array block for EVERY single day between ${startDate} and ${endDate}. Do not hardcode a single day. Map real points of interest, authentic dining options, and actual pricing options specific to ${destination}.
 
   Return a valid JSON object ONLY (absolutely no markdown, no \`\`\`json wrappers, and no conversational prose) adhering strictly to this structural blueprint:
   {
     "destination": "${destination}",
+    "currency": "${currencyCode}",
     "estimatedBudget": { 
       "total": number, 
       "breakdown": { "accommodation": number, "food": number, "activities": number, "transport": number } 

@@ -49,6 +49,7 @@ export function ItineraryPage() {
 
   const renderLocationItem = (item, type) => {
     const color = getColor(type);
+    const currency = selectedTrip?.currency || localStorage.getItem('currency') || 'INR';
     return (
       <div key={item.name} className="flex items-start gap-4 bg-white rounded-xl p-4 border border-slate-200 shadow-sm hover:shadow transition-all">
         <div className={`h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0 ${color.badge}`}>
@@ -78,7 +79,7 @@ export function ItineraryPage() {
             {item.estimatedCost > 0 && (
               <div className="flex items-center gap-1">
                 <DollarSign className="h-3.5 w-3.5 text-slate-500" />
-                {formatCurrency(item.estimatedCost)}
+                {formatCurrency(item.estimatedCost, currency)}
               </div>
             )}
             {item.rating && (

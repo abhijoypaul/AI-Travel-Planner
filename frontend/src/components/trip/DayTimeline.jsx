@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency } from '@/lib/utils'
 
-function LocationList({ items, icon: Icon, color, onSelect, selectedLocation }) {
+function LocationList({ items, icon: Icon, color, onSelect, selectedLocation, currency }) {
   if (!items?.length) return null
   return (
     <div className="space-y-2">
@@ -42,7 +42,7 @@ function LocationList({ items, icon: Icon, color, onSelect, selectedLocation }) 
                 )}
                 {item.estimatedCost > 0 && (
                   <span className="flex items-center gap-1 text-slate-700">
-                    <DollarSign className="h-3 w-3 text-slate-500" />{formatCurrency(item.estimatedCost)}
+                    <DollarSign className="h-3 w-3 text-slate-500" />{formatCurrency(item.estimatedCost, currency)}
                   </span>
                 )}
                 {item.rating && <span className="text-slate-700">⭐ {item.rating}</span>}
@@ -56,14 +56,14 @@ function LocationList({ items, icon: Icon, color, onSelect, selectedLocation }) 
   )
 }
 
-export function DayTimeline({ day, onLocationSelect, selectedLocation }) {
+export function DayTimeline({ day, currency, onLocationSelect, selectedLocation }) {
   return (
     <Card className="overflow-hidden border-slate-200">
       <CardHeader className="border-b border-slate-200 bg-slate-50/80">
         <div className="flex items-center justify-between">
           <CardTitle className="text-slate-900 font-bold">Day {day.day}: {day.title || day.date}</CardTitle>
           <div className="flex gap-2">
-            {day.estimatedCost > 0 && <Badge variant="secondary" className="bg-emerald-50 text-emerald-800 border-emerald-100">{formatCurrency(day.estimatedCost)}</Badge>}
+            {day.estimatedCost > 0 && <Badge variant="secondary" className="bg-emerald-50 text-emerald-800 border-emerald-100">{formatCurrency(day.estimatedCost, currency)}</Badge>}
             {day.travelTime && <Badge variant="outline" className="border-slate-300 text-slate-700 font-semibold">{day.travelTime}</Badge>}
           </div>
         </div>
@@ -87,6 +87,7 @@ export function DayTimeline({ day, onLocationSelect, selectedLocation }) {
           color="bg-indigo-50 text-indigo-600"
           onSelect={onLocationSelect}
           selectedLocation={selectedLocation}
+          currency={currency}
         />
         <LocationList
           items={day.restaurants}
@@ -94,6 +95,7 @@ export function DayTimeline({ day, onLocationSelect, selectedLocation }) {
           color="bg-orange-50 text-orange-600"
           onSelect={onLocationSelect}
           selectedLocation={selectedLocation}
+          currency={currency}
         />
         <LocationList
           items={day.hotels}
@@ -101,6 +103,7 @@ export function DayTimeline({ day, onLocationSelect, selectedLocation }) {
           color="bg-violet-50 text-violet-600"
           onSelect={onLocationSelect}
           selectedLocation={selectedLocation}
+          currency={currency}
         />
         {day.tips?.length > 0 && (
           <div className="rounded-xl border border-indigo-100 bg-indigo-50/50 p-3">

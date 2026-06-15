@@ -155,6 +155,7 @@ export function TripResultsPage() {
   }
 
   const budget = trip.estimatedBudget;
+  const tripCurrency = trip.currency || localStorage.getItem('currency') || 'INR';
 
   return (
     <Layout>
@@ -229,6 +230,7 @@ export function TripResultsPage() {
                       <DayTimeline
                         key={day.day}
                         day={day}
+                        currency={tripCurrency}
                         onLocationSelect={handleLocationSelect}
                         selectedLocation={selectedLocation}
                       />
@@ -384,7 +386,7 @@ export function TripResultsPage() {
                   <div className="flex items-baseline justify-between">
                     <p className="text-sm text-slate-700 font-bold">Total estimated cost</p>
                     <p className="text-2xl font-bold text-emerald-600">
-                      {formatCurrency(budget.total)}
+                      {formatCurrency(budget.total, tripCurrency)}
                     </p>
                   </div>
                   {trip.budget > budget.total && (
@@ -392,7 +394,7 @@ export function TripResultsPage() {
                       <div className="flex items-baseline justify-between">
                         <p className="text-xs text-slate-550 font-bold">Your Target Budget</p>
                         <p className="text-sm font-bold text-slate-700">
-                          {formatCurrency(trip.budget)}
+                          {formatCurrency(trip.budget, tripCurrency)}
                         </p>
                       </div>
                       <div className="flex items-center justify-between bg-emerald-50/70 border border-emerald-100 rounded-xl p-3 mt-1.5">
@@ -401,7 +403,7 @@ export function TripResultsPage() {
                           <p className="text-[10px] text-emerald-650 font-semibold">Under your budget limit</p>
                         </div>
                         <p className="text-lg font-extrabold text-emerald-700">
-                          {formatCurrency(trip.budget - budget.total)}
+                          {formatCurrency(trip.budget - budget.total, tripCurrency)}
                         </p>
                       </div>
                     </>
@@ -412,7 +414,7 @@ export function TripResultsPage() {
                     {Object.entries(budget.breakdown).map(([key, val]) => (
                       <div key={key} className="flex items-center justify-between text-sm">
                         <p className="capitalize text-slate-700 font-bold">{key}</p>
-                        <p className="font-extrabold text-slate-900">{formatCurrency(val)}</p>
+                        <p className="font-extrabold text-slate-900">{formatCurrency(val, tripCurrency)}</p>
                       </div>
                     ))}
                   </div>

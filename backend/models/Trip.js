@@ -50,6 +50,7 @@ const tripSchema = new mongoose.Schema(
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     budget: { type: Number, required: true },
+    currency: { type: String, default: 'INR' },
     travelers: { type: Number, required: true, default: 1 },
     travelStyle: {
       type: String,
