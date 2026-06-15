@@ -48,7 +48,20 @@ const generateContentWithFallback = async (options) => {
     } catch (error) {
       console.error(`Failed with model ${model}:`, error.message || error);
       lastError = error;
-      // Continue to try the next model
+
+      const errorMessage = error.message || '';
+      const isTransient = 
+        errorMessage.includes('503') || 
+        errorMessage.includes('UNAVAILABLE') || 
+        errorMessage.includes('429') || 
+        errorMessage.includes('RESOURCE_EXHAUSTED') ||
+        error.status === 503 ||
+        error.status === 429;
+
+      // Only fall back to the next model if the error is transient. Otherwise throw immediately!
+      if (!isTransient) {
+        throw error;
+      }
     }
   }
   throw lastError;
