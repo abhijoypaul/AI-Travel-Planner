@@ -95,51 +95,85 @@ const generateMockItinerary = (tripData) => {
   const end = new Date(endDate);
   const diffTime = Math.abs(end - start);
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+  const mockAttractions = [
+    { name: "Historical Downtown & Old Square", address: "Old City Center" },
+    { name: "Central Fine Arts Museum", address: "Museum Boulevard" },
+    { name: "Scenic Botanical Gardens", address: "Green Hill Park" },
+    { name: "City Skyline Viewpoint & Tower", address: "High Ridge Road" },
+    { name: "Traditional Arts & Crafts Market", address: "Market Lane" },
+    { name: "Lakeside Walking Promenade", address: "Waterfront Wharf" },
+    { name: "Historic Fortress & Castle Ruins", address: "North Citadel" },
+    { name: "Modern Science & Space Pavilion", address: "Innovation Park" }
+  ];
+
+  const mockRestaurants = [
+    { name: "The Heritage Bistro", address: "Gastronomy Street" },
+    { name: "Local Spices Cafe", address: "Spices Avenue" },
+    { name: "The Gourmet Terrace", address: "Rooftop Heights" },
+    { name: "Seafood & Grill House", address: "Coastal Harbor" },
+    { name: "Grand Feast Tavern", address: "Bazaar Square" },
+    { name: "The Green Garden Cafe", address: "Eco Park Road" }
+  ];
+
+  const mockHotels = [
+    { name: "Grand Central Resort", address: "Main Boulevard" },
+    { name: "Boutique Heritage Suites", address: "Historical Quarter" },
+    { name: "Riverside Comfort Inn", address: "Waterfront District" },
+    { name: "Skyline View Hotel", address: "Financial Center" }
+  ];
   
   const days = [];
   for (let i = 1; i <= diffDays; i++) {
     const currentDate = new Date(start);
     currentDate.setDate(start.getDate() + (i - 1));
     const dateStr = currentDate.toISOString().split('T')[0];
+
+    const att = mockAttractions[(i - 1) % mockAttractions.length];
+    const rest = mockRestaurants[(i - 1) % mockRestaurants.length];
+    const hotel = mockHotels[(i - 1) % mockHotels.length];
     
     days.push({
       day: i,
       date: dateStr,
-      title: `Exploring the highlights of ${destination}`,
+      title: `Day ${i}: Exploring ${destination} - Section ${String.fromCharCode(64 + i)}`,
       activities: [
-        `Morning: Visit the central historical spots and main landmark in ${destination}.`,
-        `Afternoon: Try local specialties at a traditional lunch spot, then tour the popular arts district.`,
-        `Evening: Dinner at a highly-rated local restaurant and a walk around the city center.`
+        `Morning: Head to the ${att.name} to see the unique architecture and local history.`,
+        `Afternoon: Enjoy lunch at ${rest.name} and explore the neighboring shops and cafes.`,
+        `Evening: Return to the area around ${hotel.name} for a relaxed walk and evening entertainment.`
       ],
       attractions: [
         {
-          name: `${destination} Landmark Spot`,
-          address: `Central District, ${destination}`,
+          name: `${destination} ${att.name}`,
+          address: `${att.address}, ${destination}`,
           estimatedCost: Math.round(budget * 0.05),
-          time: "09:00 AM",
-          notes: "Arrive early to beat the crowds!"
+          time: "09:30 AM",
+          notes: "Arrive early. Great photo opportunities here!"
         }
       ],
       restaurants: [
         {
-          name: `The ${destination} Kitchen`,
-          address: `Downtown Area, ${destination}`,
+          name: `${rest.name} of ${destination}`,
+          address: `${rest.address}, ${destination}`,
           estimatedCost: Math.round(budget * 0.03),
           time: "01:00 PM",
-          notes: "Famous for its local traditional dishes."
+          notes: "Be sure to try their signature local dish."
         }
       ],
       hotels: [
         {
-          name: `${destination} Grand Resort & Hotel`,
-          address: `Luxury Avenue, ${destination}`,
+          name: `${destination} ${hotel.name}`,
+          address: `${hotel.address}, ${destination}`,
           estimatedCost: Math.round(budget * 0.15),
-          notes: "Comfortable stay with excellent ratings."
+          notes: "Comfortable rooms, excellent location and service."
         }
       ],
       estimatedCost: Math.round(budget * 0.23),
-      travelTime: "45 mins total transit",
-      tips: ["Keep some local currency cash handy.", "Comfortable walking shoes are recommended."]
+      travelTime: `${30 + (i * 10)} mins total transit`,
+      tips: [
+        `Ask the hotel desk for local transit passes.`,
+        `Comfortable walking shoes are highly recommended today.`
+      ]
     });
   }
   
