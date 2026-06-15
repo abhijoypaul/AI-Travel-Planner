@@ -228,6 +228,10 @@ const buildPrompt = ({ destination, startDate, endDate, travelers, budget, curre
   3. Detail the transport options (e.g. taxi, train, bus, rental car, ferry, or walking) inside the daily activities or daily tips (for example: "Take the train to the historic district (~50 INR)" or "Hire a local taxi for sightseeing").
   4. Always include realistic estimated transport costs in the daily "estimatedCost" and the global "estimatedBudget.breakdown.transport" field in ${currencyCode}.
 
+  CRITICAL ITINERARY DIVERSITY GUIDELINES:
+  1. DO NOT REPEAT the same attractions, restaurants, hotels, or activities across different days. Every day must feature completely different, unique real-world places, names, dining options, and sights specific to ${destination}.
+  2. DO NOT use placeholder names from the blueprint (like "Real Landmark Name" or "Real Eatery Name"). Replace them with actual, specific names of tourist spots, restaurants, and hotels in ${destination}.
+
   CRITICAL PRICING & COST GUIDELINES:
   1. Generate highly realistic, authentic costs for that specific destination and travel style (Luxury, Budget, Adventure, Family, Solo, Romantic) in ${currencyCode}.
   2. Do not convert the user's budget into USD or any other currency. Treat ${budget} as ${currencyCode}, and return every numeric cost field in ${currencyCode}.
