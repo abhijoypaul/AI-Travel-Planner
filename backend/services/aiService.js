@@ -5,6 +5,55 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY.trim()
 });
 
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const retryWithBackoff = async (fn, retries = 3, delay = 1000) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await fn();
+    } catch (error) {
+      const errorMessage = error.message || '';
+      const isTransient = 
+        errorMessage.includes('503') || 
+        errorMessage.includes('UNAVAILABLE') || 
+        errorMessage.includes('429') || 
+        errorMessage.includes('RESOURCE_EXHAUSTED') ||
+        error.status === 503 ||
+        error.status === 429;
+
+      if (!isTransient || i === retries - 1) {
+        throw error;
+      }
+      console.warn(`Transient error encountered: ${errorMessage}. Retrying in ${delay}ms (attempt ${i + 1}/${retries})...`);
+      await wait(delay);
+      delay *= 2; // exponential backoff
+    }
+  }
+};
+
+const generateContentWithFallback = async (options) => {
+  const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+  let lastError;
+
+  for (const model of modelsToTry) {
+    try {
+      return await retryWithBackoff(async () => {
+        console.log(`Attempting content generation with model: ${model}`);
+        const response = await ai.models.generateContent({
+          ...options,
+          model: model
+        });
+        return response;
+      });
+    } catch (error) {
+      console.error(`Failed with model ${model}:`, error.message || error);
+      lastError = error;
+      // Continue to try the next model
+    }
+  }
+  throw lastError;
+};
+
 const buildPrompt = ({ destination, startDate, endDate, travelers, budget, currency = 'INR', interests, travelStyle }) => {
   const interestList = Array.isArray(interests) ? interests.join(', ') : interests;
   const currencyCode = String(currency || 'INR').toUpperCase();
@@ -65,9 +114,7 @@ export const generateItinerary = async (tripData) => {
   try {
     console.log("Routing via public AI Studio Gateway with AQ token...");
 
-    // FIXES THE 404: Updated to the native SDK target layout model
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+    const response = await generateContentWithFallback({
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -78,8 +125,8 @@ export const generateItinerary = async (tripData) => {
     const text = response.text;
     return JSON.parse(text);
   } catch (error) {
-    console.error("Gemini AI Studio Error:", error.message);
-    throw new Error(`Gemini connection failed: ${error.message}`);
+    console.error("Gemini AI Studio Error:", error.message || error);
+    throw new Error(`Gemini connection failed: ${error.message || error}`);
   }
 };
 
@@ -96,8 +143,7 @@ export const chatWithAssistant = async (message, tripContext) => {
 
     console.log("Routing chat message via public AI Studio Gateway...");
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+    const response = await generateContentWithFallback({
       contents: [
         {
           role: 'user',
@@ -117,7 +163,7 @@ export const chatWithAssistant = async (message, tripContext) => {
 
     return response.text;
   } catch (error) {
-    console.error("Gemini Chat Error:", error.message);
+    console.error("Gemini Chat Error:", error.message || error);
     return "Sorry, I'm having trouble connecting to my brain right now. Please try messaging me again in a moment!";
   }
 };
