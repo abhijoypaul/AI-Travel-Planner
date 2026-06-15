@@ -31,40 +31,15 @@ const retryWithBackoff = async (fn, retries = 3, delay = 1000) => {
   }
 };
 
-const generateContentWithFallback = async (options) => {
-  const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
-  let lastError;
-
-  for (const model of modelsToTry) {
-    try {
-      return await retryWithBackoff(async () => {
-        console.log(`Attempting content generation with model: ${model}`);
-        const response = await ai.models.generateContent({
-          ...options,
-          model: model
-        });
-        return response;
-      });
-    } catch (error) {
-      console.error(`Failed with model ${model}:`, error.message || error);
-      lastError = error;
-
-      const errorMessage = error.message || '';
-      const isTransient = 
-        errorMessage.includes('503') || 
-        errorMessage.includes('UNAVAILABLE') || 
-        errorMessage.includes('429') || 
-        errorMessage.includes('RESOURCE_EXHAUSTED') ||
-        error.status === 503 ||
-        error.status === 429;
-
-      // Only fall back to the next model if the error is transient. Otherwise throw immediately!
-      if (!isTransient) {
-        throw error;
-      }
-    }
-  }
-  throw lastError;
+const generateContentWithRetry = async (options) => {
+  return await retryWithBackoff(async () => {
+    console.log("Attempting content generation with model: gemini-2.5-flash");
+    const response = await ai.models.generateContent({
+      ...options,
+      model: 'gemini-2.5-flash'
+    });
+    return response;
+  }, 5, 1000); // Retry up to 5 times (exponential backoff)
 };
 
 const buildPrompt = ({ destination, startDate, endDate, travelers, budget, currency = 'INR', interests, travelStyle }) => {
@@ -133,7 +108,7 @@ export const generateItinerary = async (tripData) => {
   try {
     console.log("Routing via public AI Studio Gateway with AQ token...");
 
-    const response = await generateContentWithFallback({
+    const response = await generateContentWithRetry({
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -162,7 +137,7 @@ export const chatWithAssistant = async (message, tripContext) => {
 
     console.log("Routing chat message via public AI Studio Gateway...");
 
-    const response = await generateContentWithFallback({
+    const response = await generateContentWithRetry({
       contents: [
         {
           role: 'user',
