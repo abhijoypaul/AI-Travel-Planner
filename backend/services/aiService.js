@@ -7,7 +7,38 @@ const ai = new GoogleGenAI({
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const retryWithBackoff = async (fn, retries = 3, delay = 1000) => {
+const getRetryDelay = (error) => {
+  const errorMessage = error.message || '';
+  try {
+    const match = errorMessage.match(/\{.*\}/s);
+    if (match) {
+      const parsed = JSON.parse(match[0]);
+      const details = parsed.error?.details || parsed.details;
+      if (Array.isArray(details)) {
+        const retryInfo = details.find(d => d.retryDelay || d['@type']?.includes('RetryInfo'));
+        if (retryInfo && retryInfo.retryDelay) {
+          const seconds = parseFloat(retryInfo.retryDelay);
+          if (!isNaN(seconds)) {
+            return seconds * 1000;
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("Failed to parse retry delay JSON:", e);
+  }
+  
+  try {
+    const match = errorMessage.match(/retry in ([\d\.]+)s/i);
+    if (match && match[1]) {
+      return parseFloat(match[1]) * 1000;
+    }
+  } catch {}
+  
+  return null;
+};
+
+const retryWithBackoff = async (fn, retries = 5, delay = 1000) => {
   for (let i = 0; i < retries; i++) {
     try {
       return await fn();
@@ -24,9 +55,22 @@ const retryWithBackoff = async (fn, retries = 3, delay = 1000) => {
       if (!isTransient || i === retries - 1) {
         throw error;
       }
-      console.warn(`Transient error encountered: ${errorMessage}. Retrying in ${delay}ms (attempt ${i + 1}/${retries})...`);
-      await wait(delay);
-      delay *= 2; // exponential backoff
+
+      let waitTime = delay;
+      const serverRequestedDelay = getRetryDelay(error);
+      if (serverRequestedDelay) {
+        // Add 1.5 seconds safety buffer
+        waitTime = serverRequestedDelay + 1500;
+        console.warn(`Gemini API rate limit hit. Waiting ${waitTime}ms for quota reset (attempt ${i + 1}/${retries})...`);
+      } else {
+        console.warn(`Transient error encountered: ${errorMessage.substring(0, 120)}... Retrying in ${waitTime}ms (attempt ${i + 1}/${retries})...`);
+      }
+
+      await wait(waitTime);
+      
+      if (!serverRequestedDelay) {
+        delay *= 2;
+      }
     }
   }
 };
