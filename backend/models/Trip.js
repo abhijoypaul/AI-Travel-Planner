@@ -54,7 +54,7 @@ const tripSchema = new mongoose.Schema(
     travelers: { type: Number, required: true, default: 1 },
     travelStyle: {
       type: String,
-      enum: ['luxury', 'budget', 'adventure', 'family', 'solo', 'romantic'],
+      enum: ['luxury', 'budget', 'adventure', 'family', 'solo', 'romantic', 'relaxing', 'cultural'],
       default: 'adventure',
     },
     interests: [{ type: String }],
