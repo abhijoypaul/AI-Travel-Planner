@@ -36,7 +36,7 @@ export function Sidebar() {
     (path === '/dashboard' && location.pathname.startsWith('/trip'))
 
   return (
-    <aside className="sidebar-gradient flex h-screen max-h-screen w-[260px] flex-col p-5 text-white/70 overflow-y-auto custom-scrollbar">
+    <aside className="sidebar-gradient flex h-full max-h-full w-[260px] flex-col p-5 text-white/70 overflow-y-auto custom-scrollbar">
       {/* Brand */}
       <div className="mb-8 flex items-center gap-3 px-2 pt-2">
         <div className="relative flex h-10 w-10 items-center justify-center rounded-xl overflow-hidden shadow-lg">
