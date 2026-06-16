@@ -42,6 +42,7 @@ export function TripsPage() {
   const handleDelete = (id) => {
     console.log("handleDelete clicked. ID passed:", id);
     console.log("Available trips in state:", trips);
+    alert("Delete button clicked for trip ID: " + id);
     setTripToDelete(id);
   };
 
