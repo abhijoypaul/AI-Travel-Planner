@@ -145,18 +145,7 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
           mapInstance.current.fitBounds(bounds, { padding: 50 })
         }
 
-        if (trip?.routePolyline && maps.geometry?.encoding) {
-          if (polylineRef.current) polylineRef.current.setMap(null)
-          const path = maps.geometry.encoding.decodePath(trip.routePolyline)
-          polylineRef.current = new maps.Polyline({
-            path,
-            geodesic: true,
-            strokeColor: '#4f46e5',
-            strokeOpacity: 0.9,
-            strokeWeight: 4,
-            map: mapInstance.current,
-          })
-        }
+
 
         setLoading(false)
       } catch {
