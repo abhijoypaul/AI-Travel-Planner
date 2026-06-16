@@ -81,7 +81,8 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
           mapTypeControl: false,
           streetViewControl: false,
           styles: [
-            { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
+            { featureType: 'poi', stylers: [{ visibility: 'off' }] },
+            { featureType: 'transit', stylers: [{ visibility: 'off' }] },
           ],
         })
 
