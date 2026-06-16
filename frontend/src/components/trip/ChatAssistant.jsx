@@ -11,10 +11,16 @@ export function ChatAssistant({ tripId }) {
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const bottomRef = useRef(null)
+  const chatContainerRef = useRef(null)
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const container = chatContainerRef.current
+    if (container) {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: 'smooth'
+      })
+    }
   }, [messages])
 
   const sendMessage = async (e) => {
@@ -44,7 +50,7 @@ export function ChatAssistant({ tripId }) {
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col flex-1 overflow-hidden p-4 pt-4 bg-white">
-        <div className="flex-1 overflow-y-auto space-y-3 mb-3 pr-1">
+        <div ref={chatContainerRef} className="flex-1 overflow-y-auto space-y-3 mb-3 pr-1">
           {messages.map((msg, i) => (
             <div key={i} className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : ''}`}>
               {msg.role === 'assistant' && <Bot className="h-6 w-6 text-violet-650 flex-shrink-0 mt-1" />}
@@ -55,7 +61,6 @@ export function ChatAssistant({ tripId }) {
             </div>
           ))}
           {loading && <p className="text-xs text-slate-600 font-bold animate-pulse pl-8">Thinking...</p>}
-          <div ref={bottomRef} />
         </div>
         <form onSubmit={sendMessage} className="flex gap-2 border-t border-slate-100 pt-3">
           <Input
