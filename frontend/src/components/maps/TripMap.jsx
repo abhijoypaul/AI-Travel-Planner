@@ -43,9 +43,19 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
   const getAllLocations = useCallback(() => {
     const locations = []
     for (const day of trip?.itinerary || []) {
-      for (const loc of (day.attractions || [])) {
-        if (loc.lat && loc.lng) {
-          locations.push({ ...loc, dayNumber: day.day, type: 'attraction' })
+      if (day.attractions) {
+        for (const loc of day.attractions) {
+          if (loc.lat && loc.lng) locations.push({ ...loc, dayNumber: day.day, type: 'attraction' })
+        }
+      }
+      if (day.restaurants) {
+        for (const loc of day.restaurants) {
+          if (loc.lat && loc.lng) locations.push({ ...loc, dayNumber: day.day, type: 'restaurant' })
+        }
+      }
+      if (day.hotels) {
+        for (const loc of day.hotels) {
+          if (loc.lat && loc.lng) locations.push({ ...loc, dayNumber: day.day, type: 'hotel' })
         }
       }
     }
@@ -81,8 +91,10 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
           mapTypeControl: false,
           streetViewControl: false,
           styles: [
-            { featureType: 'poi', stylers: [{ visibility: 'off' }] },
-            { featureType: 'transit', stylers: [{ visibility: 'off' }] },
+            { featureType: 'poi', elementType: 'all', stylers: [{ visibility: 'off' }] },
+            { featureType: 'transit', elementType: 'all', stylers: [{ visibility: 'off' }] },
+            { featureType: 'road', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+            { featureType: 'administrative', elementType: 'all', stylers: [{ visibility: 'off' }] },
           ],
         })
 
