@@ -296,8 +296,8 @@ const buildPrompt = ({ destination, startDate, endDate, travelers, budget, curre
   5. DO NOT output or include separate recommendation lists (like recommendedAttractions, recommendedRestaurants, or recommendedHotels). If you want to suggest or recommend a landmark, restaurant, or hotel, integrate it directly into the day-by-day itinerary days array with all required details, routes, and costs.
 
   CRITICAL ALIGNMENT GUIDELINES:
-  1. The "activities" array strings for each day must describe actions that directly correspond to and mention the exact places defined in the "attractions", "restaurants", and "hotels" arrays for that specific day.
-  2. For example, if "attractions" lists "Eiffel Tower" and "restaurants" lists "Le Jules Verne", the "activities" items must talk about visiting "Eiffel Tower" and dining at "Le Jules Verne". Do not mention any landmark or eatery in the "activities" narrative that is not listed in the day's objects.
+  1. Priority is given to the "activities" flow first! Define a clear, cohesive schedule of daily activities (e.g., morning sightseeing, afternoon dining/shopping, evening viewpoint/stroll).
+  2. The specific entries in the "attractions", "restaurants", and "hotels" arrays must follow, match, and list the exact real physical places/venues chosen for those planned activities. Do not choose places first and try to fit the activities around them; plan the activities first, and then list the matching physical places inside the arrays.
 
   CRITICAL TRAVEL TIPS GUIDELINES:
   1. The "travelTips" field at the end must contain highly specific, actionable advice directly related to the generated itinerary, the locations chosen, and the specific timing of the visits (for example: "To visit Nara Park on Day 2, start by 9:00 AM when the deer are most active and crowds are thin," or "Buy train tickets by 8:30 AM on Day 3 for the scenic route").
