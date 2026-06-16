@@ -77,7 +77,7 @@ const retryWithBackoff = async (fn, retries = 5, delay = 1000) => {
 
 const generateContentWithRetry = async (options) => {
   return await retryWithBackoff(async () => {
-    const modelName = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
+    const modelName = process.env.GEMINI_MODEL || 'gemini-3-flash';
     console.log(`Attempting content generation with model: ${modelName}`);
     const response = await ai.models.generateContent({
       ...options,
