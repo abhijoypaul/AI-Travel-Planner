@@ -80,6 +80,10 @@ router.post('/generate', protect, async (req, res) => {
       interests,
     } = req.body;
 
+    const coords = await geocodeDestination(destination);
+    const recommendations = await getRecommendations(destination, coords);
+    const weather = await getWeatherForecast(coords.lat, coords.lng);
+
     const aiResult = await generateItinerary({
       destination,
       startDate,
@@ -89,11 +93,9 @@ router.post('/generate', protect, async (req, res) => {
       travelers,
       travelStyle,
       interests,
+      recommendations,
+      coords
     });
-
-    const coords = await geocodeDestination(destination);
-    const recommendations = await getRecommendations(destination, coords);
-    const weather = await getWeatherForecast(coords.lat, coords.lng);
 
     const itinerary = await enrichItineraryWithCoords(aiResult.days || [], coords, destination);
     const waypoints = collectWaypoints(itinerary);

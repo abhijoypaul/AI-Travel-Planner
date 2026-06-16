@@ -88,7 +88,7 @@ const generateContentWithRetry = async (options) => {
 };
 
 const generateMockItinerary = (tripData) => {
-  const { destination, startDate, endDate, travelers, budget, currency = 'INR', interests, travelStyle } = tripData;
+  const { destination, startDate, endDate, travelers, budget, currency = 'INR', interests, travelStyle, recommendations } = tripData;
   const currencyCode = String(currency || 'INR').toUpperCase();
   
   const start = new Date(startDate);
@@ -96,32 +96,39 @@ const generateMockItinerary = (tripData) => {
   const diffTime = Math.abs(end - start);
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
-  const mockAttractions = [
-    { name: "Historical Downtown & Old Square", address: "Old City Center" },
-    { name: "Central Fine Arts Museum", address: "Museum Boulevard" },
-    { name: "Scenic Botanical Gardens", address: "Green Hill Park" },
-    { name: "City Skyline Viewpoint & Tower", address: "High Ridge Road" },
-    { name: "Traditional Arts & Crafts Market", address: "Market Lane" },
-    { name: "Lakeside Walking Promenade", address: "Waterfront Wharf" },
-    { name: "Historic Fortress & Castle Ruins", address: "North Citadel" },
-    { name: "Modern Science & Space Pavilion", address: "Innovation Park" }
-  ];
+  // Use real Google recommendations if available
+  const attractionsList = recommendations?.attractions?.length
+    ? recommendations.attractions
+    : [
+        { name: "Historical Downtown & Old Square", address: "Old City Center" },
+        { name: "Central Fine Arts Museum", address: "Museum Boulevard" },
+        { name: "Scenic Botanical Gardens", address: "Green Hill Park" },
+        { name: "City Skyline Viewpoint & Tower", address: "High Ridge Road" },
+        { name: "Traditional Arts & Crafts Market", address: "Market Lane" },
+        { name: "Lakeside Walking Promenade", address: "Waterfront Wharf" },
+        { name: "Historic Fortress & Castle Ruins", address: "North Citadel" },
+        { name: "Modern Science & Space Pavilion", address: "Innovation Park" }
+      ].map(a => ({ ...a, name: `${destination} ${a.name}`, address: `${a.address}, ${destination}` }));
 
-  const mockRestaurants = [
-    { name: "The Heritage Bistro", address: "Gastronomy Street" },
-    { name: "Local Spices Cafe", address: "Spices Avenue" },
-    { name: "The Gourmet Terrace", address: "Rooftop Heights" },
-    { name: "Seafood & Grill House", address: "Coastal Harbor" },
-    { name: "Grand Feast Tavern", address: "Bazaar Square" },
-    { name: "The Green Garden Cafe", address: "Eco Park Road" }
-  ];
+  const restaurantsList = recommendations?.restaurants?.length
+    ? recommendations.restaurants
+    : [
+        { name: "The Heritage Bistro", address: "Gastronomy Street" },
+        { name: "Local Spices Cafe", address: "Spices Avenue" },
+        { name: "The Gourmet Terrace", address: "Rooftop Heights" },
+        { name: "Seafood & Grill House", address: "Coastal Harbor" },
+        { name: "Grand Feast Tavern", address: "Bazaar Square" },
+        { name: "The Green Garden Cafe", address: "Eco Park Road" }
+      ].map(r => ({ ...r, name: `${r.name} of ${destination}`, address: `${r.address}, ${destination}` }));
 
-  const mockHotels = [
-    { name: "Grand Central Resort", address: "Main Boulevard" },
-    { name: "Boutique Heritage Suites", address: "Historical Quarter" },
-    { name: "Riverside Comfort Inn", address: "Waterfront District" },
-    { name: "Skyline View Hotel", address: "Financial Center" }
-  ];
+  const hotelsList = recommendations?.hotels?.length
+    ? recommendations.hotels
+    : [
+        { name: "Grand Central Resort", address: "Main Boulevard" },
+        { name: "Boutique Heritage Suites", address: "Historical Quarter" },
+        { name: "Riverside Comfort Inn", address: "Waterfront District" },
+        { name: "Skyline View Hotel", address: "Financial Center" }
+      ].map(h => ({ ...h, name: `${destination} ${h.name}`, address: `${h.address}, ${destination}` }));
   
   const days = [];
   for (let i = 1; i <= diffDays; i++) {
@@ -129,9 +136,9 @@ const generateMockItinerary = (tripData) => {
     currentDate.setDate(start.getDate() + (i - 1));
     const dateStr = currentDate.toISOString().split('T')[0];
 
-    const att = mockAttractions[(i - 1) % mockAttractions.length];
-    const rest = mockRestaurants[(i - 1) % mockRestaurants.length];
-    const hotel = mockHotels[(i - 1) % mockHotels.length];
+    const att = attractionsList[(i - 1) % attractionsList.length];
+    const rest = restaurantsList[(i - 1) % restaurantsList.length];
+    const hotel = hotelsList[(i - 1) % hotelsList.length];
     
     days.push({
       day: i,
@@ -144,28 +151,34 @@ const generateMockItinerary = (tripData) => {
       ],
       attractions: [
         {
-          name: `${destination} ${att.name}`,
-          address: `${att.address}, ${destination}`,
+          name: att.name,
+          address: att.address || `${destination}`,
           estimatedCost: Math.round(budget * 0.05),
           time: "09:30 AM",
-          notes: "Arrive early. Great photo opportunities here!"
+          notes: "Arrive early. Great photo opportunities here!",
+          lat: att.lat,
+          lng: att.lng
         }
       ],
       restaurants: [
         {
-          name: `${rest.name} of ${destination}`,
-          address: `${rest.address}, ${destination}`,
+          name: rest.name,
+          address: rest.address || `${destination}`,
           estimatedCost: Math.round(budget * 0.03),
           time: "01:00 PM",
-          notes: "Be sure to try their signature local dish."
+          notes: "Be sure to try their signature local dish.",
+          lat: rest.lat,
+          lng: rest.lng
         }
       ],
       hotels: [
         {
-          name: `${destination} ${hotel.name}`,
-          address: `${hotel.address}, ${destination}`,
+          name: hotel.name,
+          address: hotel.address || `${destination}`,
           estimatedCost: Math.round(budget * 0.15),
-          notes: "Comfortable rooms, excellent location and service."
+          notes: "Comfortable rooms, excellent location and service.",
+          lat: hotel.lat,
+          lng: hotel.lng
         }
       ],
       estimatedCost: Math.round(budget * 0.23),
