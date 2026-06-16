@@ -147,59 +147,94 @@ router.post('/generate', protect, async (req, res) => {
 });
 
 router.get('/', protect, async (req, res) => {
-  const trips = await Trip.find({ userId: req.user._id }).sort({ createdAt: -1 });
-  res.json(trips);
+  try {
+    const trips = await Trip.find({ userId: req.user._id }).sort({ createdAt: -1 });
+    res.json(trips);
+  } catch (error) {
+    console.error('Get trips error:', error);
+    res.status(500).json({ message: error.message || 'Failed to fetch trips' });
+  }
 });
 
 router.get('/dashboard', protect, async (req, res) => {
-  const now = new Date();
-  const trips = await Trip.find({ userId: req.user._id }).sort({ createdAt: -1 });
+  try {
+    const now = new Date();
+    const trips = await Trip.find({ userId: req.user._id }).sort({ createdAt: -1 });
 
-  const savedTrips = trips.filter((t) => t.status !== 'completed');
-  const upcomingTrips = trips.filter((t) => new Date(t.startDate) >= now);
-  const recentSearches = trips.slice(0, 5).map((t) => ({
-    destination: t.destination,
-    createdAt: t.createdAt,
-    _id: t._id,
-  }));
+    const savedTrips = trips.filter((t) => t.status !== 'completed');
+    const upcomingTrips = trips.filter((t) => new Date(t.startDate) >= now);
+    const recentSearches = trips.slice(0, 5).map((t) => ({
+      destination: t.destination,
+      createdAt: t.createdAt,
+      _id: t._id,
+    }));
 
-  res.json({ savedTrips, upcomingTrips, recentSearches, totalTrips: trips.length });
+    res.json({ savedTrips, upcomingTrips, recentSearches, totalTrips: trips.length });
+  } catch (error) {
+    console.error('Dashboard error:', error);
+    res.status(500).json({ message: error.message || 'Failed to fetch dashboard data' });
+  }
 });
 
 router.get('/share/:token', async (req, res) => {
-  const trip = await Trip.findOne({ shareToken: req.params.token }).populate('userId', 'name');
-  if (!trip) return res.status(404).json({ message: 'Trip not found' });
-  res.json(trip);
+  try {
+    const trip = await Trip.findOne({ shareToken: req.params.token }).populate('userId', 'name');
+    if (!trip) return res.status(404).json({ message: 'Trip not found' });
+    res.json(trip);
+  } catch (error) {
+    console.error('Share trip error:', error);
+    res.status(500).json({ message: error.message || 'Failed to fetch shared trip' });
+  }
 });
 
 router.get('/:id', protect, async (req, res) => {
-  const trip = await Trip.findOne({ _id: req.params.id, userId: req.user._id });
-  if (!trip) return res.status(404).json({ message: 'Trip not found' });
-  res.json(trip);
+  try {
+    const trip = await Trip.findOne({ _id: req.params.id, userId: req.user._id });
+    if (!trip) return res.status(404).json({ message: 'Trip not found' });
+    res.json(trip);
+  } catch (error) {
+    console.error('Get trip error:', error);
+    res.status(500).json({ message: error.message || 'Failed to fetch trip details' });
+  }
 });
 
 router.put('/:id', protect, async (req, res) => {
-  const trip = await Trip.findOneAndUpdate(
-    { _id: req.params.id, userId: req.user._id },
-    req.body,
-    { new: true, runValidators: true }
-  );
-  if (!trip) return res.status(404).json({ message: 'Trip not found' });
-  res.json(trip);
+  try {
+    const trip = await Trip.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user._id },
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (!trip) return res.status(404).json({ message: 'Trip not found' });
+    res.json(trip);
+  } catch (error) {
+    console.error('Update trip error:', error);
+    res.status(500).json({ message: error.message || 'Failed to update trip' });
+  }
 });
 
 router.delete('/:id', protect, async (req, res) => {
-  const trip = await Trip.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
-  if (!trip) return res.status(404).json({ message: 'Trip not found' });
-  res.json({ message: 'Trip deleted' });
+  try {
+    const trip = await Trip.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
+    if (!trip) return res.status(404).json({ message: 'Trip not found' });
+    res.json({ message: 'Trip deleted' });
+  } catch (error) {
+    console.error('Delete trip error:', error);
+    res.status(500).json({ message: error.message || 'Failed to delete trip' });
+  }
 });
 
 router.post('/:id/expenses', protect, async (req, res) => {
-  const trip = await Trip.findOne({ _id: req.params.id, userId: req.user._id });
-  if (!trip) return res.status(404).json({ message: 'Trip not found' });
-  trip.expenses.push(req.body);
-  await trip.save();
-  res.json(trip);
+  try {
+    const trip = await Trip.findOne({ _id: req.params.id, userId: req.user._id });
+    if (!trip) return res.status(404).json({ message: 'Trip not found' });
+    trip.expenses.push(req.body);
+    await trip.save();
+    res.json(trip);
+  } catch (error) {
+    console.error('Add expense error:', error);
+    res.status(500).json({ message: error.message || 'Failed to add expense' });
+  }
 });
 
 router.patch('/:id/checklist/:itemId', protect, async (req, res) => {
