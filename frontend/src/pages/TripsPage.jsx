@@ -75,7 +75,7 @@ export function TripsPage() {
 
         {/* Stats */}
         {!loading && (
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             {[
               { label: "Total Trips", value: trips.length, icon: Globe, color: "text-indigo-500", bg: "bg-indigo-50" },
               { label: "Destinations", value: new Set(trips.map(t => t.destination.split(",")[0])).size, icon: MapPin, color: "text-emerald-500", bg: "bg-emerald-50" },
@@ -84,13 +84,13 @@ export function TripsPage() {
                   return acc + (isNaN(diff) ? 0 : diff);
                 }, 0), icon: Clock, color: "text-violet-500", bg: "bg-violet-50" },
             ].map(({ label, value, icon: Icon, color, bg }) => (
-              <div key={label} className="wander-card p-5 flex items-center gap-4">
-                <div className={`h-10 w-10 rounded-xl ${bg} flex items-center justify-center`}>
-                  <Icon className={`h-5 w-5 ${color}`} />
+              <div key={label} className="wander-card p-4 sm:p-5 flex items-center gap-3 sm:gap-4">
+                <div className={`h-9 w-9 sm:h-10 sm:w-10 rounded-xl ${bg} flex items-center justify-center flex-shrink-0`}>
+                  <Icon className={`h-4.5 w-4.5 sm:h-5 sm:w-5 ${color}`} />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-slate-900">{value}</p>
-                  <p className="text-xs text-slate-500 font-medium">{label}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-slate-900">{value}</p>
+                  <p className="text-[11px] sm:text-xs text-slate-500 font-medium">{label}</p>
                 </div>
               </div>
             ))}
