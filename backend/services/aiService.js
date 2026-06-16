@@ -287,6 +287,7 @@ const buildPrompt = ({ destination, startDate, endDate, travelers, budget, curre
   2. Minimize travel time and completely prevent backtracking. Do not jump between far-apart regions of the destination on the same day. Once the traveler covers a particular area or sub-district, they should not return to it on subsequent days.
   3. Plan logical, efficient transit routes within the chosen area for the day. Detail transport options (e.g. taxi, train, bus, rental car, ferry, or walking) inside the daily activities or daily tips (for example: "Take the train to the historic district (~50 INR)" or "Hire a local taxi for sightseeing").
   4. Always include realistic estimated transport costs in the daily "estimatedCost" and the global "estimatedBudget.breakdown.transport" field in ${currencyCode}.
+  5. The selected hotel/accommodation for each day must be located in the same geographical area or district as that day's attractions and restaurants (especially if returning to the hotel is in the evening or later). Keep the lodging close to the day's sights to avoid long commutes at the end of the day.
 
   CRITICAL ITINERARY DIVERSITY & ATTRACTION SELECTION GUIDELINES:
   1. Choose a diverse mix of points of interest! Include major famous landmarks and popular attractions of the destination, balanced with a mix of different types of spots (historical, cultural, parks/nature, shopping, viewpoint, food, etc.).
