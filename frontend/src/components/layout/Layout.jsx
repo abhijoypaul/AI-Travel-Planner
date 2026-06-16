@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Sidebar } from "./Sidebar";
-import { Bell, ChevronDown, User, Settings, LogOut, X } from "lucide-react";
+import { Bell, ChevronDown, User, Settings, LogOut, X, Menu } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useNotification } from "@/context/NotificationContext";
 import { useLocation, Link, useNavigate } from "react-router-dom";
@@ -12,8 +12,13 @@ export function Layout({ children, hideSidebar = false }) {
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const dropdownRef = useRef(null);
   const notificationRef = useRef(null);
+
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
 
   const formatTime = (timeStr) => {
     try {
@@ -63,19 +68,27 @@ export function Layout({ children, hideSidebar = false }) {
 
   return (
     <div className="dashboard-layout">
-      {/* Fixed Sidebar */}
-      <Sidebar />
+      {/* Fixed/Responsive Sidebar */}
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Main Content Area */}
       <div className="flex flex-col h-full overflow-hidden">
         {/* Top Header */}
         <header
-          className="flex h-16 shrink-0 items-center justify-between px-8 gap-6"
+          className="flex h-16 shrink-0 items-center justify-between px-4 sm:px-8 gap-4"
           style={{
             background: "#f4f6fb",
             borderBottom: "1px solid rgba(99,102,241,0.07)",
           }}
         >
+          {/* Mobile Sidebar Toggle */}
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="lg:hidden p-2 rounded-xl bg-white shadow-sm border border-slate-100 text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-colors focus:outline-none shrink-0 animate-fade-in"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+
           {/* Spacing placeholder instead of top search bar */}
           <div className="flex-1" />
 
@@ -204,7 +217,7 @@ export function Layout({ children, hideSidebar = false }) {
 
         {/* Scrollable Content */}
         <main
-          className="flex-1 overflow-y-auto px-8 pb-2 custom-scrollbar"
+          className="flex-1 overflow-y-auto px-4 sm:px-8 pb-4 custom-scrollbar"
           style={{ background: "#f4f6fb" }}
         >
           {children}

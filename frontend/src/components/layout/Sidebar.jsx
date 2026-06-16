@@ -10,6 +10,7 @@ import {
   Settings,
   Plane,
   Plus,
+  X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import logoVideo from '@/assets/logo.mp4'
@@ -28,7 +29,7 @@ const bottomMenuItems = [
   { icon: Settings, label: 'Settings', path: '/settings' },
 ]
 
-export function Sidebar() {
+export function Sidebar({ isOpen, onClose }) {
   const location = useLocation()
 
   const isActive = (path) =>
@@ -36,24 +37,48 @@ export function Sidebar() {
     (path === '/dashboard' && location.pathname.startsWith('/trip'))
 
   return (
-    <aside className="sidebar-gradient flex h-screen max-h-screen min-h-0 w-[260px] flex-col p-5 text-white/70 overflow-y-auto custom-scrollbar">
-      {/* Brand */}
-      <div className="mb-8 flex items-center gap-3 px-2 pt-2">
-        <div className="relative flex h-10 w-10 items-center justify-center rounded-xl overflow-hidden shadow-lg">
-          <video
-            src={logoVideo}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="h-10 w-10 object-cover"
-          />
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300 lg:hidden"
+          onClick={onClose}
+        />
+      )}
+
+      <aside
+        className={cn(
+          "sidebar-gradient flex h-screen max-h-screen min-h-0 w-[260px] flex-col p-5 text-white/70 overflow-y-auto custom-scrollbar transition-transform duration-300 ease-in-out",
+          "fixed top-0 bottom-0 left-0 z-50 lg:sticky lg:translate-x-0",
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        {/* Brand Header */}
+        <div className="mb-8 flex items-center justify-between px-2 pt-2">
+          <div className="flex items-center gap-3">
+            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl overflow-hidden shadow-lg">
+              <video
+                src={logoVideo}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="h-10 w-10 object-cover"
+              />
+            </div>
+            <span className="text-xl font-bold tracking-normal text-white flex items-center gap-1">
+              <span>Odyssey</span>
+              <span className="font-light opacity-80">X</span>
+            </span>
+          </div>
+          {/* Close Button on mobile */}
+          <button
+            onClick={onClose}
+            className="lg:hidden p-1 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-colors"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
-        <span className="text-xl font-bold tracking-normal text-white flex items-center gap-1">
-          <span>Odyssey</span>
-          <span className="font-light opacity-80">X</span>
-        </span>
-      </div>
 
       {/* Main Menu */}
       <nav className="flex-1 space-y-1">
