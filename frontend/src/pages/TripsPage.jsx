@@ -122,44 +122,47 @@ export function TripsPage() {
               const style = STYLE_COLORS[trip.travelStyle] || STYLE_COLORS.adventure;
               const days = Math.round((new Date(trip.endDate) - new Date(trip.startDate)) / 86400000);
               return (
-                <div key={trip._id} className="wander-card p-5 flex items-center gap-4 hover:shadow-md transition-all group">
-                  {/* Color indicator */}
-                  <div className={`h-12 w-12 rounded-2xl ${style.bg} flex items-center justify-center flex-shrink-0`}>
-                    <MapPin className={`h-6 w-6 ${style.text}`} />
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-base font-bold text-slate-900 truncate">{trip.destination}</h3>
-                      <span className={`px-2.5 py-0.5 rounded-lg text-[10px] font-bold ${style.bg} ${style.text} capitalize`}>
-                        {trip.travelStyle}
-                      </span>
+                <div key={trip._id} className="wander-card p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:shadow-md transition-all group">
+                  <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto min-w-0">
+                    {/* Color indicator */}
+                    <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-2xl ${style.bg} flex items-center justify-center flex-shrink-0`}>
+                      <MapPin className={`h-5 w-5 sm:h-6 sm:w-6 ${style.text}`} />
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-slate-500">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        {formatDate(trip.startDate)} – {formatDate(trip.endDate)}
-                      </span>
-                      {!isNaN(days) && days > 0 && (
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {days} {days === 1 ? "day" : "days"}
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1">
+                        <h3 className="text-sm sm:text-base font-bold text-slate-900 truncate max-w-[140px] xs:max-w-none">{trip.destination}</h3>
+                        <span className={`px-2 py-0.5 rounded-lg text-[9px] sm:text-[10px] font-bold ${style.bg} ${style.text} capitalize flex-shrink-0`}>
+                          {trip.travelStyle}
                         </span>
-                      )}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] sm:text-xs text-slate-500 font-medium">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3.5 w-3.5" />
+                          {formatDate(trip.startDate)} – {formatDate(trip.endDate)}
+                        </span>
+                        {!isNaN(days) && days > 0 && (
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3.5 w-3.5" />
+                            {days} {days === 1 ? "day" : "days"}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 relative z-10">
+                  <div className="flex items-center justify-end gap-2 w-full sm:w-auto border-t sm:border-t-0 border-slate-100 pt-3 sm:pt-0 relative z-10">
                     <button
                       onClick={(e) => handleDelete(trip._id, e)}
                       className="h-9 w-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-red-650 hover:bg-red-50 bg-slate-50 transition-colors cursor-pointer"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
-                    <Link to={`/trip/${trip._id}`} className="block">
-                      <button className="h-9 w-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 bg-slate-50 transition-colors cursor-pointer">
+                    <Link to={`/trip/${trip._id}`} className="block w-full sm:w-auto">
+                      <button className="h-9 px-4 sm:px-0 sm:w-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 bg-slate-50 transition-colors cursor-pointer w-full gap-1">
+                        <span className="inline sm:hidden text-xs font-bold">View Details</span>
                         <ChevronRight className="h-4.5 w-4.5" />
                       </button>
                     </Link>
