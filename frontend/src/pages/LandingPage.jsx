@@ -59,7 +59,7 @@ export function LandingPage() {
         <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-indigo-500/10 blur-[150px] pointer-events-none animate-pulse-glow z-0" style={{ animationDelay: '-5s' }} />
 
         {/* Apple Vision Pro Glassmorphic Navigation Bar */}
-        <header className="w-full max-w-[1400px] mx-auto px-6 sm:px-12 py-6 flex justify-between items-center relative z-20">
+        <header className="w-full max-w-[1400px] mx-auto px-4 sm:px-12 py-6 flex justify-between items-center relative z-20">
           {/* Left links */}
           <nav className="hidden md:flex items-center gap-8 text-[11px] font-bold tracking-widest uppercase text-white/80">
             <Link to="/explore" className="hover:text-white transition-colors">Explore</Link>
@@ -69,26 +69,28 @@ export function LandingPage() {
           </nav>
 
           {/* Centered Premium Brand Logo */}
-          <div className="absolute left-1/2 -translate-x-1/2 flex items-center select-none group cursor-pointer">
+          <div className="flex items-center select-none group cursor-pointer md:absolute md:left-1/2 md:-translate-x-1/2">
             <span
-              className="text-2xl sm:text-3xl font-light tracking-wider text-white font-serif italic transition-all duration-500 group-hover:tracking-widest"
+              className="text-xl sm:text-3xl font-light tracking-wider text-white font-serif italic transition-all duration-500 group-hover:tracking-widest"
               style={{ fontFamily: "'Playfair Display', serif" }}
             >
               Odyssey
             </span>
-            <span className="text-2xl sm:text-3xl font-black tracking-tighter text-cyan-400 font-sans ml-1 transition-all duration-500 group-hover:scale-110 group-hover:text-cyan-300">X</span>
+            <span className="text-xl sm:text-3xl font-black tracking-tighter text-cyan-400 font-sans ml-1 transition-all duration-500 group-hover:scale-110 group-hover:text-cyan-300">X</span>
           </div>
 
           {/* Right actions */}
-          <div className="flex items-center gap-4 ml-auto md:ml-0">
+          <div className="flex items-center gap-2 sm:gap-4 ml-auto md:ml-0">
             <Link to="/login">
-              <button className="px-5 py-2.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/5 border border-white/10 hover:bg-white/10 transition-all backdrop-blur-md">
-                Members portal
+              <button className="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider bg-white/5 border border-white/10 hover:bg-white/10 transition-all backdrop-blur-md">
+                <span className="hidden sm:inline">Members portal</span>
+                <span className="inline sm:hidden">Sign In</span>
               </button>
             </Link>
             <Link to="/register">
-              <button className="px-5 py-2.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white text-slate-950 hover:bg-slate-100 transition-all shadow-lg shadow-white/10">
-                Become a member
+              <button className="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider bg-white text-slate-950 hover:bg-slate-100 transition-all shadow-lg shadow-white/10">
+                <span className="hidden sm:inline">Become a member</span>
+                <span className="inline sm:hidden">Join</span>
               </button>
             </Link>
           </div>
@@ -114,11 +116,11 @@ export function LandingPage() {
           {/* Hero Typography Heading */}
           <div className="space-y-4 max-w-4xl animate-fade-in-up">
             <h1
-              className="text-4xl sm:text-6xl md:text-7xl font-extralight tracking-tight leading-[1.1] text-white select-none"
+              className="text-3xl sm:text-6xl md:text-7xl font-extralight tracking-tight leading-[1.2] sm:leading-[1.1] text-white select-none"
               style={{ fontFamily: "'Playfair Display', serif" }}
             >
               Grand <span className="font-serif italic font-normal text-white">itineraries</span>.<br />
-              <span className="font-sans font-black tracking-tighter uppercase text-[2.5rem] sm:text-[4.5rem] md:text-[5.5rem] bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent">
+              <span className="font-sans font-black tracking-tighter uppercase text-[2rem] sm:text-[4.5rem] md:text-[5.5rem] bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent leading-none">
                 Annual voyages
               </span><br />
               with <span className="font-serif italic font-normal text-white">intelligent routing</span><br />

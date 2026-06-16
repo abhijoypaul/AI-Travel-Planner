@@ -520,7 +520,7 @@ export function DashboardPage() {
         {/* ── Search Widget (outside hero so it's never clipped) ── */}
         <div className="search-widget">
           {/* Where to — text input */}
-          <div className="flex-1 px-5 py-3 flex flex-col justify-center border-r border-slate-100 min-w-0">
+          <div className="flex-1 px-5 py-3 flex flex-col justify-center border-b md:border-b-0 md:border-r border-slate-100 min-w-0 w-full">
             <p className="text-[9px] font-extrabold text-slate-450 uppercase tracking-widest mb-1">Where to?</p>
             <div className="flex items-center gap-2">
               <div className="h-7 w-7 rounded-full bg-indigo-50 flex items-center justify-center flex-shrink-0">
@@ -538,7 +538,7 @@ export function DashboardPage() {
           </div>
 
           {/* Budget */}
-          <div className="px-5 py-3 flex flex-col justify-center border-r border-slate-100 w-52 flex-shrink-0">
+          <div className="px-5 py-3 flex flex-col justify-center border-b md:border-b-0 md:border-r border-slate-100 w-full md:w-52 flex-shrink-0">
             <p className="text-[9px] font-extrabold text-slate-455 uppercase tracking-widest mb-1">Budget ({currencySymbol})</p>
             <div className="flex items-center gap-1.5 min-w-0">
               <div className="h-7 w-7 rounded-full bg-indigo-50 flex items-center justify-center flex-shrink-0">
@@ -573,7 +573,7 @@ export function DashboardPage() {
           </div>
 
           {/* Duration */}
-          <div className="px-5 py-3 flex flex-col justify-center border-r border-slate-100 w-36 flex-shrink-0">
+          <div className="px-5 py-3 flex flex-col justify-center border-b md:border-b-0 md:border-r border-slate-100 w-full md:w-36 flex-shrink-0">
             <p className="text-[9px] font-extrabold text-slate-455 uppercase tracking-widest mb-1">Duration</p>
             <div className="flex items-center gap-2">
               <div className="h-7 w-7 rounded-full bg-indigo-50 flex items-center justify-center flex-shrink-0">
@@ -594,7 +594,7 @@ export function DashboardPage() {
           </div>
 
           {/* Travelers */}
-          <div className="px-5 py-3 flex flex-col justify-center w-36 flex-shrink-0">
+          <div className="px-5 py-3 flex flex-col justify-center w-full md:w-36 flex-shrink-0">
             <p className="text-[9px] font-extrabold text-slate-455 uppercase tracking-widest mb-1">Travelers</p>
             <div className="flex items-center gap-2">
               <div className="h-7 w-7 rounded-full bg-indigo-50 flex items-center justify-center flex-shrink-0">
@@ -615,10 +615,10 @@ export function DashboardPage() {
           </div>
 
           {/* CTA */}
-          <div className="pl-3 pr-1 flex-shrink-0">
+          <div className="px-5 py-2 md:pl-3 md:pr-1 md:py-0 w-full md:w-auto flex-shrink-0">
             <button
               onClick={handleGenerate}
-              className="btn-primary h-12 px-5 rounded-xl text-[13px] font-bold gap-2 flex items-center whitespace-nowrap"
+              className="btn-primary h-12 w-full md:w-auto px-5 rounded-xl text-[13px] font-bold gap-2 flex items-center justify-center whitespace-nowrap"
             >
               <Sparkles className="h-4 w-4 fill-white" />
               Generate Itinerary
