@@ -355,13 +355,6 @@ export const generateItinerary = async (tripData) => {
     return JSON.parse(text);
   } catch (error) {
     console.error("Gemini AI Studio Error:", error.message || error);
-    
-    const isQuotaExceeded = error.message?.includes('429') || error.message?.includes('quota') || error.message?.includes('RESOURCE_EXHAUSTED');
-    if (isQuotaExceeded) {
-      console.warn("Quota limit hit. Generating a high-quality fallback mock itinerary...");
-      return generateMockItinerary(tripData);
-    }
-    
     throw new Error(`Gemini connection failed: ${error.message || error}`);
   }
 };
@@ -399,10 +392,6 @@ export const chatWithAssistant = async (message, tripContext) => {
     return response.text;
   } catch (error) {
     console.error("Gemini Chat Error:", error.message || error);
-    const isQuotaExceeded = error.message?.includes('429') || error.message?.includes('quota') || error.message?.includes('RESOURCE_EXHAUSTED');
-    if (isQuotaExceeded) {
-      return "Hi there! It looks like our AI service is currently receiving a lot of traffic (API quota exhausted). I'm temporarily running in fallback mode, but please ask me anything and I'll do my best to help you with your plans!";
-    }
-    return "Sorry, I'm having trouble connecting to my brain right now. Please try messaging me again in a moment!";
+    throw new Error(`Gemini Chat failed: ${error.message || error}`);
   }
 };
