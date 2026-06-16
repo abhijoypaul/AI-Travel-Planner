@@ -312,7 +312,7 @@ const buildPrompt = ({ destination, startDate, endDate, travelers, budget, curre
   4. Transport costs must also be realistic in ${currencyCode}, including local taxis, trains, flights, or rental car costs where applicable.
   5. If the destination's realistic cost for this trip is LOWER than the user's maximum budget limit (${currencyCode} ${budget}), do NOT artificially inflate the costs to match the budget. Instead, estimate the genuine realistic cost and output it in estimatedBudget.total. This will show the traveler their potential savings!
 
-  CRITICAL: You must generate a distinct entries array block for EVERY single day between ${startDate} and ${endDate}. Do not hardcode a single day. Map real points of interest, authentic dining options, and actual pricing options specific to ${destination}.
+  CRITICAL: You must generate a distinct entries array block for EVERY single day between ${startDate} and ${endDate}. Do not hardcode a single day. Map real points of interest, authentic dining options, and actual pricing options specific to ${destination}. On the final day (departure day), do not use "None" or "none" or "n/a" for the "travelTime", "attractions", "restaurants", or "hotels" fields. For "travelTime", estimate the transit time to the airport, station, or back home (e.g., "45 mins to airport"). For "hotels", if checking out, list the checkout hotel name or leave the array empty `[]` instead of writing "None" or using placeholder values. No string field in the JSON should contain the word "None" or "none" or "n/a".
 
   Return a valid JSON object ONLY (absolutely no markdown, no \`\`\`json wrappers, and no conversational prose) adhering strictly to this structural blueprint:
   {

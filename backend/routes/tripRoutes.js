@@ -13,11 +13,21 @@ const router = express.Router();
 const enrichItineraryWithCoords = async (itinerary, coords, destination) => {
   const enriched = [];
   for (const day of itinerary) {
+    let travelTime = day.travelTime || '';
+    if (travelTime.toLowerCase() === 'none' || travelTime.toLowerCase() === 'n/a') {
+      travelTime = '';
+    }
+
+    const attractions = (day.attractions || []).filter(a => a && a.name && a.name.toLowerCase() !== 'none' && a.name.toLowerCase() !== 'n/a');
+    const restaurants = (day.restaurants || []).filter(r => r && r.name && r.name.toLowerCase() !== 'none' && r.name.toLowerCase() !== 'n/a');
+    const hotels = (day.hotels || []).filter(h => h && h.name && h.name.toLowerCase() !== 'none' && h.name.toLowerCase() !== 'n/a');
+
     enriched.push({
       ...day,
-      attractions: await geocodeLocations(day.attractions || [], coords, destination),
-      restaurants: await geocodeLocations(day.restaurants || [], coords, destination),
-      hotels: await geocodeLocations(day.hotels || [], coords, destination),
+      travelTime,
+      attractions: await geocodeLocations(attractions, coords, destination),
+      restaurants: await geocodeLocations(restaurants, coords, destination),
+      hotels: await geocodeLocations(hotels, coords, destination),
     });
   }
   return enriched;
