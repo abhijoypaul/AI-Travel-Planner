@@ -204,7 +204,7 @@ export function Layout({ children, hideSidebar = false }) {
 
         {/* Scrollable Content */}
         <main
-          className="flex-1 overflow-y-auto px-8 pb-10 hide-scrollbar"
+          className="flex-1 overflow-y-auto px-8 pb-10 custom-scrollbar"
           style={{ background: "#f4f6fb" }}
         >
           {children}
