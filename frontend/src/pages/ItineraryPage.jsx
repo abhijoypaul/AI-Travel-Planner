@@ -140,7 +140,7 @@ export function ItineraryPage() {
 
   return (
     <Layout>
-      <div className="py-6 animate-fade-in-up">
+      <div className="pt-4 pb-2 animate-fade-in-up">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
