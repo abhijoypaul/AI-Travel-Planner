@@ -384,8 +384,14 @@ export const chatWithAssistant = async (message, tripContext) => {
         {
           role: 'user',
           parts: [{
-            text: `You are an expert AI Travel Assistant. Use the following itinerary details to answer the user's specific questions accurately. Be concise, helpful, and suggest practical local alternatives if they want to modify their plans.
+            text: `You are an expert AI Travel Assistant.
             
+            CRITICAL INSTRUCTIONS:
+            1. PRIORITIZE answering the user's questions using the details in the provided Itinerary Context (attractions, activities, restaurants, hotels, budget, dates, etc.).
+            2. If you cannot answer the user's question or fulfill their request based strictly on the itinerary (e.g. if they ask for new recommendations, or ask about general travel tips or landmarks in that city not currently on the itinerary), then answer based on your general knowledge of the destination area/city: "${tripContext?.destination || 'the destination'}".
+            3. Keep your answers concise, helpful, and suggest practical local options or modifications when requested.
+            
+            Itinerary Context:
             ${contextString}
             
             User Message: "${message}"`

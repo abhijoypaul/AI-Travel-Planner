@@ -269,6 +269,7 @@ router.post('/:id/chat', protect, async (req, res) => {
     budget: trip.budget,
     currency: trip.currency || req.user.settings?.currency || 'INR',
     dates: { start: trip.startDate, end: trip.endDate },
+    itinerary: trip.itinerary,
   });
   res.json({ reply });
 });
