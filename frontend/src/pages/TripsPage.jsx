@@ -36,8 +36,25 @@ export function TripsPage() {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
-
-
+  const handleDelete = async (id, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!confirm("Are you sure you want to delete this trip?")) return;
+    try {
+      await tripAPI.delete(id);
+      setTrips((prev) => prev.filter((t) => t._id !== id));
+      addNotification("Success", "Trip deleted successfully", "success");
+    } catch (err) {
+      console.error(err);
+      addNotification(
+        "Error",
+        "Failed to delete the trip. Please try again.",
+        "error"
+      );
+    }
+  };
 
   return (
     <Layout>
@@ -135,6 +152,12 @@ export function TripsPage() {
 
                   {/* Actions */}
                   <div className="flex items-center gap-2 relative z-10">
+                    <button
+                      onClick={(e) => handleDelete(trip._id, e)}
+                      className="h-9 w-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-red-650 hover:bg-red-50 bg-slate-50 transition-colors cursor-pointer"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                     <Link to={`/trip/${trip._id}`} className="block">
                       <button className="h-9 w-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 bg-slate-50 transition-colors cursor-pointer">
                         <ChevronRight className="h-4.5 w-4.5" />

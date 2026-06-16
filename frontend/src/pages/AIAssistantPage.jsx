@@ -37,10 +37,16 @@ export function AIAssistantPage() {
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const bottomRef = useRef(null);
+  const chatContainerRef = useRef(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = chatContainerRef.current;
+    if (container) {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth",
+      });
+    }
   }, [messages]);
 
   const send = async (text) => {
@@ -67,7 +73,7 @@ export function AIAssistantPage() {
           {/* Chat Panel */}
           <div className="flex-1 wander-card flex flex-col overflow-hidden">
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-4 hide-scrollbar">
+            <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-5 space-y-4 hide-scrollbar">
               {messages.map((msg, i) => (
                 <div key={i} className={`flex gap-3 ${msg.role === "user" ? "justify-end" : ""}`}>
                   {msg.role === "assistant" && (
@@ -103,7 +109,6 @@ export function AIAssistantPage() {
                   </div>
                 </div>
               )}
-              <div ref={bottomRef} />
             </div>
 
             {/* Quick Prompts */}
