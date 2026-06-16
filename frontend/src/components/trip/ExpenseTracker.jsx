@@ -87,7 +87,7 @@ export function ExpenseTracker({ trip, onUpdate }) {
         <div className="space-y-2 max-h-40 overflow-y-auto">
           {(trip.expenses || []).map((exp) => (
             <div key={exp._id} className="flex justify-between border-b border-slate-100 py-1.5 text-sm text-slate-800 font-bold">
-              <span>{exp.description} <span className="text-slate-500 font-medium text-xs">({exp.category})</span></span>
+              <span>{exp.description}</span>
               <span className="font-bold text-slate-900">{formatCurrency(exp.amount, currency)}</span>
             </div>
           ))}
