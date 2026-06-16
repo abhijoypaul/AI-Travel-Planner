@@ -282,16 +282,18 @@ const buildPrompt = ({ destination, startDate, endDate, travelers, budget, curre
   - Travel Style: ${travelStyle || 'adventure'}
   - Core Interests: ${interestList}
 
-  CRITICAL GEOGRAPHIC DISTRIBUTION & TRANSPORTATION GUIDELINES:
-  1. Geographically spread out the itinerary! Do not concentrate all activities in a single neighborhood or local area. Plan activities, attractions, and accommodations across different sub-regions, districts, or distinct parts of the destination.
-  2. Plan logical transit routes between these spread-out areas (e.g. traveling from East district to West district).
-  3. Detail the transport options (e.g. taxi, train, bus, rental car, ferry, or walking) inside the daily activities or daily tips (for example: "Take the train to the historic district (~50 INR)" or "Hire a local taxi for sightseeing").
+  CRITICAL GEOGRAPHIC GROUPING & TRANSPORTATION GUIDELINES:
+  1. Group attractions and activities geographically! For each day (or consecutive block of 1-2 days), all planned places must be connected, nearby, and located in the same local district, neighborhood, or area of the destination.
+  2. Minimize travel time and completely prevent backtracking. Do not jump between far-apart regions of the destination on the same day. Once the traveler covers a particular area or sub-district, they should not return to it on subsequent days.
+  3. Plan logical, efficient transit routes within the chosen area for the day. Detail transport options (e.g. taxi, train, bus, rental car, ferry, or walking) inside the daily activities or daily tips (for example: "Take the train to the historic district (~50 INR)" or "Hire a local taxi for sightseeing").
   4. Always include realistic estimated transport costs in the daily "estimatedCost" and the global "estimatedBudget.breakdown.transport" field in ${currencyCode}.
 
-  CRITICAL ITINERARY DIVERSITY GUIDELINES:
-  1. DO NOT REPEAT the same attractions, restaurants, hotels, or activities across different days. Every day must feature completely different, unique real-world places, names, dining options, and sights specific to ${destination}.
-  2. DO NOT use placeholder names from the blueprint (like "Real Landmark Name" or "Real Eatery Name"). Replace them with actual, specific names of tourist spots, restaurants, and hotels in ${destination}.
-  3. DO NOT output or include separate recommendation lists (like recommendedAttractions, recommendedRestaurants, or recommendedHotels). If you want to suggest or recommend a landmark, restaurant, or hotel, integrate it directly into the day-by-day itinerary days array with all required details, routes, and costs.
+  CRITICAL ITINERARY DIVERSITY & ATTRACTION SELECTION GUIDELINES:
+  1. Choose a diverse mix of points of interest! Include major famous landmarks and popular attractions of the destination, balanced with a mix of different types of spots (historical, cultural, parks/nature, shopping, viewpoint, food, etc.).
+  2. Ensure the daily pacing is highly realistic: don't overload days with too many sights, and keep traveler energy levels, travel times, and monetary/budget constraints in mind.
+  3. DO NOT REPEAT the same attractions, restaurants, hotels, or activities across different days. Every day must feature completely different, unique real-world places, names, dining options, and sights specific to ${destination}.
+  4. DO NOT use placeholder names from the blueprint (like "Real Landmark Name" or "Real Eatery Name"). Replace them with actual, specific names of tourist spots, restaurants, and hotels in ${destination}.
+  5. DO NOT output or include separate recommendation lists (like recommendedAttractions, recommendedRestaurants, or recommendedHotels). If you want to suggest or recommend a landmark, restaurant, or hotel, integrate it directly into the day-by-day itinerary days array with all required details, routes, and costs.
 
   CRITICAL TRAVEL TIPS GUIDELINES:
   1. The "travelTips" field at the end must contain highly specific, actionable advice directly related to the generated itinerary, the locations chosen, and the specific timing of the visits (for example: "To visit Nara Park on Day 2, start by 9:00 AM when the deer are most active and crowds are thin," or "Buy train tickets by 8:30 AM on Day 3 for the scenic route").

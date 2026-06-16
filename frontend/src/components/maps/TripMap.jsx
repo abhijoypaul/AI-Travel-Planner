@@ -43,9 +43,9 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
   const getAllLocations = useCallback(() => {
     const locations = []
     for (const day of trip?.itinerary || []) {
-      for (const loc of [...(day.attractions || []), ...(day.restaurants || []), ...(day.hotels || [])]) {
+      for (const loc of (day.attractions || [])) {
         if (loc.lat && loc.lng) {
-          locations.push({ ...loc, dayNumber: day.day })
+          locations.push({ ...loc, dayNumber: day.day, type: 'attraction' })
         }
       }
     }
