@@ -284,7 +284,14 @@ export function ItineraryPage() {
             {trips.map((trip) => (
               <div key={trip._id} className="space-y-2.5">
                 <button
-                  onClick={() => { setSelectedTrip(trip); setOpenDay(1); }}
+                  onClick={() => {
+                    if (selectedTrip?._id === trip._id) {
+                      setSelectedTrip(null);
+                    } else {
+                      setSelectedTrip(trip);
+                      setOpenDay(1);
+                    }
+                  }}
                   className={`w-full text-left px-4 py-3.5 rounded-xl border transition-all ${
                     selectedTrip?._id === trip._id
                       ? "bg-indigo-50 border-indigo-200 text-indigo-750 font-semibold"
