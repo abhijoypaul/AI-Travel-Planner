@@ -40,13 +40,17 @@ export function TripsPage() {
   const [tripToDelete, setTripToDelete] = useState(null);
 
   const handleDelete = (id) => {
+    console.log("handleDelete clicked. ID passed:", id);
+    console.log("Available trips in state:", trips);
     setTripToDelete(id);
   };
 
   const handleConfirmDelete = async () => {
+    console.log("handleConfirmDelete called. tripToDelete ID:", tripToDelete);
     if (!tripToDelete) return;
     const id = tripToDelete;
     const trip = trips.find((t) => t._id === id);
+    console.log("Found trip to delete:", trip);
     try {
       await tripAPI.delete(id);
       setTrips((prev) => prev.filter((t) => t._id !== id));
