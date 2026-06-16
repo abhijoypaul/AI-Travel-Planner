@@ -13,19 +13,19 @@ export function WeatherWidget({ weather = [] }) {
     const container = scrollContainerRef.current
     if (!container) return
 
-    // Find the scrollable main tag
-    const mainScroll = container.closest('main') || window
-
-    const handleScroll = () => {
-      const scrollTop = mainScroll.scrollTop || window.scrollY || 0
-      // Scroll the container horizontally as the page scrolls vertically
-      // Multiplier of 0.35 gives a very smooth, subtle effect
-      container.scrollLeft = scrollTop * 0.35
+    const handleWheel = (e) => {
+      // Check if container has horizontal scrollable content
+      if (container.scrollWidth > container.clientWidth) {
+        e.preventDefault()
+        // Scroll horizontally by the vertical wheel scroll delta
+        container.scrollLeft += e.deltaY * 0.95
+      }
     }
 
-    mainScroll.addEventListener('scroll', handleScroll, { passive: true })
+    // Bind active listener to allow preventDefault()
+    container.addEventListener('wheel', handleWheel, { passive: false })
     return () => {
-      mainScroll.removeEventListener('scroll', handleScroll)
+      container.removeEventListener('wheel', handleWheel)
     }
   }, [weather])
 
