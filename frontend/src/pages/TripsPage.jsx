@@ -166,24 +166,24 @@ export function TripsPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-2 relative z-10">
                     <button
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         handleDelete(trip._id);
                       }}
-                      className="h-8 w-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                      className="h-9 w-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-red-600 hover:bg-red-50 bg-slate-50 transition-colors cursor-pointer"
+                      title="Delete Trip"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-4.5 w-4.5" />
                     </button>
+                    <Link to={`/trip/${trip._id}`} className="block">
+                      <button className="h-9 w-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 bg-slate-50 transition-colors cursor-pointer">
+                        <ChevronRight className="h-4.5 w-4.5" />
+                      </button>
+                    </Link>
                   </div>
-
-                  <Link to={`/trip/${trip._id}`}>
-                    <button className="h-8 w-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors">
-                      <ChevronRight className="h-4 w-4" />
-                    </button>
-                  </Link>
                 </div>
               );
             })}
