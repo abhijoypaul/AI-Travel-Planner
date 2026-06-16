@@ -227,7 +227,7 @@ export function TripResultsPage() {
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left Column (8/12) */}
-          <div className="lg:col-span-8 space-y-5 lg:h-[calc(100vh-140px)] lg:overflow-y-auto lg:pr-2 custom-scrollbar">
+          <div className="lg:col-span-8 space-y-5">
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-4 h-11 rounded-xl p-1" style={{ background: "#eef0f6" }}>
@@ -310,7 +310,7 @@ export function TripResultsPage() {
           </div>
 
           {/* Right Column (4/12) - STICKY CONTAINER */}
-          <div className="lg:col-span-4 space-y-5 lg:h-[calc(100vh-140px)] lg:overflow-y-auto lg:pr-2 lg:sticky lg:top-0 custom-scrollbar">
+          <div className="lg:col-span-4 space-y-5 lg:sticky lg:top-6">
             {/* Map Panel */}
             <div ref={mapSectionRef} className="wander-card overflow-hidden">
               {/* Map Header */}
