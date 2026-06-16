@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { Cloud, Sun, CloudRain } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -6,6 +7,28 @@ const iconMap = {
 }
 
 export function WeatherWidget({ weather = [] }) {
+  const scrollContainerRef = useRef(null)
+
+  useEffect(() => {
+    const container = scrollContainerRef.current
+    if (!container) return
+
+    // Find the scrollable main tag
+    const mainScroll = container.closest('main') || window
+
+    const handleScroll = () => {
+      const scrollTop = mainScroll.scrollTop || window.scrollY || 0
+      // Scroll the container horizontally as the page scrolls vertically
+      // Multiplier of 0.35 gives a very smooth, subtle effect
+      container.scrollLeft = scrollTop * 0.35
+    }
+
+    mainScroll.addEventListener('scroll', handleScroll, { passive: true })
+    return () => {
+      mainScroll.removeEventListener('scroll', handleScroll)
+    }
+  }, [weather])
+
   if (!weather.length) return null
 
   return (
@@ -16,7 +39,7 @@ export function WeatherWidget({ weather = [] }) {
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-4 bg-white">
-        <div className="flex gap-3 overflow-x-auto pb-2">
+        <div ref={scrollContainerRef} className="flex gap-3 overflow-x-auto pb-2 scroll-smooth">
           {weather.map((day, i) => {
             const Icon = iconMap[day.icon] || Cloud
             return (

@@ -83,36 +83,54 @@ export function TripResultsPage() {
     const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
     setPhotoLoading(true);
     setLocationPhoto(null);
-    try {
-      const params = new URLSearchParams({ name: loc.name, exact: "true" });
-      if (loc.lat) params.set("lat", loc.lat);
-      if (loc.lng) params.set("lng", loc.lng);
-      const res = await fetch(`${API_URL}/place-photo?${params}`);
-      
-      let data = null;
-      if (res.ok) {
-        data = await res.json();
-      }
 
-      if (data && data.url && !data.url.includes("placeholder")) {
+    const tryFetchPhoto = async (searchTerm) => {
+      const params = new URLSearchParams({ name: searchTerm, exact: "true" });
+      if (loc.lat && searchTerm === loc.name) params.set("lat", loc.lat);
+      if (loc.lng && searchTerm === loc.name) params.set("lng", loc.lng);
+      const res = await fetch(`${API_URL}/place-photo?${params}`);
+      if (!res.ok) throw new Error("Fetch failed");
+      const data = await res.json();
+      if (!data || !data.url || data.url.includes("placeholder") || data.url.includes("staticmap.php")) {
+        throw new Error("No valid photo");
+      }
+      return data;
+    };
+
+    try {
+      // 1. Try to fetch the photo of the specific place
+      try {
+        const data = await tryFetchPhoto(loc.name);
         setLocationPhoto({
           url: data.url,
           credit: data.source,
           title: data.title || loc.name,
         });
-      } else {
-        // Fallback to city/town photo
-        const cityParams = new URLSearchParams({ name: trip.destination, exact: "true" });
-        const cityRes = await fetch(`${API_URL}/place-photo?${cityParams}`);
-        if (cityRes.ok) {
-          const cityData = await cityRes.json();
-          setLocationPhoto({
-            url: cityData.url,
-            credit: cityData.source,
-            title: cityData.title || trip.destination,
-          });
-        }
+        return;
+      } catch (err) {
+        console.log(`Failed to get photo for "${loc.name}", trying destination area fallback...`);
       }
+
+      // 2. Try to fetch the photo of the destination area/city
+      try {
+        const data = await tryFetchPhoto(trip.destination);
+        setLocationPhoto({
+          url: data.url,
+          credit: data.source,
+          title: data.title || trip.destination,
+        });
+        return;
+      } catch (err) {
+        console.log(`Failed to get photo for area "${trip.destination}", using generic fallback.`);
+      }
+
+      // 3. Fallback to generic premium scenic travel photo
+      setLocationPhoto({
+        url: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&auto=format&fit=crop&q=80",
+        credit: "Unsplash",
+        title: loc.name,
+      });
+
     } catch (error) {
       console.error("Failed to fetch location photo:", error);
     } finally {
