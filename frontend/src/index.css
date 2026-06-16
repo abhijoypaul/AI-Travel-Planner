@@ -70,6 +70,9 @@
 @layer utilities {
   .sidebar-gradient {
     background: linear-gradient(160deg, #6366f1 0%, #7c3aed 60%, #8b5cf6 100%);
+    height: 100vh;
+    max-height: 100vh;
+    min-height: 0;
   }
 
   .nav-active {
