@@ -37,40 +37,7 @@ export function TripsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const [tripToDelete, setTripToDelete] = useState(null);
 
-  const handleDelete = (id) => {
-    console.log("handleDelete clicked. ID passed:", id);
-    console.log("Available trips in state:", trips);
-    alert("Delete button clicked for trip ID: " + id);
-    setTripToDelete(id);
-  };
-
-  const handleConfirmDelete = async () => {
-    console.log("handleConfirmDelete called. tripToDelete ID:", tripToDelete);
-    if (!tripToDelete) return;
-    const id = tripToDelete;
-    const trip = trips.find((t) => t._id === id);
-    console.log("Found trip to delete:", trip);
-    try {
-      await tripAPI.delete(id);
-      setTrips((prev) => prev.filter((t) => t._id !== id));
-      addNotification(
-        "Trip Deleted",
-        `Your trip to ${trip?.destination || "Destination"} has been successfully deleted.`,
-        "info"
-      );
-    } catch (err) {
-      console.error(err);
-      addNotification(
-        "Error",
-        "Failed to delete the trip. Please try again.",
-        "error"
-      );
-    } finally {
-      setTripToDelete(null);
-    }
-  };
 
   return (
     <Layout>
@@ -168,17 +135,6 @@ export function TripsPage() {
 
                   {/* Actions */}
                   <div className="flex items-center gap-2 relative z-10">
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleDelete(trip._id);
-                      }}
-                      className="h-9 w-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-red-600 hover:bg-red-50 bg-slate-50 transition-colors cursor-pointer"
-                      title="Delete Trip"
-                    >
-                      <Trash2 className="h-4.5 w-4.5" />
-                    </button>
                     <Link to={`/trip/${trip._id}`} className="block">
                       <button className="h-9 w-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 bg-slate-50 transition-colors cursor-pointer">
                         <ChevronRight className="h-4.5 w-4.5" />
@@ -191,32 +147,6 @@ export function TripsPage() {
           </div>
         )}
       </div>
-
-      {/* Custom Confirmation Modal */}
-      {tripToDelete && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100 animate-scale-in">
-            <h3 className="text-lg font-bold text-slate-900 mb-2">Delete Trip</h3>
-            <p className="text-slate-500 text-sm mb-6">
-              Are you sure you want to delete this trip? This action cannot be undone.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setTripToDelete(null)}
-                className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-50 text-sm font-semibold transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmDelete}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </Layout>
   );
 }
