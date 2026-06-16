@@ -193,7 +193,10 @@ export const geocodeLocations = async (locations, biasCoords = null, biasDestina
       }
     }
     
-    let queryAddress = loc.address || loc.name;
+    let queryAddress = loc.name;
+    if (loc.address && loc.address !== loc.name) {
+      queryAddress = `${loc.name}, ${loc.address}`;
+    }
     if (biasDestination && !queryAddress.toLowerCase().includes(biasDestination.toLowerCase())) {
       queryAddress = `${queryAddress}, ${biasDestination}`;
     }
