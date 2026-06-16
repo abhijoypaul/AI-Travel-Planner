@@ -181,16 +181,8 @@ export const geocodeLocations = async (locations, biasCoords = null, biasDestina
   const results = [];
   for (const loc of locations) {
     if (loc.lat && loc.lng) {
-      if (biasCoords && biasCoords.lat && biasCoords.lng) {
-        const dist = getDistance(loc.lat, loc.lng, biasCoords.lat, biasCoords.lng);
-        if (dist < 300) { // within 300km is acceptable, otherwise re-geocode
-          results.push(loc);
-          continue;
-        }
-      } else {
-        results.push(loc);
-        continue;
-      }
+      results.push(loc);
+      continue;
     }
     
     let queryAddress = loc.name;
@@ -226,17 +218,6 @@ export const geocodeLocations = async (locations, biasCoords = null, biasDestina
 
       if (data.results?.[0]) {
         const { lat, lng } = data.results[0].geometry.location;
-        // Verify distance if biasCoords is available
-        if (biasCoords && biasCoords.lat && biasCoords.lng) {
-          const dist = getDistance(lat, lng, biasCoords.lat, biasCoords.lng);
-          if (dist > 300) {
-            // If the geocoded location is wildly far (>300km), fallback to a randomized offset near the destination center
-            const randomOffsetLat = biasCoords.lat + (Math.random() - 0.5) * 0.02;
-            const randomOffsetLng = biasCoords.lng + (Math.random() - 0.5) * 0.02;
-            results.push({ ...loc, lat: randomOffsetLat, lng: randomOffsetLng, address: biasDestination });
-            continue;
-          }
-        }
         results.push({ ...loc, lat, lng, address: data.results[0].formatted_address });
       } else {
         const nomLoc = await geocodeWithNominatim(queryAddress, biasCoords);
