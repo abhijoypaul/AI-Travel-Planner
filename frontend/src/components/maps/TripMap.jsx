@@ -90,7 +90,7 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
           zoom: 13,
           mapTypeControl: false,
           streetViewControl: false,
-          scrollwheel: false,
+          scrollwheel: true,
           styles: [
             { featureType: 'poi', elementType: 'all', stylers: [{ visibility: 'off' }] },
             { featureType: 'transit', elementType: 'all', stylers: [{ visibility: 'off' }] },

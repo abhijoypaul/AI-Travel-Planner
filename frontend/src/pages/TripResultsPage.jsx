@@ -309,8 +309,8 @@ export function TripResultsPage() {
             )}
           </div>
 
-          {/* Right Column (4/12) - STICKY CONTAINER */}
-          <div className="lg:col-span-4 space-y-5 lg:sticky lg:top-6">
+          {/* Right Column (4/12) */}
+          <div className="lg:col-span-4 space-y-5">
             {/* Map Panel */}
             <div ref={mapSectionRef} className="wander-card overflow-hidden">
               {/* Map Header */}
