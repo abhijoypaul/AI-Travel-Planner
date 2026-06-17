@@ -13,6 +13,16 @@ export function formatDateMMT(dateInput) {
   return `${day}/${month}/${year}`;
 }
 
+export function formatDateYYYYMMDD(dateInput) {
+  if (!dateInput) return "";
+  const d = new Date(dateInput);
+  if (isNaN(d.getTime())) return "";
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${year}${month}${day}`;
+}
+
 export function formatDateBooking(dateInput) {
   if (!dateInput) return "";
   const d = new Date(dateInput);
@@ -157,7 +167,12 @@ export function getTrainStation(cityName) {
     "udaipur": { city: "Udaipur", code: "UDZ" },
     "kochi": { city: "Kochi", code: "ERS" },
     "cochin": { city: "Kochi", code: "ERS" },
-    "agra": { city: "Agra", code: "AGC" }
+    "agra": { city: "Agra", code: "AGC" },
+    // Region / State fallbacks to main travel hubs
+    "kerala": { city: "Kochi", code: "ERS" },
+    "keral": { city: "Kochi", code: "ERS" },
+    "goa": { city: "Madgaon", code: "MAO" },
+    "rajasthan": { city: "Jaipur", code: "JP" }
   };
 
   for (const [key, value] of Object.entries(stations)) {
@@ -199,7 +214,7 @@ export function getFlightBookingUrl(origin, destination, date, travelers = 1) {
  * Generates train booking search redirect URL on MakeMyTrip
  */
 export function getTrainBookingUrl(origin, destination, date) {
-  const formattedDate = formatDateMMT(date);
+  const formattedDate = formatDateYYYYMMDD(date); // YYYYMMDD required by MakeMyTrip
   
   // Extract city names
   const cleanOriginVal = String(origin || "").split(',')[0].trim();
