@@ -12,11 +12,14 @@ import {
   Utensils,
   Hotel,
   DollarSign,
+  ExternalLink,
 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { tripAPI } from "@/services/api";
 import { formatDate, formatCurrency } from "@/lib/utils";
+import { getHotelBookingUrl } from "@/lib/booking";
+import { BookTransportWidget } from "@/components/trip/BookTransportWidget";
 
 const ITEM_COLORS = {
   attraction: { bg: "bg-indigo-500", badge: "bg-indigo-50 text-indigo-700 border border-indigo-100" },
@@ -50,51 +53,89 @@ export function ItineraryPage() {
   const renderLocationItem = (item, type) => {
     const color = getColor(type);
     const currency = selectedTrip?.currency || localStorage.getItem('currency') || 'INR';
+    const isHotel = type === 'hotel' || type === 'Hotel';
+
     return (
-      <div key={item.name} className="flex items-start gap-4 bg-white rounded-xl p-4 border border-slate-200 shadow-sm hover:shadow transition-all">
-        <div className={`h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0 ${color.badge}`}>
-          {type === 'attraction' && <MapPin className="h-5 w-5" />}
-          {type === 'restaurant' && <Utensils className="h-5 w-5" />}
-          {type === 'hotel' && <Hotel className="h-5 w-5" />}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-start justify-between gap-2">
-            <h4 className="text-sm font-bold text-slate-900 leading-snug">{item.name}</h4>
-            <span className={`px-2.5 py-0.5 rounded-lg text-[10px] font-bold flex-shrink-0 capitalize ${color.badge}`}>
-              {type}
-            </span>
+      <div key={item.name} className="flex flex-col gap-3 bg-white rounded-xl p-4 border border-slate-200 shadow-sm hover:shadow transition-all">
+        <div className="flex items-start gap-4">
+          <div className={`h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0 ${color.badge}`}>
+            {type === 'attraction' && <MapPin className="h-5 w-5" />}
+            {type === 'restaurant' && <Utensils className="h-5 w-5" />}
+            {type === 'hotel' && <Hotel className="h-5 w-5" />}
           </div>
-          {item.address && (
-            <p className="text-[12px] text-slate-700 mt-1 leading-relaxed">
-              {item.address}
-            </p>
-          )}
-          <div className="flex flex-wrap items-center gap-3 mt-2 text-[11px] text-slate-700 font-medium">
-            {item.time && (
-              <div className="flex items-center gap-1">
-                <Clock className="h-3.5 w-3.5 text-slate-500" />
-                {item.time}
-              </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <h4 className="text-sm font-bold text-slate-900 leading-snug">{item.name}</h4>
+              <span className={`px-2.5 py-0.5 rounded-lg text-[10px] font-bold flex-shrink-0 capitalize ${color.badge}`}>
+                {type}
+              </span>
+            </div>
+            {item.address && (
+              <p className="text-[12px] text-slate-700 mt-1 leading-relaxed">
+                {item.address}
+              </p>
             )}
-            {item.estimatedCost > 0 && (
-              <div className="flex items-center gap-1">
-                <DollarSign className="h-3.5 w-3.5 text-slate-500" />
-                {formatCurrency(item.estimatedCost, currency)}
-              </div>
-            )}
-            {item.rating && (
-              <div className="flex items-center gap-0.5 text-slate-700">
-                <span>⭐</span>
-                <span>{item.rating}</span>
-              </div>
+            <div className="flex flex-wrap items-center gap-3 mt-2 text-[11px] text-slate-700 font-medium">
+              {item.time && (
+                <div className="flex items-center gap-1">
+                  <Clock className="h-3.5 w-3.5 text-slate-500" />
+                  {item.time}
+                </div>
+              )}
+              {item.estimatedCost > 0 && (
+                <div className="flex items-center gap-1">
+                  <DollarSign className="h-3.5 w-3.5 text-slate-500" />
+                  {formatCurrency(item.estimatedCost, currency)}
+                </div>
+              )}
+              {item.rating && (
+                <div className="flex items-center gap-0.5 text-slate-700">
+                  <span>⭐</span>
+                  <span>{item.rating}</span>
+                </div>
+              )}
+            </div>
+            {item.notes && (
+              <p className="text-[11px] text-slate-600 italic mt-1.5 border-l-2 border-slate-200 pl-2">
+                "{item.notes}"
+              </p>
             )}
           </div>
-          {item.notes && (
-            <p className="text-[11px] text-slate-600 italic mt-1.5 border-l-2 border-slate-200 pl-2">
-              "{item.notes}"
-            </p>
-          )}
         </div>
+
+        {/* Quick Booking Options for Hotels */}
+        {isHotel && selectedTrip && (
+          <div className="pt-3 border-t border-slate-100 flex flex-wrap gap-1.5 items-center">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 mr-1">Book:</span>
+            <a
+              href={getHotelBookingUrl(item.name, selectedTrip.destination, selectedTrip.startDate, selectedTrip.endDate, selectedTrip.travelers, 'booking')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-0.5 px-2 py-0.5 text-[10px] font-bold rounded-md bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition-colors"
+            >
+              Booking.com
+              <ExternalLink className="h-2.5 w-2.5" />
+            </a>
+            <a
+              href={getHotelBookingUrl(item.name, selectedTrip.destination, selectedTrip.startDate, selectedTrip.endDate, selectedTrip.travelers, 'makemytrip')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-0.5 px-2 py-0.5 text-[10px] font-bold rounded-md bg-red-50 text-red-700 border border-red-100 hover:bg-red-100 transition-colors"
+            >
+              MakeMyTrip
+              <ExternalLink className="h-2.5 w-2.5" />
+            </a>
+            <a
+              href={getHotelBookingUrl(item.name, selectedTrip.destination, selectedTrip.startDate, selectedTrip.endDate, selectedTrip.travelers, 'goibibo')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-0.5 px-2 py-0.5 text-[10px] font-bold rounded-md bg-orange-50 text-orange-700 border border-orange-100 hover:bg-orange-100 transition-colors"
+            >
+              Goibibo
+              <ExternalLink className="h-2.5 w-2.5" />
+            </a>
+          </div>
+        )}
       </div>
     );
   };
@@ -154,6 +195,15 @@ export function ItineraryPage() {
               <ChevronRight className="h-3.5 w-3.5" />
             </button>
           </Link>
+        </div>
+
+        {/* Book Transport Widget */}
+        <div className="p-6 border-b border-slate-100 bg-slate-50/20">
+          <BookTransportWidget
+            destination={trip.destination}
+            startDate={trip.startDate}
+            travelers={trip.travelers}
+          />
         </div>
 
         {/* Days accordion */}

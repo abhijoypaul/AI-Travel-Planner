@@ -29,6 +29,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TripMap } from "@/components/maps/TripMap";
 import { DayTimeline } from "@/components/trip/DayTimeline";
+import { BookTransportWidget } from "@/components/trip/BookTransportWidget";
 import { WeatherWidget } from "@/components/trip/WeatherWidget";
 import { ExpenseTracker } from "@/components/trip/ExpenseTracker";
 import { ChatAssistant } from "@/components/trip/ChatAssistant";
@@ -260,7 +261,13 @@ export function TripResultsPage() {
                 ))}
               </TabsList>
 
-              <TabsContent value="itinerary" className="mt-4">
+              <TabsContent value="itinerary" className="mt-4 space-y-6">
+                <BookTransportWidget
+                  destination={trip.destination}
+                  startDate={trip.startDate}
+                  travelers={trip.travelers}
+                />
+                
                 <div className="wander-card p-6">
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-lg font-bold text-slate-900">Full Itinerary</h2>
@@ -273,6 +280,8 @@ export function TripResultsPage() {
                         currency={tripCurrency}
                         onLocationSelect={handleLocationSelect}
                         selectedLocation={selectedLocation}
+                        destination={trip.destination}
+                        travelers={trip.travelers}
                       />
                     ))}
                   </div>

@@ -1,64 +1,120 @@
-import { MapPin, Utensils, Hotel, Clock, DollarSign } from 'lucide-react'
+import { MapPin, Utensils, Hotel, Clock, DollarSign, ExternalLink } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency } from '@/lib/utils'
+import { getHotelBookingUrl } from '@/lib/booking'
 
-function LocationList({ items, icon: Icon, color, onSelect, selectedLocation, currency }) {
+function LocationList({ items, icon: Icon, color, onSelect, selectedLocation, currency, destination, dayDate, travelers }) {
   if (!items?.length) return null
   return (
     <div className="space-y-2">
       {items.map((item, i) => {
         const isSelected = selectedLocation?.name === item.name
         const placeId = `place-${encodeURIComponent(item.name.toLowerCase().replace(/\s+/g, '-'))}`
+        const isHotel = Icon === Hotel
+
         return (
-          <button
+          <div
             id={placeId}
             key={i}
-            onClick={() => onSelect?.(item)}
-            className={`flex w-full items-start gap-3 rounded-lg border p-3 text-left transition-all ${
+            className={`flex flex-col w-full rounded-lg border p-3 text-left transition-all ${
               isSelected
                 ? 'border-indigo-500/40 bg-indigo-50/60 ring-1 ring-indigo-500/30 shadow-sm'
                 : 'border-slate-200 bg-white hover:border-slate-350 hover:bg-slate-50'
             }`}
           >
-            <div className={`mt-0.5 rounded-lg p-1.5 ${color} ${isSelected ? 'ring-2 ring-indigo-500/50 ring-offset-1 ring-offset-transparent' : ''}`}>
-              <Icon className="h-4 w-4" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5">
-                <p className={`truncate text-sm font-bold ${isSelected ? 'text-indigo-900' : 'text-slate-800'}`}>
-                  {item.name}
-                </p>
-                {isSelected && (
-                  <span className="shrink-0 rounded-full bg-indigo-600 px-1.5 py-0.5 text-xs font-semibold text-white">
-                    on map
-                  </span>
-                )}
+            <div 
+              className="flex w-full items-start gap-3 cursor-pointer" 
+              onClick={() => onSelect?.(item)}
+            >
+              <div className={`mt-0.5 rounded-lg p-1.5 ${color} ${isSelected ? 'ring-2 ring-indigo-500/50 ring-offset-1 ring-offset-transparent' : ''}`}>
+                <Icon className="h-4 w-4" />
               </div>
-              <p className="truncate text-xs text-slate-700 font-medium">{item.address}</p>
-              <div className="mt-1 flex flex-wrap gap-2 text-xs text-slate-700 font-semibold">
-                {item.time && (
-                  <span className="flex items-center gap-1 text-slate-700">
-                    <Clock className="h-3 w-3 text-slate-500" />{item.time}
-                  </span>
-                )}
-                {item.estimatedCost > 0 && (
-                  <span className="flex items-center gap-1 text-slate-700">
-                    <DollarSign className="h-3 w-3 text-slate-500" />{formatCurrency(item.estimatedCost, currency)}
-                  </span>
-                )}
-                {item.rating && <span className="text-slate-700">⭐ {item.rating}</span>}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <p className={`truncate text-sm font-bold ${isSelected ? 'text-indigo-900' : 'text-slate-800'}`}>
+                    {item.name}
+                  </p>
+                  {isSelected && (
+                    <span className="shrink-0 rounded-full bg-indigo-600 px-1.5 py-0.5 text-xs font-semibold text-white">
+                      on map
+                    </span>
+                  )}
+                </div>
+                <p className="truncate text-xs text-slate-700 font-medium">{item.address}</p>
+                <div className="mt-1 flex flex-wrap gap-2 text-xs text-slate-700 font-semibold">
+                  {item.time && (
+                    <span className="flex items-center gap-1 text-slate-700">
+                      <Clock className="h-3 w-3 text-slate-500" />{item.time}
+                    </span>
+                  )}
+                  {item.estimatedCost > 0 && (
+                    <span className="flex items-center gap-1 text-slate-700">
+                      <DollarSign className="h-3 w-3 text-slate-500" />{formatCurrency(item.estimatedCost, currency)}
+                    </span>
+                  )}
+                  {item.rating && <span className="text-slate-700">⭐ {item.rating}</span>}
+                </div>
               </div>
+              <MapPin className={`mt-0.5 h-4 w-4 shrink-0 ${isSelected ? 'text-indigo-600' : 'text-slate-500'}`} />
             </div>
-            <MapPin className={`mt-0.5 h-4 w-4 shrink-0 ${isSelected ? 'text-indigo-600' : 'text-slate-500'}`} />
-          </button>
+
+            {/* Quick Booking Options for Hotels */}
+            {isHotel && (
+              <div className="mt-3 pt-3 border-t border-slate-150 flex flex-wrap gap-1.5 items-center">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 mr-1 flex items-center gap-1">
+                  Book:
+                </span>
+                <a
+                  href={getHotelBookingUrl(item.name, destination, dayDate, null, travelers, 'booking')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-0.5 px-2 py-0.5 text-[10px] font-bold rounded-md bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition-colors"
+                >
+                  Booking.com
+                  <ExternalLink className="h-2.5 w-2.5" />
+                </a>
+                <a
+                  href={getHotelBookingUrl(item.name, destination, dayDate, null, travelers, 'makemytrip')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-0.5 px-2 py-0.5 text-[10px] font-bold rounded-md bg-red-50 text-red-700 border border-red-100 hover:bg-red-100 transition-colors"
+                >
+                  MakeMyTrip
+                  <ExternalLink className="h-2.5 w-2.5" />
+                </a>
+                <a
+                  href={getHotelBookingUrl(item.name, destination, dayDate, null, travelers, 'goibibo')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-0.5 px-2 py-0.5 text-[10px] font-bold rounded-md bg-orange-50 text-orange-700 border border-orange-100 hover:bg-orange-100 transition-colors"
+                >
+                  Goibibo
+                  <ExternalLink className="h-2.5 w-2.5" />
+                </a>
+                <a
+                  href={getHotelBookingUrl(item.name, destination, dayDate, null, travelers, 'direct')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-0.5 px-2 py-0.5 text-[10px] font-bold rounded-md bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition-colors"
+                >
+                  Search Web
+                  <ExternalLink className="h-2.5 w-2.5" />
+                </a>
+              </div>
+            )}
+          </div>
         )
       })}
     </div>
   )
 }
 
-export function DayTimeline({ day, currency, onLocationSelect, selectedLocation }) {
+export function DayTimeline({ day, currency, onLocationSelect, selectedLocation, destination, travelers }) {
   return (
     <Card className="overflow-hidden border-slate-200">
       <CardHeader className="border-b border-slate-200 bg-slate-50/80">
@@ -90,6 +146,9 @@ export function DayTimeline({ day, currency, onLocationSelect, selectedLocation 
           onSelect={onLocationSelect}
           selectedLocation={selectedLocation}
           currency={currency}
+          destination={destination}
+          dayDate={day.date}
+          travelers={travelers}
         />
         <LocationList
           items={day.restaurants}
@@ -98,6 +157,9 @@ export function DayTimeline({ day, currency, onLocationSelect, selectedLocation 
           onSelect={onLocationSelect}
           selectedLocation={selectedLocation}
           currency={currency}
+          destination={destination}
+          dayDate={day.date}
+          travelers={travelers}
         />
         <LocationList
           items={day.hotels}
@@ -106,6 +168,9 @@ export function DayTimeline({ day, currency, onLocationSelect, selectedLocation 
           onSelect={onLocationSelect}
           selectedLocation={selectedLocation}
           currency={currency}
+          destination={destination}
+          dayDate={day.date}
+          travelers={travelers}
         />
         {day.tips?.length > 0 && (
           <div className="rounded-xl border border-indigo-100 bg-indigo-50/50 p-3">
