@@ -178,8 +178,15 @@ export function getFlightBookingUrl(origin, destination, date, travelers = 1) {
   const cleanOriginVal = String(origin || "").split(',')[0].trim();
   const cleanDestVal = String(destination || "").split(',')[0].trim();
   
-  const cleanOrigin = getAirportCode(cleanOriginVal) || cleanOriginVal.toUpperCase();
-  const cleanDest = getAirportCode(cleanDestVal) || cleanDestVal.toUpperCase();
+  const cleanOrigin = getAirportCode(cleanOriginVal);
+  const cleanDest = getAirportCode(cleanDestVal);
+  
+  // If either code cannot be resolved to a valid 3-letter IATA code, MakeMyTrip search page fails.
+  // We fall back to Google Search redirect to let Google's indexing route them correctly.
+  if (!cleanOrigin || !cleanDest || cleanOrigin.length !== 3 || cleanDest.length !== 3) {
+    const searchQuery = `MakeMyTrip flights from ${cleanOriginVal} to ${cleanDestVal} on ${formattedDate} for ${travelers} travelers`;
+    return `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+  }
   
   // List of domestic Indian airport codes to determine international search routing
   const domesticCodes = ["DEL", "BOM", "BLR", "GOI", "CCU", "MAA", "HYD", "PNQ", "AMD", "JAI", "UDR", "COK", "AGR", "KUV", "IXL", "SXR", "ATQ"];
