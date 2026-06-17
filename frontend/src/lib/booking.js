@@ -90,7 +90,37 @@ export function getAirportCode(cityName) {
     "sydney": "SYD",
     "melbourne": "MEL",
     "san francisco": "SFO",
-    "los angeles": "LAX"
+    "los angeles": "LAX",
+    "rome": "FCO",
+    "milan": "MXP",
+    "venice": "VCE",
+    "florence": "FLR",
+    "kyoto": "KIX",
+    "osaka": "KIX",
+    "munich": "MUC",
+    "frankfurt": "FRA",
+    "berlin": "BER",
+    "barcelona": "BCN",
+    "madrid": "MAD",
+    "amsterdam": "AMS",
+    "brussels": "BRU",
+    "vienna": "VIE",
+    "zurich": "ZRH",
+    "geneva": "GVA",
+    "athens": "ATH",
+    "cairo": "CAI",
+    "cape town": "CPT",
+    "toronto": "YYZ",
+    "vancouver": "YVR",
+    "seoul": "ICN",
+    "hong kong": "HKG",
+    "shanghai": "PVG",
+    "beijing": "PEK",
+    "kuala lumpur": "KUL",
+    "manila": "MNL",
+    "jakarta": "CGK",
+    "ho chi minh": "SGN",
+    "hanoi": "HAN"
   };
 
   for (const [key, value] of Object.entries(codes)) {
@@ -103,12 +133,53 @@ export function getAirportCode(cityName) {
 }
 
 /**
+ * Resolves a city name to its railway station code for MakeMyTrip Train Search
+ */
+export function getTrainStation(cityName) {
+  if (!cityName) return null;
+  const clean = cityName.toLowerCase().trim();
+  
+  const stations = {
+    "delhi": { city: "Delhi", code: "NDLS" },
+    "new delhi": { city: "New Delhi", code: "NDLS" },
+    "mumbai": { city: "Mumbai", code: "MMCT" },
+    "bombay": { city: "Mumbai", code: "MMCT" },
+    "bangalore": { city: "Bengaluru", code: "SBC" },
+    "bengaluru": { city: "Bengaluru", code: "SBC" },
+    "kolkata": { city: "Kolkata", code: "HWH" },
+    "calcutta": { city: "Kolkata", code: "HWH" },
+    "chennai": { city: "Chennai", code: "MAS" },
+    "madras": { city: "Chennai", code: "MAS" },
+    "hyderabad": { city: "Hyderabad", code: "SC" },
+    "pune": { city: "Pune", code: "PUNE" },
+    "ahmedabad": { city: "Ahmedabad", code: "ADI" },
+    "jaipur": { city: "Jaipur", code: "JP" },
+    "udaipur": { city: "Udaipur", code: "UDZ" },
+    "kochi": { city: "Kochi", code: "ERS" },
+    "cochin": { city: "Kochi", code: "ERS" },
+    "agra": { city: "Agra", code: "AGC" }
+  };
+
+  for (const [key, value] of Object.entries(stations)) {
+    if (clean.includes(key)) {
+      return value;
+    }
+  }
+  return null;
+}
+
+/**
  * Generates flight booking search redirect URL on MakeMyTrip
  */
 export function getFlightBookingUrl(origin, destination, date, travelers = 1) {
   const formattedDate = formatDateMMT(date);
-  const cleanOrigin = getAirportCode(origin) || String(origin || "DEL").trim().toUpperCase();
-  const cleanDest = getAirportCode(destination) || String(destination || "").trim().toUpperCase();
+  
+  // Extract city name before resolving (e.g. "Paris, France" -> "Paris")
+  const cleanOriginVal = String(origin || "").split(',')[0].trim();
+  const cleanDestVal = String(destination || "").split(',')[0].trim();
+  
+  const cleanOrigin = getAirportCode(cleanOriginVal) || cleanOriginVal.toUpperCase();
+  const cleanDest = getAirportCode(cleanDestVal) || cleanDestVal.toUpperCase();
   
   return `https://www.makemytrip.com/flight/search?tripType=O&itinerary=${cleanOrigin}-${cleanDest}-${formattedDate}&paxType=A-${travelers}_C-0_I-0&intl=false&cabinClass=E`;
 }
@@ -118,11 +189,16 @@ export function getFlightBookingUrl(origin, destination, date, travelers = 1) {
  */
 export function getTrainBookingUrl(origin, destination, date) {
   const formattedDate = formatDateMMT(date);
-  const cleanOrigin = origin || "Delhi";
-  const cleanDest = destination || "";
   
-  // Directly goes to MakeMyTrip train landing page with custom query parameter search string
-  return `https://www.makemytrip.com/railways/listing?srcCity=${encodeURIComponent(cleanOrigin)}&destCity=${encodeURIComponent(cleanDest)}&date=${formattedDate}`;
+  // Extract city names
+  const cleanOriginVal = String(origin || "").split(',')[0].trim();
+  const cleanDestVal = String(destination || "").split(',')[0].trim();
+  
+  const srcNode = getTrainStation(cleanOriginVal) || { city: cleanOriginVal || "Delhi", code: "NDLS" };
+  const destNode = getTrainStation(cleanDestVal) || { city: cleanDestVal || "", code: "" };
+  
+  // Format: https://www.makemytrip.com/railways/listing?srcCity=Delhi&destCity=Mumbai&srcCode=NDLS&destCode=MMCT&date=18/06/2026
+  return `https://www.makemytrip.com/railways/listing?srcCity=${encodeURIComponent(srcNode.city)}&destCity=${encodeURIComponent(destNode.city)}&srcCode=${srcNode.code}&destCode=${destNode.code}&date=${formattedDate}`;
 }
 
 /**
