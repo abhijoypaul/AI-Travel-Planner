@@ -13,14 +13,14 @@ export function formatDateMMT(dateInput) {
   return `${day}/${month}/${year}`;
 }
 
-export function formatDateYYYYMMDD(dateInput) {
+export function formatDateDDMMYYYY(dateInput) {
   if (!dateInput) return "";
   const d = new Date(dateInput);
   if (isNaN(d.getTime())) return "";
   const day = String(d.getDate()).padStart(2, '0');
   const month = String(d.getMonth() + 1).padStart(2, '0');
   const year = d.getFullYear();
-  return `${year}${month}${day}`;
+  return `${day}-${month}-${year}`;
 }
 
 export function formatDateBooking(dateInput) {
@@ -214,7 +214,7 @@ export function getFlightBookingUrl(origin, destination, date, travelers = 1) {
  * Generates train booking search redirect URL on MakeMyTrip
  */
 export function getTrainBookingUrl(origin, destination, date) {
-  const formattedDate = formatDateYYYYMMDD(date); // YYYYMMDD required by MakeMyTrip
+  const formattedDate = formatDateDDMMYYYY(date); // DD-MM-YYYY required by MakeMyTrip results page
   
   // Extract city names
   const cleanOriginVal = String(origin || "").split(',')[0].trim();
@@ -223,8 +223,8 @@ export function getTrainBookingUrl(origin, destination, date) {
   const srcNode = getTrainStation(cleanOriginVal) || { city: cleanOriginVal || "Delhi", code: "NDLS" };
   const destNode = getTrainStation(cleanDestVal) || { city: cleanDestVal || "", code: "" };
   
-  // Format: Note the critical trailing slash after 'listing' to prevent redirection drops
-  return `https://www.makemytrip.com/railways/listing/?srcCity=${encodeURIComponent(srcNode.city)}&destCity=${encodeURIComponent(destNode.city)}&srcCode=${srcNode.code}&destCode=${destNode.code}&date=${formattedDate}`;
+  // Use MMT's results route directly which parses station codes in the URL correctly
+  return `https://www.makemytrip.com/railways/results?fromStation=${srcNode.code}&toStation=${destNode.code}&dateOfJourney=${formattedDate}`;
 }
 
 /**
