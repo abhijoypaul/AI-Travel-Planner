@@ -214,17 +214,15 @@ export function getFlightBookingUrl(origin, destination, date, travelers = 1) {
  * Generates train booking search redirect URL on MakeMyTrip
  */
 export function getTrainBookingUrl(origin, destination, date) {
-  const formattedDate = formatDateDDMMYYYY(date); // DD-MM-YYYY required by MakeMyTrip results page
+  const formattedDate = formatDateDDMMYYYY(date);
   
   // Extract city names
   const cleanOriginVal = String(origin || "").split(',')[0].trim();
   const cleanDestVal = String(destination || "").split(',')[0].trim();
   
-  const srcNode = getTrainStation(cleanOriginVal) || { city: cleanOriginVal || "Delhi", code: "NDLS" };
-  const destNode = getTrainStation(cleanDestVal) || { city: cleanDestVal || "", code: "" };
-  
-  // Use MMT's results route directly which parses station codes in the URL correctly
-  return `https://www.makemytrip.com/railways/results?fromStation=${srcNode.code}&toStation=${destNode.code}&dateOfJourney=${formattedDate}`;
+  // To bypass MakeMyTrip session blocking on direct search links, we use a targeted search redirect.
+  const searchQuery = `site:makemytrip.com/railways/ trains from ${cleanOriginVal} to ${cleanDestVal} on ${formattedDate}`;
+  return `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
 }
 
 /**
