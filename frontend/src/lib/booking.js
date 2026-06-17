@@ -181,7 +181,11 @@ export function getFlightBookingUrl(origin, destination, date, travelers = 1) {
   const cleanOrigin = getAirportCode(cleanOriginVal) || cleanOriginVal.toUpperCase();
   const cleanDest = getAirportCode(cleanDestVal) || cleanDestVal.toUpperCase();
   
-  return `https://www.makemytrip.com/flight/search?tripType=O&itinerary=${cleanOrigin}-${cleanDest}-${formattedDate}&paxType=A-${travelers}_C-0_I-0&intl=false&cabinClass=E`;
+  // List of domestic Indian airport codes to determine international search routing
+  const domesticCodes = ["DEL", "BOM", "BLR", "GOI", "CCU", "MAA", "HYD", "PNQ", "AMD", "JAI", "UDR", "COK", "AGR", "KUV", "IXL", "SXR", "ATQ"];
+  const isIntl = !domesticCodes.includes(cleanOrigin) || !domesticCodes.includes(cleanDest);
+  
+  return `https://www.makemytrip.com/flight/search?tripType=O&itinerary=${cleanOrigin}-${cleanDest}-${formattedDate}&paxType=A-${travelers}_C-0_I-0&intl=${isIntl}&cabinClass=E`;
 }
 
 /**
@@ -197,8 +201,8 @@ export function getTrainBookingUrl(origin, destination, date) {
   const srcNode = getTrainStation(cleanOriginVal) || { city: cleanOriginVal || "Delhi", code: "NDLS" };
   const destNode = getTrainStation(cleanDestVal) || { city: cleanDestVal || "", code: "" };
   
-  // Format: https://www.makemytrip.com/railways/listing?srcCity=Delhi&destCity=Mumbai&srcCode=NDLS&destCode=MMCT&date=18/06/2026
-  return `https://www.makemytrip.com/railways/listing?srcCity=${encodeURIComponent(srcNode.city)}&destCity=${encodeURIComponent(destNode.city)}&srcCode=${srcNode.code}&destCode=${destNode.code}&date=${formattedDate}`;
+  // Format: Note the critical trailing slash after 'listing' to prevent redirection drops
+  return `https://www.makemytrip.com/railways/listing/?srcCity=${encodeURIComponent(srcNode.city)}&destCity=${encodeURIComponent(destNode.city)}&srcCode=${srcNode.code}&destCode=${destNode.code}&date=${formattedDate}`;
 }
 
 /**
