@@ -23,6 +23,14 @@ export function formatDateBooking(dateInput) {
   return `${year}-${month}-${day}`;
 }
 
+export function formatDateGoibibo(d) {
+  if (!d || isNaN(d.getTime())) return "";
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${year}${month}${day}`;
+}
+
 export function getCheckoutDate(checkinInput, daysCount = 1) {
   if (!checkinInput) return "";
   const d = new Date(checkinInput);
@@ -32,19 +40,75 @@ export function getCheckoutDate(checkinInput, daysCount = 1) {
 }
 
 /**
+ * Resolves a city name to its 3-letter IATA airport/city code
+ */
+export function getAirportCode(cityName) {
+  if (!cityName) return "";
+  const clean = cityName.toLowerCase().trim();
+  
+  if (clean.length === 3 && /^[a-z]{3}$/.test(clean)) {
+    return clean.toUpperCase();
+  }
+  
+  const codes = {
+    "delhi": "DEL",
+    "new delhi": "DEL",
+    "mumbai": "BOM",
+    "bombay": "BOM",
+    "bangalore": "BLR",
+    "bengaluru": "BLR",
+    "goa": "GOI",
+    "kolkata": "CCU",
+    "calcutta": "CCU",
+    "chennai": "MAA",
+    "madras": "MAA",
+    "hyderabad": "HYD",
+    "pune": "PNQ",
+    "ahmedabad": "AMD",
+    "jaipur": "JAI",
+    "udaipur": "UDR",
+    "kochi": "COK",
+    "cochin": "COK",
+    "agra": "AGR",
+    "manali": "KUV",
+    "leh": "IXL",
+    "srinagar": "SXR",
+    "amritsar": "ATQ",
+    "singapore": "SIN",
+    "dubai": "DXB",
+    "london": "LHR",
+    "paris": "CDG",
+    "bangkok": "BKK",
+    "tokyo": "NRT",
+    "new york": "JFK",
+    "nyc": "JFK",
+    "maldives": "MLE",
+    "male": "MLE",
+    "bali": "DPS",
+    "denpasar": "DPS",
+    "phuket": "HKT",
+    "sydney": "SYD",
+    "melbourne": "MEL",
+    "san francisco": "SFO",
+    "los angeles": "LAX"
+  };
+
+  for (const [key, value] of Object.entries(codes)) {
+    if (clean.includes(key)) {
+      return value;
+    }
+  }
+
+  return "";
+}
+
+/**
  * Generates flight booking search redirect URL on MakeMyTrip
  */
 export function getFlightBookingUrl(origin, destination, date, travelers = 1) {
   const formattedDate = formatDateMMT(date);
-  const cleanOrigin = String(origin || "DEL").trim().toUpperCase();
-  const cleanDest = String(destination || "").trim().toUpperCase();
-  
-  // If destination is a full name or does not look like a 3-letter IATA code, we fallback to Google Search
-  // which will route them to MakeMyTrip with the prefilled search parameters.
-  if (cleanOrigin.length !== 3 || cleanDest.length !== 3) {
-    const searchQuery = `MakeMyTrip flights from ${origin} to ${destination} on ${formattedDate} for ${travelers} travelers`;
-    return `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
-  }
+  const cleanOrigin = getAirportCode(origin) || String(origin || "DEL").trim().toUpperCase();
+  const cleanDest = getAirportCode(destination) || String(destination || "").trim().toUpperCase();
   
   return `https://www.makemytrip.com/flight/search?tripType=O&itinerary=${cleanOrigin}-${cleanDest}-${formattedDate}&paxType=A-${travelers}_C-0_I-0&intl=false&cabinClass=E`;
 }
@@ -54,33 +118,42 @@ export function getFlightBookingUrl(origin, destination, date, travelers = 1) {
  */
 export function getTrainBookingUrl(origin, destination, date) {
   const formattedDate = formatDateMMT(date);
-  // Train search URL parameters on MakeMyTrip are highly session/station-code dependent,
-  // so redirecting via search is extremely reliable.
-  const searchQuery = `MakeMyTrip trains from ${origin} to ${destination} on ${formattedDate}`;
-  return `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+  const cleanOrigin = origin || "Delhi";
+  const cleanDest = destination || "";
+  
+  // Directly goes to MakeMyTrip train landing page with custom query parameter search string
+  return `https://www.makemytrip.com/railways/listing?srcCity=${encodeURIComponent(cleanOrigin)}&destCity=${encodeURIComponent(cleanDest)}&date=${formattedDate}`;
 }
 
 /**
  * Generates hotel booking search redirect URL
  */
 export function getHotelBookingUrl(hotelName, destination, checkin, checkout, travelers = 1, provider = 'booking') {
-  const checkinStr = formatDateBooking(checkin);
-  const checkoutStr = checkout ? formatDateBooking(checkout) : getCheckoutDate(checkin);
+  const checkinDateObj = new Date(checkin);
+  const checkoutDateObj = checkout ? new Date(checkout) : new Date(checkinDateObj.getTime() + 86400000);
+  
+  const checkinYYYYMMDD = formatDateGoibibo(checkinDateObj);
+  const checkoutYYYYMMDD = formatDateGoibibo(checkoutDateObj);
+  
+  const checkinMs = checkinDateObj.getTime();
+  const checkoutMs = checkoutDateObj.getTime();
+  
   const rooms = Math.max(1, Math.ceil(travelers / 2));
+  const roomStayQualifier = `${travelers}e0u`;
+  const cleanCityName = String(destination || "").split(',')[0].trim();
 
   switch (provider) {
     case 'booking':
-      return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(hotelName + ", " + destination)}&checkin=${checkinStr}&checkout=${checkoutStr}&group_adults=${travelers}&no_rooms=${rooms}`;
+      return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(hotelName + ", " + destination)}&checkin=${formatDateBooking(checkin)}&checkout=${checkout ? formatDateBooking(checkout) : getCheckoutDate(checkin)}&group_adults=${travelers}&no_rooms=${rooms}`;
     
     case 'makemytrip': {
-      const searchQuery = `MakeMyTrip hotels ${hotelName} in ${destination} checkin ${checkinStr} checkout ${checkoutStr} for ${travelers} guests`;
-      return `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+      const code = getAirportCode(cleanCityName);
+      const cityCodeParam = code ? `&city=CT${code}` : "";
+      return `https://www.makemytrip.com/hotels/hotel-listing/?checkin=${checkinMs}&checkout=${checkoutMs}&roomStayQualifier=${roomStayQualifier}&searchText=${encodeURIComponent(hotelName)}${cityCodeParam}`;
     }
     
-    case 'goibibo': {
-      const searchQuery = `Goibibo hotels ${hotelName} in ${destination} checkin ${checkinStr} checkout ${checkoutStr} for ${travelers} guests`;
-      return `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
-    }
+    case 'goibibo':
+      return `https://www.goibibo.com/hotels/find-hotels-in-${encodeURIComponent(cleanCityName)}/?checkin=${checkinYYYYMMDD}&checkout=${checkoutYYYYMMDD}&roomStayQualifier=${roomStayQualifier}&searchText=${encodeURIComponent(hotelName)}`;
     
     case 'direct':
     default:
