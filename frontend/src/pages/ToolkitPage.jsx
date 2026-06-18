@@ -187,6 +187,153 @@ const DESTINATION_DATA = {
       { english: "Help!", local: "ช่วยด้วย! (Chuay duay!)", pronunciation: "choo-ay-doo-ay" },
     ],
   },
+  canada: {
+    countryName: "Canada", langCode: "en-CA", langName: "English / French",
+    currency: "CAD", exchangeRate: 1.37, plugType: "A, B", voltage: "120 V / 60 Hz",
+    emergency: "911", police: "911", medical: "911",
+    visa: "eTA required for visa-exempt foreign nationals; visitor visa otherwise.",
+    culture: [
+      "Tipping 15% to 20% in restaurants is standard practice.",
+      "Saying 'please', 'thank you', and 'sorry' is very common and expected.",
+      "Always respect line/queue etiquette strictly.",
+    ],
+    phrases: [
+      { english: "Hello", local: "Hello / Bonjour", pronunciation: "heh-loh / bohn-zhoor" },
+      { english: "Thank you", local: "Thank you / Merci", pronunciation: "thangk yoo / mair-see" },
+      { english: "Please", local: "Please / S'il vous plaît", pronunciation: "pleez / seel voo pleh" },
+      { english: "Excuse me", local: "Excuse me / Excusez-moi", pronunciation: "ik-skyooz mee / ex-kew-zay mwah" },
+      { english: "How much is this?", local: "How much is this?", pronunciation: "how-muhch-iz-this" },
+      { english: "Where is the bathroom?", local: "Where is the restroom?", pronunciation: "wair-iz-the-res-troom" },
+      { english: "Do you speak English?", local: "Do you speak English?", pronunciation: "doo-yoo-speek-ing-glish" },
+      { english: "Help!", local: "Help!", pronunciation: "help" },
+    ],
+  },
+  australia: {
+    countryName: "Australia", langCode: "en-AU", langName: "English",
+    currency: "AUD", exchangeRate: 1.51, plugType: "I", voltage: "230 V / 50 Hz",
+    emergency: "000 (Triple Zero)", police: "000", medical: "000",
+    visa: "eVisitor or Electronic Travel Authority (ETA) required for most visitors.",
+    culture: [
+      "Tipping is not customary, though appreciated for excellent service.",
+      "A friendly 'G'day' or 'How ya going?' is a standard local greeting.",
+      "Protect yourself from the sun (slip, slop, slap) - UV levels are extremely high.",
+    ],
+    phrases: [
+      { english: "Hello", local: "G'day", pronunciation: "guh-day" },
+      { english: "Thank you", local: "Thanks mate", pronunciation: "thangks mayt" },
+      { english: "Please", local: "Please", pronunciation: "pleez" },
+      { english: "Excuse me", local: "Excuse me", pronunciation: "ik-skyooz mee" },
+      { english: "How much is this?", local: "How much is this?", pronunciation: "how muhch iz this" },
+      { english: "Where is the bathroom?", local: "Where is the toilet?", pronunciation: "wair iz the toy-lit" },
+      { english: "Do you speak English?", local: "Do you speak English?", pronunciation: "doo yoo speek ing-glish" },
+      { english: "Help!", local: "Help!", pronunciation: "help" },
+    ],
+  },
+  germany: {
+    countryName: "Germany", langCode: "de-DE", langName: "German",
+    currency: "EUR", exchangeRate: 0.92, plugType: "C, F", voltage: "230 V / 50 Hz",
+    emergency: "112", police: "110", medical: "112",
+    visa: "Schengen Visa rules apply.",
+    culture: [
+      "Punctuality is extremely important in Germany; try to arrive exactly on time.",
+      "Quiet hours (Ruhezeit) are respected on Sundays and late evenings.",
+      "Cash is still preferred in many smaller bakeries, kiosks, and beer gardens.",
+    ],
+    phrases: [
+      { english: "Hello", local: "Hallo", pronunciation: "hah-loh" },
+      { english: "Thank you", local: "Danke schön", pronunciation: "dahn-keh shern" },
+      { english: "Please", local: "Bitte", pronunciation: "bit-teh" },
+      { english: "Excuse me", local: "Entschuldigung", pronunciation: "ent-shool-dee-goong" },
+      { english: "How much is this?", local: "Wie viel kostet das?", pronunciation: "vee feel kos-tet dahs" },
+      { english: "Where is the bathroom?", local: "Wo ist die Toilette?", pronunciation: "voh ist dee toy-let-teh" },
+      { english: "Do you speak English?", local: "Sprechen Sie Englisch?", pronunciation: "shpreh-khen zee eng-lish" },
+      { english: "Help!", local: "Hilfe!", pronunciation: "hil-feh" },
+    ],
+  },
+  singapore: {
+    countryName: "Singapore", langCode: "en-SG", langName: "English / Malay / Mandarin",
+    currency: "SGD", exchangeRate: 1.35, plugType: "G", voltage: "230 V / 50 Hz",
+    emergency: "999 (Police) / 995 (Ambulance/Fire)", police: "999", medical: "995",
+    visa: "Visa-free entry for up to 30 or 90 days for most passport holders.",
+    culture: [
+      "Littering, spitting, chewing gum in public, and jaywalking are strictly fined.",
+      "Clear your food trays at hawker centers to follow local regulations.",
+      "Keep to the left on escalators and walk on the right.",
+    ],
+    phrases: [
+      { english: "Hello", local: "Hello / Nǐ hǎo", pronunciation: "heh-loh / nee how" },
+      { english: "Thank you", local: "Thank you / Xièxiè", pronunciation: "thangk yoo / shyeh-shyeh" },
+      { english: "Please", local: "Please / Qǐng", pronunciation: "pleez / chingh" },
+      { english: "Excuse me", local: "Excuse me", pronunciation: "ik-skyooz mee" },
+      { english: "How much is this?", local: "How much is this?", pronunciation: "how muhch iz this" },
+      { english: "Where is the bathroom?", local: "Where is the toilet?", pronunciation: "wair iz the toy-lit" },
+      { english: "Do you speak English?", local: "Do you speak English?", pronunciation: "doo yoo speek ing-glish" },
+      { english: "Help!", local: "Help!", pronunciation: "help" },
+    ],
+  },
+  switzerland: {
+    countryName: "Switzerland", langCode: "de-CH", langName: "German / French / Italian",
+    currency: "CHF", exchangeRate: 0.89, plugType: "C, J", voltage: "230 V / 50 Hz",
+    emergency: "112 (General) / 117 (Police) / 144 (Ambulance)", police: "117", medical: "144",
+    visa: "Schengen Visa rules apply.",
+    culture: [
+      "Quiet hours are strictly observed between 10 PM and 7 AM, and all day Sunday.",
+      "Tipping is included in restaurant prices, but rounding up is appreciated.",
+      "Keep public spaces clean and recycle your trash in designated bins.",
+    ],
+    phrases: [
+      { english: "Hello", local: "Grüezi (Swiss German)", pronunciation: "grew-et-see" },
+      { english: "Thank you", local: "Merci vielmal", pronunciation: "mair-see feel-mahl" },
+      { english: "Please", local: "Bitte", pronunciation: "bit-teh" },
+      { english: "Excuse me", local: "Entschuldigung", pronunciation: "ent-shool-dee-goong" },
+      { english: "How much is this?", local: "Was kostet das?", pronunciation: "vahs kos-tet dahs" },
+      { english: "Where is the bathroom?", local: "Wo ist die Toilette?", pronunciation: "voh ist dee toy-let-teh" },
+      { english: "Do you speak English?", local: "Sprechen Sie Englisch?", pronunciation: "shpreh-khen zee eng-lish" },
+      { english: "Help!", local: "Hilfe!", pronunciation: "hil-feh" },
+    ],
+  },
+  mexico: {
+    countryName: "Mexico", langCode: "es-MX", langName: "Spanish",
+    currency: "MXN", exchangeRate: 18.20, plugType: "A, B", voltage: "127 V / 60 Hz",
+    emergency: "911", police: "911", medical: "911",
+    visa: "Visa-free for up to 180 days for tourists from 67 countries.",
+    culture: [
+      "Tipping 10% to 15% in sit-down restaurants is customary and expected.",
+      "Greetings are warm; a handshake or a light hug/cheek kiss is common.",
+      "Try to carry some cash (pesos) for markets, street food, and taxis.",
+    ],
+    phrases: [
+      { english: "Hello", local: "Hola", pronunciation: "oh-lah" },
+      { english: "Thank you", local: "Gracias", pronunciation: "grah-syahs" },
+      { english: "Please", local: "Por favor", pronunciation: "por fah-vor" },
+      { english: "Excuse me", local: "Disculpe", pronunciation: "dees-kool-peh" },
+      { english: "How much is this?", local: "¿Cuánto cuesta esto?", pronunciation: "kwan-toh kwes-tah es-toh" },
+      { english: "Where is the bathroom?", local: "¿Dónde está el baño?", pronunciation: "dohn-deh es-tah el bah-nyoh" },
+      { english: "Do you speak English?", local: "¿Habla inglés?", pronunciation: "ah-blah een-glehs" },
+      { english: "Help!", local: "¡Ayuda!", pronunciation: "ah-yoo-dah" },
+    ],
+  },
+  uae: {
+    countryName: "United Arab Emirates", langCode: "ar-AE", langName: "Arabic / English",
+    currency: "AED", exchangeRate: 3.67, plugType: "G", voltage: "220 V / 50 Hz",
+    emergency: "999 (Police) / 998 (Ambulance)", police: "999", medical: "998",
+    visa: "Visa on arrival available for residents/passport holders of many countries.",
+    culture: [
+      "Dress modestly in public places (shoulders and knees covered), especially in malls.",
+      "Avoid showing intense public displays of affection.",
+      "Respect local Islamic traditions, particularly during the holy month of Ramadan.",
+    ],
+    phrases: [
+      { english: "Hello", local: "مرحباً (Marhaban)", pronunciation: "mar-hah-ban" },
+      { english: "Thank you", local: "شكراً (Shukran)", pronunciation: "shook-ran" },
+      { english: "Please", local: "من فضلك (Min fadlik)", pronunciation: "min fad-lik" },
+      { english: "Excuse me", local: "لو سمحت (Law samaht)", pronunciation: "law sah-maht" },
+      { english: "How much is this?", local: "بكم هذا؟ (Bikam hadha?)", pronunciation: "bee-kam hah-tha" },
+      { english: "Where is the bathroom?", local: "أين الحمام؟ (Ayna al-hammam?)", pronunciation: "ay-na al-ham-mam" },
+      { english: "Do you speak English?", local: "هل تتحدث الإنجليزية؟", pronunciation: "hal tatahaddath al-ingleeziah" },
+      { english: "Help!", local: "النجدة! (An-najdah!)", pronunciation: "an-naj-dah" },
+    ],
+  },
 };
 
 // ── Currencies list ───────────────────────────────────────────────────────────
@@ -225,6 +372,37 @@ const DEFAULT_DATA = {
   ],
 };
 
+// ── Weather description utility ───────────────────────────────────────────────
+const getWeatherDescription = (code) => {
+  const codes = {
+    0: { desc: "Clear sky", icon: "☀️" },
+    1: { desc: "Mainly clear", icon: "🌤️" },
+    2: { desc: "Partly cloudy", icon: "⛅" },
+    3: { desc: "Overcast", icon: "☁️" },
+    45: { desc: "Foggy", icon: "🌫️" },
+    48: { desc: "Depositing rime fog", icon: "🌫️" },
+    51: { desc: "Light drizzle", icon: "🌦️" },
+    53: { desc: "Moderate drizzle", icon: "🌦️" },
+    55: { desc: "Dense drizzle", icon: "🌦️" },
+    61: { desc: "Slight rain", icon: "🌧️" },
+    63: { desc: "Moderate rain", icon: "🌧️" },
+    65: { desc: "Heavy rain", icon: "🌧️" },
+    71: { desc: "Slight snow fall", icon: "🌨️" },
+    73: { desc: "Moderate snow fall", icon: "🌨️" },
+    75: { desc: "Heavy snow fall", icon: "🌨️" },
+    77: { desc: "Snow grains", icon: "🌨️" },
+    80: { desc: "Slight rain showers", icon: "🌧️" },
+    81: { desc: "Moderate rain showers", icon: "🌧️" },
+    82: { desc: "Violent rain showers", icon: "🌧️" },
+    85: { desc: "Slight snow showers", icon: "🌨️" },
+    86: { desc: "Heavy snow showers", icon: "🌨️" },
+    95: { desc: "Thunderstorm", icon: "⛈️" },
+    96: { desc: "Thunderstorm with slight hail", icon: "⛈️" },
+    99: { desc: "Thunderstorm with heavy hail", icon: "⛈️" },
+  };
+  return codes[code] || { desc: "Clear sky", icon: "☀️" };
+};
+
 // ── Component ─────────────────────────────────────────────────────────────────
 export function ToolkitPage() {
   const [trips, setTrips] = useState([]);
@@ -240,6 +418,10 @@ export function ToolkitPage() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+  const [liveRates, setLiveRates] = useState(null);
+  const [weatherLoading, setWeatherLoading] = useState(false);
+  const [weatherData, setWeatherData] = useState(null);
+
   // Stop synthesis on unmount
   useEffect(() => {
     return () => {
@@ -248,6 +430,71 @@ export function ToolkitPage() {
       }
     };
   }, []);
+
+  // Fetch live currency exchange rates on mount
+  useEffect(() => {
+    fetch("https://open.er-api.com/v6/latest/USD")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.rates) {
+          setLiveRates(data.rates);
+          try {
+            localStorage.setItem("usd_exchange_rates", JSON.stringify(data.rates));
+          } catch {}
+        }
+      })
+      .catch((err) => {
+        console.warn("Failed to fetch live exchange rates, using fallback:", err);
+      });
+  }, []);
+
+  // Fetch live weather data for the selected destination
+  useEffect(() => {
+    if (!selectedTrip) return;
+    setWeatherLoading(true);
+    setWeatherData(null);
+
+    const fetchWeather = (lat, lng) => {
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.current_weather && data.daily) {
+            setWeatherData({
+              current: data.current_weather,
+              daily: data.daily
+            });
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to fetch weather forecast:", err);
+        })
+        .finally(() => {
+          setWeatherLoading(false);
+        });
+    };
+
+    // If trip has coordinates, use them
+    if (selectedTrip.coordinates && selectedTrip.coordinates.lat && selectedTrip.coordinates.lng) {
+      fetchWeather(selectedTrip.coordinates.lat, selectedTrip.coordinates.lng);
+    } else {
+      // Otherwise, geocode the destination string
+      const cleanDest = selectedTrip.destination.split(",")[0].trim();
+      fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cleanDest)}&count=1&language=en&format=json`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.results && data.results[0]) {
+            const { latitude, longitude } = data.results[0];
+            fetchWeather(latitude, longitude);
+          } else {
+            setWeatherLoading(false);
+          }
+        })
+        .catch((err) => {
+          console.error("Geocoding failed:", err);
+          setWeatherLoading(false);
+        });
+    }
+  }, [selectedTrip]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -281,6 +528,13 @@ export function ToolkitPage() {
     if (d.includes("italy") || d.includes("rome") || d.includes("venice") || d.includes("florence")) return DESTINATION_DATA.italy;
     if (d.includes("thailand") || d.includes("bangkok") || d.includes("phuket")) return DESTINATION_DATA.thailand;
     if (d.includes("usa") || d.includes("united states") || d.includes("york") || d.includes("miami")) return DESTINATION_DATA.usa;
+    if (d.includes("canada") || d.includes("toronto") || d.includes("vancouver") || d.includes("montreal")) return DESTINATION_DATA.canada;
+    if (d.includes("australia") || d.includes("sydney") || d.includes("melbourne") || d.includes("brisbane")) return DESTINATION_DATA.australia;
+    if (d.includes("germany") || d.includes("berlin") || d.includes("munich") || d.includes("frankfurt")) return DESTINATION_DATA.germany;
+    if (d.includes("singapore")) return DESTINATION_DATA.singapore;
+    if (d.includes("switzerland") || d.includes("zurich") || d.includes("geneva")) return DESTINATION_DATA.switzerland;
+    if (d.includes("mexico") || d.includes("cancun") || d.includes("mexico city")) return DESTINATION_DATA.mexico;
+    if (d.includes("united arab emirates") || d.includes("uae") || d.includes("dubai") || d.includes("abu dhabi")) return DESTINATION_DATA.uae;
     return DEFAULT_DATA;
   };
 
@@ -294,7 +548,8 @@ export function ToolkitPage() {
   }, [selectedTrip]);
 
   const getExchangeRate = () => {
-    let rates = window.EXCHANGE_RATES;
+    let rates = liveRates;
+    if (!rates) rates = window.EXCHANGE_RATES;
     if (!rates) {
       try { const c = localStorage.getItem("usd_exchange_rates"); if (c) rates = JSON.parse(c); } catch {}
     }
@@ -307,7 +562,7 @@ export function ToolkitPage() {
   useEffect(() => {
     const amt = parseFloat(calcBaseAmount);
     setCalcTargetAmount(isNaN(amt) ? "" : (amt * currentRate).toFixed(2));
-  }, [calcBaseAmount, baseCurrency, targetCurrency]);
+  }, [calcBaseAmount, baseCurrency, targetCurrency, liveRates, currentRate]);
 
   const handleBaseChange = (v) => {
     setCalcBaseAmount(v);
@@ -635,9 +890,86 @@ export function ToolkitPage() {
               </div>
             </div>
 
-            {/* ── RIGHT COL: Currency Converter ─────────────────────────────── */}
-            <div>
-              <div className="rounded-3xl border border-slate-100 bg-white shadow-sm overflow-hidden sticky top-6">
+            {/* ── RIGHT COL: Weather + Currency Converter ───────────────────── */}
+            <div className="space-y-5 lg:sticky lg:top-6">
+
+              {/* ── WEATHER FORECAST WIDGET ── */}
+              <div className="rounded-3xl border border-slate-100 bg-white shadow-sm overflow-hidden">
+                {/* Weather Header */}
+                <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600 px-6 py-5">
+                  <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-white/10 blur-xl" />
+                  <div className="relative z-10 flex justify-between items-start">
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <span className="text-[10px] font-extrabold uppercase tracking-widest text-white/70">Weather Forecast</span>
+                      </div>
+                      <h2 className="text-lg font-black text-white">{selectedTrip.destination.split(",")[0]}</h2>
+                    </div>
+                    {weatherData && (
+                      <span className="text-3xl" title={getWeatherDescription(weatherData.current.weathercode).desc}>
+                        {getWeatherDescription(weatherData.current.weathercode).icon}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-5">
+                  {weatherLoading ? (
+                    <div className="flex flex-col items-center justify-center py-6 gap-2">
+                      <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
+                      <p className="text-[11px] text-slate-400 font-medium">Fetching local weather...</p>
+                    </div>
+                  ) : weatherData ? (
+                    <div className="space-y-4">
+                      {/* Current Weather details */}
+                      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div>
+                          <p className="text-3xl font-black text-slate-900">
+                            {weatherData.current.temperature.toFixed(1)}°C
+                          </p>
+                          <p className="text-xs font-bold text-slate-500">
+                            {getWeatherDescription(weatherData.current.weathercode).desc}
+                          </p>
+                        </div>
+                        <div className="text-right text-[11px] font-mono text-slate-400">
+                          <p>Wind: {weatherData.current.windspeed} km/h</p>
+                          <p>Time: {new Date(weatherData.current.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                        </div>
+                      </div>
+
+                      {/* Daily Forecast */}
+                      <div className="space-y-2.5">
+                        <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">3-Day Forecast</p>
+                        <div className="space-y-2">
+                          {weatherData.daily.time.slice(0, 3).map((dayStr, idx) => {
+                            const date = new Date(dayStr);
+                            const dayName = date.toLocaleDateString(undefined, { weekday: 'short' });
+                            const maxTemp = weatherData.daily.temperature_2m_max[idx];
+                            const minTemp = weatherData.daily.temperature_2m_min[idx];
+                            const wCode = weatherData.daily.weathercode[idx];
+                            const { desc, icon } = getWeatherDescription(wCode);
+
+                            return (
+                              <div key={dayStr} className="flex items-center justify-between text-xs py-1 hover:bg-slate-50/50 rounded-lg px-1 transition-colors">
+                                <span className="font-bold text-slate-600 w-12">{dayName}</span>
+                                <span className="text-base" title={desc}>{icon}</span>
+                                <span className="font-mono text-slate-400">
+                                  <strong className="text-slate-800 font-bold">{maxTemp.toFixed(0)}°</strong> / {minTemp.toFixed(0)}°
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-center text-slate-400 py-4">Weather data currently unavailable.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Currency Converter Card */}
+              <div className="rounded-3xl border border-slate-100 bg-white shadow-sm overflow-hidden">
 
                 {/* Gradient header */}
                 <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 px-6 py-6">
