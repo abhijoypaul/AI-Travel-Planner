@@ -33,6 +33,30 @@ function simulateReply(message) {
   return `✈️ Great question about "${message}"! As your AI travel companion, I can help plan itineraries, suggest destinations, estimate budgets, and find hidden gems. Go to **Create Trip** to generate a full AI itinerary, or ask me anything specific!`;
 }
 
+const formatMessageContent = (content, isUser) => {
+  if (!content) return "";
+  const paragraphs = content.split("\n");
+  
+  return paragraphs.map((para, pIdx) => {
+    const parts = para.split(/(\*\*.*?\*\*)/g);
+    
+    return (
+      <p key={pIdx} className={pIdx > 0 ? "mt-2" : ""}>
+        {parts.map((part, partIdx) => {
+          if (part.startsWith("**") && part.endsWith("**")) {
+            return (
+              <strong key={partIdx} className={isUser ? "font-black text-white" : "font-black text-slate-950 dark:text-white"}>
+                {part.slice(2, -2)}
+              </strong>
+            );
+          }
+          return part;
+        })}
+      </p>
+    );
+  });
+};
+
 export function AIAssistantPage() {
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [input, setInput] = useState("");
@@ -88,7 +112,7 @@ export function AIAssistantPage() {
                         : "bg-slate-50 border border-slate-100 text-slate-800 rounded-tl-sm"
                     }`}
                   >
-                    {msg.content}
+                    {formatMessageContent(msg.content, msg.role === "user")}
                   </div>
                   {msg.role === "user" && (
                     <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
