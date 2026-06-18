@@ -478,7 +478,7 @@ export function ToolkitPage() {
       fetchWeather(selectedTrip.coordinates.lat, selectedTrip.coordinates.lng);
     } else {
       // Otherwise, geocode the destination string
-      const cleanDest = selectedTrip.destination.split(",")[0].trim();
+      const cleanDest = selectedTrip.destination.trim();
       fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cleanDest)}&count=1&language=en&format=json`)
         .then((res) => res.json())
         .then((data) => {

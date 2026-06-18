@@ -118,7 +118,7 @@ export function CreateTripPage() {
     destination: searchParams.get("destination") || "",
     startDate: durationDays > 0 ? today.toISOString().split("T")[0] : "",
     endDate: defaultEnd,
-    budget: parseInt(searchParams.get("budget") || "0"),
+    budget: searchParams.get("budget") ? parseInt(searchParams.get("budget")) : "",
     travelers: parseInt(searchParams.get("travelers") || "2"),
     travelStyle: "adventure",
     interests: [],
@@ -140,6 +140,7 @@ export function CreateTripPage() {
     try {
       const { data } = await tripAPI.generate({
         ...form,
+        budget: Number(form.budget) || 0,
         currency: selectedCurrency,
       });
       addNotification(
@@ -336,7 +337,7 @@ export function CreateTripPage() {
                             className="input-field pl-11"
                             value={form.budget}
                             onChange={(e) =>
-                              setForm({ ...form, budget: Number(e.target.value) })
+                              setForm({ ...form, budget: e.target.value === "" ? "" : Number(e.target.value) })
                             }
                             required
                             min={0}

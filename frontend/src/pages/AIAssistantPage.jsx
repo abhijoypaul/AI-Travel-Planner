@@ -128,7 +128,7 @@ export function AIAssistantPage() {
             )}
 
             {/* Input */}
-            <div className="p-4 border-t border-slate-100 flex-shrink-0">
+            <div className="p-4 border-t border-slate-100 bg-slate-50/50 flex-shrink-0">
               <form
                 onSubmit={(e) => { e.preventDefault(); send(); }}
                 className="flex items-center gap-3"
@@ -139,12 +139,16 @@ export function AIAssistantPage() {
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask about destinations, budgets, itineraries..."
                   disabled={loading}
-                  className="flex-1 h-11 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all disabled:opacity-50"
+                  className="flex-1 h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-800 placeholder:text-slate-400 shadow-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all disabled:opacity-50"
                 />
                 <button
                   type="submit"
                   disabled={loading || !input.trim()}
-                  className="h-11 w-11 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white hover:opacity-90 disabled:opacity-40 transition-all shadow-sm"
+                  className={`h-11 w-11 rounded-xl flex items-center justify-center transition-all shadow-sm ${
+                    !input.trim() || loading
+                      ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                      : "bg-gradient-to-br from-indigo-500 to-violet-600 text-white hover:opacity-95 active:scale-95 cursor-pointer"
+                  }`}
                 >
                   <Send className="h-4 w-4" />
                 </button>
