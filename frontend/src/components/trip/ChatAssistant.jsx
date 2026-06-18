@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { MessageCircle, Send, Bot, User } from 'lucide-react'
+import { MessageCircle, Send, Bot, User, Sparkles } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -62,18 +62,32 @@ export function ChatAssistant({ tripId }) {
           ))}
           {loading && <p className="text-xs text-slate-600 font-bold animate-pulse pl-8">Thinking...</p>}
         </div>
-        <form onSubmit={sendMessage} className="flex gap-2 border-t border-slate-100 pt-3">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about your trip..."
-            disabled={loading}
-            className="bg-white border-slate-250 text-slate-805 font-medium rounded-xl h-10"
-          />
-          <Button type="submit" size="icon" className="h-10 w-10 rounded-xl bg-indigo-650 hover:bg-indigo-700 text-white shrink-0" disabled={loading}>
-            <Send className="h-4 w-4" />
-          </Button>
-        </form>
+        <div className="border-t border-slate-100 pt-3 mt-auto">
+          <form onSubmit={sendMessage} className="relative flex items-center w-full">
+            <span className="absolute left-3 text-indigo-500">
+              <Sparkles className="h-4 w-4 text-indigo-500 animate-pulse" />
+            </span>
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask about your trip..."
+              disabled={loading}
+              className="w-full h-11 pl-10 pr-12 rounded-2xl border-2 border-slate-200 bg-white text-sm text-slate-800 placeholder:text-slate-400/80 outline-none focus:border-indigo-500 focus:ring-0 transition-all disabled:opacity-50"
+            />
+            <button
+              type="submit"
+              disabled={loading || !input.trim()}
+              className={`absolute right-1.5 h-8 w-8 rounded-xl flex items-center justify-center transition-all ${
+                !input.trim() || loading
+                  ? "bg-indigo-50 text-indigo-300 cursor-not-allowed"
+                  : "bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 shadow-sm shadow-indigo-200/40 cursor-pointer"
+              }`}
+            >
+              <Send className="h-3.5 w-3.5" />
+            </button>
+          </form>
+        </div>
       </CardContent>
     </Card>
   )
