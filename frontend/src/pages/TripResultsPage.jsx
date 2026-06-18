@@ -139,20 +139,29 @@ export function TripResultsPage() {
     }
   }, [trip]);
 
-  const handleLocationSelect = (loc, preventTabSwitch = false) => {
+  const handleLocationSelect = (loc, source = 'itinerary') => {
     setSelectedLocation(loc);
     fetchLocationPhoto(loc);
 
-    if (!preventTabSwitch) {
-      // Switch to itinerary tab to ensure the item is visible and can be scrolled to
+    if (source === 'map') {
       setActiveTab("itinerary");
-
-      // Scroll to the timeline item
       setTimeout(() => {
         const placeId = `place-${encodeURIComponent(loc.name.toLowerCase().replace(/\s+/g, '-'))}`;
         const element = document.getElementById(placeId);
         if (element) {
           element.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 150);
+    } else {
+      if (source === 'itinerary') {
+        setActiveTab("itinerary");
+      }
+      setTimeout(() => {
+        if (mapSectionRef.current) {
+          const yOffset = -20;
+          const element = mapSectionRef.current;
+          const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
         }
       }, 150);
     }

@@ -100,7 +100,7 @@ export function RecommendationCards({ trip, onLocationSelect }) {
                 place={place} 
                 icon={section.icon} 
                 color={section.color} 
-                onSelect={onLocationSelect} 
+                onSelect={(loc) => onLocationSelect?.(loc, 'recommendations')}
                 destination={trip.destination}
                 startDate={trip.startDate}
                 endDate={trip.endDate}

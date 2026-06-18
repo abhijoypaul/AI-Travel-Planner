@@ -102,7 +102,7 @@ export function DayTimeline({ day, currency, onLocationSelect, selectedLocation,
                   }`}>
                     <div 
                       className="flex w-full items-start gap-3.5 cursor-pointer" 
-                      onClick={() => onLocationSelect?.(item)}
+                      onClick={() => onLocationSelect?.(item, 'itinerary')}
                     >
                       {/* Icon */}
                       <div className={`rounded-xl p-2.5 transition-transform duration-300 group-hover:scale-105 ${config.badgeBg} ${

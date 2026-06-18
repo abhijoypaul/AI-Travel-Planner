@@ -142,7 +142,7 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
 
           marker.addListener('click', () => {
             openInfoWindow(maps, marker, loc)
-            onLocationSelect?.(loc)
+            onLocationSelect?.(loc, 'map')
           })
 
           markersRef.current.push(marker)
@@ -230,7 +230,7 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
           {locations.slice(0, 5).map((loc, i) => (
             <button
               key={i}
-              onClick={() => onLocationSelect?.(loc)}
+              onClick={() => onLocationSelect?.(loc, 'map')}
               className={`flex items-center gap-2 rounded-lg p-3 text-left text-sm shadow-sm transition-all ${
                 selectedLocation?.name === loc.name
                   ? 'scale-[1.02] border border-cyan-500/40 bg-cyan-500/20 text-cyan-100 shadow-[0_0_15px_rgb(34_211_238/0.2)]'
