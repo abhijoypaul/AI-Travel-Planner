@@ -139,21 +139,23 @@ export function TripResultsPage() {
     }
   }, [trip]);
 
-  const handleLocationSelect = (loc) => {
+  const handleLocationSelect = (loc, preventTabSwitch = false) => {
     setSelectedLocation(loc);
     fetchLocationPhoto(loc);
 
-    // Switch to itinerary tab to ensure the item is visible and can be scrolled to
-    setActiveTab("itinerary");
+    if (!preventTabSwitch) {
+      // Switch to itinerary tab to ensure the item is visible and can be scrolled to
+      setActiveTab("itinerary");
 
-    // Scroll to the timeline item
-    setTimeout(() => {
-      const placeId = `place-${encodeURIComponent(loc.name.toLowerCase().replace(/\s+/g, '-'))}`;
-      const element = document.getElementById(placeId);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-    }, 150);
+      // Scroll to the timeline item
+      setTimeout(() => {
+        const placeId = `place-${encodeURIComponent(loc.name.toLowerCase().replace(/\s+/g, '-'))}`;
+        const element = document.getElementById(placeId);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 150);
+    }
   };
 
   if (loading) {
@@ -291,7 +293,7 @@ export function TripResultsPage() {
               <TabsContent value="recommendations" className="mt-4">
                 <RecommendationCards
                   trip={trip}
-                  onLocationSelect={handleLocationSelect}
+                  onLocationSelect={(loc) => handleLocationSelect(loc, true)}
                   selectedLocation={selectedLocation}
                 />
               </TabsContent>
