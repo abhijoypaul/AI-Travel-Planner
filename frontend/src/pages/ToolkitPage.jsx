@@ -331,7 +331,7 @@ export function ToolkitPage() {
     setCalcTargetAmount(calcBaseAmount);
   };
 
-  const speakText = (phrase, idx) => {
+  const speakText = (text, idx) => {
     if (!("speechSynthesis" in window)) {
       addNotification("Unavailable", "Speech Synthesis is not supported in this browser.", "error");
       return;
@@ -348,27 +348,13 @@ export function ToolkitPage() {
       return vLang === targetLangLower || vLang.split("-")[0] === targetLangPrefix;
     });
 
-    let textToSpeak = "";
-    let lang = info.langCode;
-
-    if (matchedVoice) {
-      // Clean local text (e.g. remove romanization inside parenthesis)
-      textToSpeak = phrase.local.split("(")[0].trim();
-      lang = matchedVoice.lang;
-    } else {
-      // Fallback: Speak phonetic pronunciation using an English/default voice
-      textToSpeak = phrase.pronunciation;
-      lang = "en-US";
-    }
-
+    const textToSpeak = text.split("(")[0].trim();
     const utt = new SpeechSynthesisUtterance(textToSpeak);
-    utt.lang = lang;
+    utt.lang = info.langCode;
 
     if (matchedVoice) {
       utt.voice = matchedVoice;
-    } else {
-      const enVoice = voices.find(v => v.lang.toLowerCase().startsWith("en"));
-      if (enVoice) utt.voice = enVoice;
+      utt.lang = matchedVoice.lang;
     }
 
     utt.onstart = () => setSpeakingIndex(idx);
@@ -618,7 +604,7 @@ export function ToolkitPage() {
                           <p className="text-[10px] italic text-slate-400 truncate">{phrase.pronunciation}</p>
                         </div>
                         <button
-                          onClick={() => speakText(phrase, idx)}
+                          onClick={() => speakText(phrase.local, idx)}
                           title="Hear pronunciation"
                           className={`flex-shrink-0 h-9 w-9 rounded-xl flex items-center justify-center transition-all ${
                             active
