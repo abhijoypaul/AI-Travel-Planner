@@ -152,8 +152,8 @@ export function DayTimeline({ day, currency, onLocationSelect, selectedLocation,
                         </div>
 
                         {item.notes && (
-                          <p className="text-xs text-slate-600 italic mt-2 border-l-2 border-slate-200 pl-2">
-                            "{item.notes}"
+                          <p className="text-xs text-slate-600 mt-2 border-l-2 border-slate-200 pl-2">
+                            {item.notes}
                           </p>
                         )}
                       </div>
