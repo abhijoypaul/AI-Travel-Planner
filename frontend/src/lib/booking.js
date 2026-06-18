@@ -239,28 +239,28 @@ export function getHotelBookingUrl(hotelName, destination, checkin, checkout, tr
   const checkinDateObj = new Date(checkin);
   const checkoutDateObj = checkout ? new Date(checkout) : new Date(checkinDateObj.getTime() + 86400000);
   
-  const checkinYYYYMMDD = formatDateGoibibo(checkinDateObj);
-  const checkoutYYYYMMDD = formatDateGoibibo(checkoutDateObj);
+  const checkinStr = formatDateBooking(checkin);
+  const checkoutStr = checkout ? formatDateBooking(checkout) : getCheckoutDate(checkin);
   
-  const checkinMs = checkinDateObj.getTime();
-  const checkoutMs = checkoutDateObj.getTime();
+  const checkinReadable = formatDateReadable(checkinDateObj);
+  const checkoutReadable = formatDateReadable(checkoutDateObj);
   
   const rooms = Math.max(1, Math.ceil(travelers / 2));
-  const roomStayQualifier = `${travelers}e0u`;
   const cleanCityName = String(destination || "").split(',')[0].trim();
 
   switch (provider) {
     case 'booking':
-      return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(hotelName + ", " + destination)}&checkin=${formatDateBooking(checkin)}&checkout=${checkout ? formatDateBooking(checkout) : getCheckoutDate(checkin)}&group_adults=${travelers}&no_rooms=${rooms}`;
+      return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(hotelName + ", " + destination)}&checkin=${checkinStr}&checkout=${checkoutStr}&group_adults=${travelers}&no_rooms=${rooms}`;
     
     case 'makemytrip': {
-      const code = getAirportCode(cleanCityName);
-      const cityCodeParam = code ? `&city=CT${code}` : "";
-      return `https://www.makemytrip.com/hotels/hotel-listing/?checkin=${checkinMs}&checkout=${checkoutMs}&roomStayQualifier=${roomStayQualifier}&searchText=${encodeURIComponent(hotelName)}${cityCodeParam}`;
+      const searchQuery = `MakeMyTrip hotels ${hotelName} in ${cleanCityName} checkin ${checkinReadable} checkout ${checkoutReadable} for ${travelers} guests`;
+      return `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
     }
     
-    case 'goibibo':
-      return `https://www.goibibo.com/hotels/find-hotels-in-${encodeURIComponent(cleanCityName)}/?checkin=${checkinYYYYMMDD}&checkout=${checkoutYYYYMMDD}&roomStayQualifier=${roomStayQualifier}&searchText=${encodeURIComponent(hotelName)}`;
+    case 'goibibo': {
+      const searchQuery = `Goibibo hotels ${hotelName} in ${cleanCityName} checkin ${checkinReadable} checkout ${checkoutReadable} for ${travelers} guests`;
+      return `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+    }
     
     case 'direct':
     default:
