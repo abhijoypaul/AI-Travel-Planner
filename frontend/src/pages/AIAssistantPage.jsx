@@ -35,23 +35,41 @@ function simulateReply(message) {
 
 const formatMessageContent = (content, isUser) => {
   if (!content) return "";
-  const paragraphs = content.split("\n");
+  const lines = content.split("\n");
   
-  return paragraphs.map((para, pIdx) => {
-    const parts = para.split(/(\*\*.*?\*\*)/g);
+  return lines.map((line, idx) => {
+    let isListItem = false;
+    let cleanLine = line.trim();
     
+    if (cleanLine.startsWith("* ") || cleanLine.startsWith("- ")) {
+      isListItem = true;
+      cleanLine = cleanLine.substring(2);
+    }
+    
+    const parts = cleanLine.split(/(\*\*.*?\*\*)/g);
+    const parsedText = parts.map((part, partIdx) => {
+      if (part.startsWith("**") && part.endsWith("**")) {
+        return (
+          <strong key={partIdx} className={isUser ? "font-black text-white" : "font-black text-slate-950 dark:text-white"}>
+            {part.slice(2, -2)}
+          </strong>
+        );
+      }
+      return part;
+    });
+
+    if (isListItem) {
+      return (
+        <div key={idx} className="flex items-start gap-2 pl-4 mt-1.5 text-xs sm:text-sm">
+          <span className={isUser ? "text-white mt-1.5 flex-shrink-0" : "text-indigo-500 mt-1.5 flex-shrink-0"}>•</span>
+          <p className="leading-relaxed flex-1">{parsedText}</p>
+        </div>
+      );
+    }
+
     return (
-      <p key={pIdx} className={pIdx > 0 ? "mt-2" : ""}>
-        {parts.map((part, partIdx) => {
-          if (part.startsWith("**") && part.endsWith("**")) {
-            return (
-              <strong key={partIdx} className={isUser ? "font-black text-white" : "font-black text-slate-950 dark:text-white"}>
-                {part.slice(2, -2)}
-              </strong>
-            );
-          }
-          return part;
-        })}
+      <p key={idx} className={idx > 0 ? "mt-2 leading-relaxed" : "leading-relaxed"}>
+        {parsedText}
       </p>
     );
   });
