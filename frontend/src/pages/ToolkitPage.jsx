@@ -239,18 +239,14 @@ export function ToolkitPage() {
   const [speakingIndex, setSpeakingIndex] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const voicesRef = useRef([]);
+  const audioRef = useRef(null);
 
-  // Load and cache voices for synthesis
+  // Stop audio on unmount
   useEffect(() => {
-    if (!("speechSynthesis" in window)) return;
-    const loadVoices = () => {
-      voicesRef.current = window.speechSynthesis.getVoices();
-    };
-    loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
     return () => {
-      window.speechSynthesis.onvoiceschanged = null;
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
     };
   }, []);
 
@@ -332,35 +328,40 @@ export function ToolkitPage() {
   };
 
   const speakText = (text, idx) => {
-    if (!("speechSynthesis" in window)) {
-      addNotification("Unavailable", "Speech Synthesis is not supported in this browser.", "error");
-      return;
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
     }
-    window.speechSynthesis.cancel();
-
-    // Find best matching voice for the target language (case-insensitive & handles both hyphens/underscores)
-    const voices = voicesRef.current.length ? voicesRef.current : window.speechSynthesis.getVoices();
-    const targetLangLower = info.langCode.toLowerCase();
-    const targetLangPrefix = info.langCode.split("-")[0].toLowerCase();
-
-    const matchedVoice = voices.find(v => {
-      const vLang = v.lang.toLowerCase().replace("_", "-");
-      return vLang === targetLangLower || vLang.split("-")[0] === targetLangPrefix;
-    });
+    setSpeakingIndex(idx);
 
     const textToSpeak = text.split("(")[0].trim();
-    const utt = new SpeechSynthesisUtterance(textToSpeak);
-    utt.lang = info.langCode;
+    // Google Translate TTS URL
+    const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${info.langCode}&client=tw-ob&q=${encodeURIComponent(textToSpeak)}`;
 
-    if (matchedVoice) {
-      utt.voice = matchedVoice;
-      utt.lang = matchedVoice.lang;
-    }
+    const audio = new Audio(url);
+    audioRef.current = audio;
 
-    utt.onstart = () => setSpeakingIndex(idx);
-    utt.onend   = () => setSpeakingIndex(null);
-    utt.onerror = () => { setSpeakingIndex(null); addNotification("Speaker Alert", "Audio speech engine not ready.", "info"); };
-    window.speechSynthesis.speak(utt);
+    audio.onended = () => {
+      if (audioRef.current === audio) {
+        setSpeakingIndex(null);
+        audioRef.current = null;
+      }
+    };
+    audio.onerror = () => {
+      if (audioRef.current === audio) {
+        setSpeakingIndex(null);
+        audioRef.current = null;
+        addNotification("Speaker Alert", "Google Translate voice engine is not responding.", "error");
+      }
+    };
+
+    audio.play().catch((err) => {
+      console.error("Audio playback error:", err);
+      if (audioRef.current === audio) {
+        setSpeakingIndex(null);
+        audioRef.current = null;
+      }
+    });
   };
 
   // ── Render ────────────────────────────────────────────────────────────────
