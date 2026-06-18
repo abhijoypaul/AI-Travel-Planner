@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
   Wrench,
@@ -237,6 +237,19 @@ export function ToolkitPage() {
   const [calcBaseAmount, setCalcBaseAmount] = useState("100");
   const [calcTargetAmount, setCalcTargetAmount] = useState("");
   const [speakingIndex, setSpeakingIndex] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   useEffect(() => {
     tripAPI.getAll()
@@ -341,30 +354,68 @@ export function ToolkitPage() {
               Visa info · emergency contacts · plug specs · native phrases with audio · currency converter
             </p>
 
-            {/* Trip selector — sits in the hero */}
+            {/* Trip selector — custom dropdown in hero */}
             {!loading && trips.length > 0 && (
-              <div className="mt-3">
-                <p className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-white/35">
+              <div className="mt-4" ref={dropdownRef}>
+                <p className="mb-2 text-[10px] font-extrabold uppercase tracking-widest text-white/35">
                   Active destination
                 </p>
-                <div className="relative inline-block">
-                  <select
-                    id="trip-selector"
-                    value={selectedTrip?._id ?? ""}
-                    onChange={(e) => {
-                      const t = trips.find(t => t._id === e.target.value);
-                      if (t) setSelectedTrip(t);
-                    }}
-                    className="appearance-none rounded-2xl border border-white/20 bg-white/10 py-3 pl-5 pr-10 text-sm font-bold text-white backdrop-blur-md outline-none cursor-pointer transition hover:bg-white/15 focus:bg-white/20 min-w-[260px] text-center"
-                  >
-                    {trips.map(trip => (
-                      <option key={trip._id} value={trip._id} className="bg-slate-900 text-white">
-                        ✈️  {trip.destination.split(",")[0]}  ·  {new Date(trip.startDate).toLocaleDateString(undefined, { month: "short", year: "numeric" })}
-                      </option>
-                    ))}
-                  </select>
-                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[11px] text-white/40">▾</span>
-                </div>
+
+                {/* Trigger button */}
+                <button
+                  id="trip-selector"
+                  onClick={() => setDropdownOpen(o => !o)}
+                  className="group relative flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-5 py-3.5 backdrop-blur-md transition-all hover:bg-white/15 hover:border-white/30 min-w-[280px] cursor-pointer"
+                >
+                  {/* Destination info */}
+                  <div className="flex-1 text-left">
+                    <p className="text-base font-black text-white leading-tight">
+                      ✈️ &nbsp;{selectedTrip ? selectedTrip.destination.split(",")[0] : "Select trip"}
+                    </p>
+                    {selectedTrip && (
+                      <p className="text-[11px] text-white/50 font-medium mt-0.5">
+                        {new Date(selectedTrip.startDate).toLocaleDateString(undefined, { month: "long", year: "numeric" })}
+                      </p>
+                    )}
+                  </div>
+                  {/* Chevron */}
+                  <span className={`text-white/40 text-sm transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`}>
+                    ▾
+                  </span>
+                </button>
+
+                {/* Dropdown panel */}
+                {dropdownOpen && (
+                  <div className="absolute mt-2 left-1/2 -translate-x-1/2 z-50 w-72 rounded-2xl border border-white/15 bg-slate-900/95 backdrop-blur-xl shadow-2xl overflow-hidden">
+                    {trips.map((trip, idx) => {
+                      const isActive = selectedTrip?._id === trip._id;
+                      return (
+                        <button
+                          key={trip._id}
+                          onClick={() => { setSelectedTrip(trip); setDropdownOpen(false); }}
+                          className={`w-full flex items-center gap-3 px-4 py-3.5 text-left transition-colors ${
+                            idx !== 0 ? "border-t border-white/5" : ""
+                          } ${
+                            isActive
+                              ? "bg-indigo-600/40 text-white"
+                              : "text-white/70 hover:bg-white/10 hover:text-white"
+                          }`}
+                        >
+                          <span className="text-xl">✈️</span>
+                          <div className="min-w-0">
+                            <p className="text-sm font-bold truncate leading-tight">{trip.destination.split(",")[0]}</p>
+                            <p className="text-[11px] text-white/40 font-medium">
+                              {new Date(trip.startDate).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                            </p>
+                          </div>
+                          {isActive && (
+                            <span className="ml-auto flex-shrink-0 h-2 w-2 rounded-full bg-indigo-400" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
           </div>
