@@ -169,30 +169,37 @@ export function AIAssistantPage() {
               </div>
             )}
 
-            {/* Input */}
-            <div className="p-4 border-t border-slate-100 bg-slate-50/50 flex-shrink-0">
+            {/* Input Container */}
+            <div className="p-4 border-t border-slate-100 bg-slate-50/30 flex-shrink-0">
               <form
                 onSubmit={(e) => { e.preventDefault(); send(); }}
-                className="flex items-center gap-3"
+                className="relative flex items-center"
               >
+                {/* Sparkles search icon on the left */}
+                <span className="absolute left-4 text-slate-400">
+                  <Sparkles className="h-4 w-4 text-indigo-500 animate-pulse" />
+                </span>
+
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask about destinations, budgets, itineraries..."
                   disabled={loading}
-                  className="flex-1 h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-800 placeholder:text-slate-400 shadow-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all disabled:opacity-50"
+                  className="w-full h-12 pl-11 pr-14 rounded-2xl border border-slate-200 bg-white text-sm text-slate-800 placeholder:text-slate-400/80 shadow-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all disabled:opacity-50"
                 />
+
+                {/* Send/Search button inside the pill container on the right */}
                 <button
                   type="submit"
                   disabled={loading || !input.trim()}
-                  className={`h-11 w-11 rounded-xl flex items-center justify-center transition-all shadow-sm ${
+                  className={`absolute right-1.5 h-9 w-9 rounded-xl flex items-center justify-center transition-all ${
                     !input.trim() || loading
-                      ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-                      : "bg-gradient-to-br from-indigo-500 to-violet-600 text-white hover:opacity-95 active:scale-95 cursor-pointer"
+                      ? "bg-slate-100 text-slate-400 cursor-not-allowed opacity-80"
+                      : "bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 shadow-md shadow-indigo-200/50 cursor-pointer"
                   }`}
                 >
-                  <Send className="h-4 w-4" />
+                  <Send className="h-3.5 w-3.5" />
                 </button>
               </form>
             </div>
