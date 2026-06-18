@@ -335,17 +335,18 @@ export function ToolkitPage() {
       audioRef.current.pause();
       audioRef.current = null;
     }
-    if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-    }
     setSpeakingIndex(idx);
 
     const textToSpeak = text.split("(")[0].trim();
+    const shortLang = info.langCode.split("-")[0].toLowerCase();
     
-    // Google Translate TTS URL
-    const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${info.langCode}&client=gtx&q=${encodeURIComponent(textToSpeak)}`;
+    // Google Translate TTS expects 2-character language codes (e.g., 'hi', 'th', 'ja')
+    const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${shortLang}&client=gtx&q=${encodeURIComponent(textToSpeak)}`;
 
-    const audio = new Audio(url);
+    // Create audio element with no-referrer policy to bypass Google's hotlinking/referrer blocks
+    const audio = document.createElement("audio");
+    audio.referrerPolicy = "no-referrer";
+    audio.src = url;
     audioRef.current = audio;
 
     audio.onended = () => {
@@ -355,49 +356,20 @@ export function ToolkitPage() {
       }
     };
 
-    const playNativeFallback = () => {
-      if (!("speechSynthesis" in window)) {
-        setSpeakingIndex(null);
-        return;
-      }
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.resume();
-
-      const utt = new SpeechSynthesisUtterance(textToSpeak);
-      const voices = window.speechSynthesis.getVoices();
-      const targetLangLower = info.langCode.toLowerCase();
-      const targetLangPrefix = info.langCode.split("-")[0].toLowerCase();
-
-      let matchedVoice = voices.find(v => v.lang.toLowerCase().replace("_", "-") === targetLangLower);
-      if (!matchedVoice) {
-        matchedVoice = voices.find(v => v.lang.toLowerCase().replace("_", "-").startsWith(targetLangPrefix));
-      }
-
-      if (matchedVoice) {
-        utt.voice = matchedVoice;
-        utt.lang = matchedVoice.lang;
-      } else {
-        utt.lang = info.langCode;
-      }
-
-      utt.onstart = () => setSpeakingIndex(idx);
-      utt.onend = () => setSpeakingIndex(null);
-      utt.onerror = () => setSpeakingIndex(null);
-      window.speechSynthesis.speak(utt);
-    };
-
-    audio.onerror = () => {
+    audio.onerror = (e) => {
+      console.error("Google TTS error:", e);
       if (audioRef.current === audio) {
+        setSpeakingIndex(null);
         audioRef.current = null;
-        playNativeFallback();
+        addNotification("Speaker Alert", "Audio pronunciation could not be loaded.", "error");
       }
     };
 
     audio.play().catch((err) => {
-      console.warn("Google TTS failed, falling back to native SpeechSynthesis:", err);
+      console.error("Audio playback error:", err);
       if (audioRef.current === audio) {
+        setSpeakingIndex(null);
         audioRef.current = null;
-        playNativeFallback();
       }
     });
   };
