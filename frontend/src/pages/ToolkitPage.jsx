@@ -337,7 +337,7 @@ export function ToolkitPage() {
       <div className="animate-fade-in-up">
 
         {/* ══ HERO HEADER ══════════════════════════════════════════════════════ */}
-        <div className="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-violet-950 px-8 py-12 shadow-2xl">
+        <div className="relative mb-8 rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-violet-950 px-8 py-12 shadow-2xl">
           <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-violet-500/20 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-16 -left-16 h-56 w-56 rounded-full bg-indigo-500/20 blur-3xl" />
 
@@ -356,7 +356,7 @@ export function ToolkitPage() {
 
             {/* Trip selector — custom dropdown in hero */}
             {!loading && trips.length > 0 && (
-              <div className="mt-4" ref={dropdownRef}>
+              <div className="relative mt-4" ref={dropdownRef}>
                 <p className="mb-2 text-[10px] font-extrabold uppercase tracking-widest text-white/35">
                   Active destination
                 </p>
@@ -365,11 +365,10 @@ export function ToolkitPage() {
                 <button
                   id="trip-selector"
                   onClick={() => setDropdownOpen(o => !o)}
-                  className="group relative flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-5 py-3.5 backdrop-blur-md transition-all hover:bg-white/15 hover:border-white/30 min-w-[280px] cursor-pointer"
+                  className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-5 py-3.5 backdrop-blur-md transition-all hover:bg-white/15 hover:border-white/30 w-72 cursor-pointer"
                 >
-                  {/* Destination info */}
                   <div className="flex-1 text-left">
-                    <p className="text-base font-black text-white leading-tight">
+                    <p className="text-sm font-black text-white leading-tight">
                       ✈️ &nbsp;{selectedTrip ? selectedTrip.destination.split(",")[0] : "Select trip"}
                     </p>
                     {selectedTrip && (
@@ -378,15 +377,14 @@ export function ToolkitPage() {
                       </p>
                     )}
                   </div>
-                  {/* Chevron */}
-                  <span className={`text-white/40 text-sm transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`}>
+                  <span className={`text-white/50 text-xs transition-transform duration-200 ${dropdownOpen ? "-rotate-180" : ""}`}>
                     ▾
                   </span>
                 </button>
 
-                {/* Dropdown panel */}
+                {/* Dropdown panel — positions directly below the trigger */}
                 {dropdownOpen && (
-                  <div className="absolute mt-2 left-1/2 -translate-x-1/2 z-50 w-72 rounded-2xl border border-white/15 bg-slate-900/95 backdrop-blur-xl shadow-2xl overflow-hidden">
+                  <div className="absolute top-full left-0 mt-2 z-[100] w-72 rounded-2xl border border-white/15 bg-slate-900 shadow-2xl overflow-hidden">
                     {trips.map((trip, idx) => {
                       const isActive = selectedTrip?._id === trip._id;
                       return (
@@ -397,20 +395,18 @@ export function ToolkitPage() {
                             idx !== 0 ? "border-t border-white/5" : ""
                           } ${
                             isActive
-                              ? "bg-indigo-600/40 text-white"
-                              : "text-white/70 hover:bg-white/10 hover:text-white"
+                              ? "bg-indigo-600/30 text-white"
+                              : "text-white/70 hover:bg-white/8 hover:text-white"
                           }`}
                         >
-                          <span className="text-xl">✈️</span>
-                          <div className="min-w-0">
-                            <p className="text-sm font-bold truncate leading-tight">{trip.destination.split(",")[0]}</p>
-                            <p className="text-[11px] text-white/40 font-medium">
+                          <span className="text-lg">✈️</span>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-bold truncate">{trip.destination.split(",")[0]}</p>
+                            <p className="text-[11px] text-white/40">
                               {new Date(trip.startDate).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
                             </p>
                           </div>
-                          {isActive && (
-                            <span className="ml-auto flex-shrink-0 h-2 w-2 rounded-full bg-indigo-400" />
-                          )}
+                          {isActive && <span className="h-2 w-2 rounded-full bg-indigo-400 flex-shrink-0" />}
                         </button>
                       );
                     })}
