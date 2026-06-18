@@ -125,6 +125,7 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
               fillOpacity: 1,
               strokeColor: '#fff',
               strokeWeight: 2,
+              labelOrigin: new maps.Point(0, 0),
             },
             animation: maps.Animation.DROP,
           })
@@ -186,6 +187,7 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
         fillOpacity: 1,
         strokeColor: '#fff',
         strokeWeight: 2,
+        labelOrigin: new maps.Point(0, 0),
       })
       m.setZIndex(1)
     })
@@ -204,6 +206,7 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
         fillOpacity: 1,
         strokeColor: '#fff',
         strokeWeight: 3,
+        labelOrigin: new maps.Point(0, 0),
       })
       match.setZIndex(999)
       match.setAnimation(maps.Animation.BOUNCE)
