@@ -158,10 +158,7 @@ export function TripResultsPage() {
       }
       setTimeout(() => {
         if (mapSectionRef.current) {
-          const yOffset = -20;
-          const element = mapSectionRef.current;
-          const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
-          window.scrollTo({ top: y, behavior: 'smooth' });
+          mapSectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
         }
       }, 150);
     }
