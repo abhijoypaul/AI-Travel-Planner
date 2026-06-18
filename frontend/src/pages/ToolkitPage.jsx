@@ -4,14 +4,12 @@ import {
   Wrench,
   PhoneCall,
   Volume2,
-  DollarSign,
   Info,
   Zap,
   Globe,
   Languages,
   TrendingUp,
   ArrowRightLeft,
-  ChevronRight,
   BookOpen,
   Sparkles,
 } from "lucide-react";
@@ -19,20 +17,12 @@ import { Layout } from "@/components/layout/Layout";
 import { tripAPI } from "@/services/api";
 import { useNotification } from "@/context/NotificationContext";
 
-// Detailed data for major travel destinations
+// ── Destination data ─────────────────────────────────────────────────────────
 const DESTINATION_DATA = {
   france: {
-    countryName: "France",
-    langCode: "fr-FR",
-    langName: "French",
-    currency: "EUR",
-    currencySymbol: "€",
-    exchangeRate: 0.92, // 1 USD = 0.92 EUR
-    plugType: "C, E",
-    voltage: "230 V / 50 Hz",
-    emergency: "112 (European emergency number)",
-    police: "17",
-    medical: "15",
+    countryName: "France", langCode: "fr-FR", langName: "French",
+    currency: "EUR", exchangeRate: 0.92, plugType: "C, E", voltage: "230 V / 50 Hz",
+    emergency: "112 (European emergency number)", police: "17", medical: "15",
     visa: "Schengen Visa required (Visa-free for up to 90 days for US/UK/Canada citizens).",
     culture: [
       "Always greet shopkeepers with a polite 'Bonjour' or 'Bonsoir'.",
@@ -41,7 +31,7 @@ const DESTINATION_DATA = {
     ],
     phrases: [
       { english: "Hello / Good day", local: "Bonjour", pronunciation: "bohn-zhoor" },
-      { english: "Thank you very much", local: "Merci beaucoup", pronunciation: "mair-see boh-koo" },
+      { english: "Thank you", local: "Merci beaucoup", pronunciation: "mair-see boh-koo" },
       { english: "Please", local: "S'il vous plaît", pronunciation: "seel voo pleh" },
       { english: "Excuse me", local: "Excusez-moi", pronunciation: "ex-kew-zay mwah" },
       { english: "How much is this?", local: "C'est combien?", pronunciation: "say cohn-byan" },
@@ -51,17 +41,9 @@ const DESTINATION_DATA = {
     ],
   },
   japan: {
-    countryName: "Japan",
-    langCode: "ja-JP",
-    langName: "Japanese",
-    currency: "JPY",
-    currencySymbol: "¥",
-    exchangeRate: 156.40, // 1 USD = 156.4 JPY
-    plugType: "A, B",
-    voltage: "100 V / 50-60 Hz",
-    emergency: "110 (Police) / 119 (Ambulance/Fire)",
-    police: "110",
-    medical: "119",
+    countryName: "Japan", langCode: "ja-JP", langName: "Japanese",
+    currency: "JPY", exchangeRate: 156.40, plugType: "A, B", voltage: "100 V / 50-60 Hz",
+    emergency: "110 (Police) / 119 (Ambulance/Fire)", police: "110", medical: "119",
     visa: "Visa-free entry for up to 90 days for tourist visits from 68 countries.",
     culture: [
       "Avoid eating or drinking while walking in public.",
@@ -80,17 +62,9 @@ const DESTINATION_DATA = {
     ],
   },
   india: {
-    countryName: "India",
-    langCode: "hi-IN",
-    langName: "Hindi",
-    currency: "INR",
-    currencySymbol: "₹",
-    exchangeRate: 83.50, // 1 USD = 83.5 INR
-    plugType: "C, D, M",
-    voltage: "230 V / 50 Hz",
-    emergency: "112 (National emergency number)",
-    police: "100",
-    medical: "102",
+    countryName: "India", langCode: "hi-IN", langName: "Hindi",
+    currency: "INR", exchangeRate: 83.50, plugType: "C, D, M", voltage: "230 V / 50 Hz",
+    emergency: "112 (National emergency number)", police: "100", medical: "102",
     visa: "e-Visa required for most international visitors before arrival.",
     culture: [
       "Remove your shoes before entering homes and places of worship.",
@@ -104,22 +78,14 @@ const DESTINATION_DATA = {
       { english: "Excuse me", local: "माफ़ कीजिए (Maaf keejiye)", pronunciation: "mahf kee-jee-yeh" },
       { english: "How much is this?", local: "यह कितने का है? (Yeh kitne ka hai?)", pronunciation: "yeh kit-nay kah hay" },
       { english: "Where is the bathroom?", local: "शौचालय कहाँ है? (Shauchalay kahan hai?)", pronunciation: "show-chah-lay kuh-haan hay" },
-      { english: "Do you speak English?", local: "क्या आप अंग्रेज़ी बोलते हैं? (Kya aap angrezi bolte hain?)", pronunciation: "kyah aap un-gray-zee bole-tay hain" },
+      { english: "Do you speak English?", local: "क्या आप अंग्रेज़ी बोलते हैं?", pronunciation: "kyah aap un-gray-zee bole-tay hain" },
       { english: "Help!", local: "मदद करो! (Madad karo!)", pronunciation: "muh-dudh kuh-roh" },
     ],
   },
   uk: {
-    countryName: "United Kingdom",
-    langCode: "en-GB",
-    langName: "English",
-    currency: "GBP",
-    currencySymbol: "£",
-    exchangeRate: 0.79, // 1 USD = 0.79 GBP
-    plugType: "G",
-    voltage: "230 V / 50 Hz",
-    emergency: "999 or 112",
-    police: "999",
-    medical: "999",
+    countryName: "United Kingdom", langCode: "en-GB", langName: "English",
+    currency: "GBP", exchangeRate: 0.79, plugType: "G", voltage: "230 V / 50 Hz",
+    emergency: "999 or 112", police: "999", medical: "999",
     visa: "Visa-free for citizens of EU, USA, Canada, Australia (up to 6 months).",
     culture: [
       "Queueing (standing in line) is respected strictly; never cut in line.",
@@ -138,17 +104,9 @@ const DESTINATION_DATA = {
     ],
   },
   usa: {
-    countryName: "United States",
-    langCode: "en-US",
-    langName: "English",
-    currency: "USD",
-    currencySymbol: "$",
-    exchangeRate: 1.0,
-    plugType: "A, B",
-    voltage: "120 V / 60 Hz",
-    emergency: "911",
-    police: "911",
-    medical: "911",
+    countryName: "United States", langCode: "en-US", langName: "English",
+    currency: "USD", exchangeRate: 1.0, plugType: "A, B", voltage: "120 V / 60 Hz",
+    emergency: "911", police: "911", medical: "911",
     visa: "ESTA required for Visa Waiver Program countries; visitor visa otherwise.",
     culture: [
       "Tipping 15% to 20% in sit-down restaurants is customary and expected.",
@@ -167,17 +125,9 @@ const DESTINATION_DATA = {
     ],
   },
   spain: {
-    countryName: "Spain",
-    langCode: "es-ES",
-    langName: "Spanish",
-    currency: "EUR",
-    currencySymbol: "€",
-    exchangeRate: 0.92,
-    plugType: "C, F",
-    voltage: "230 V / 50 Hz",
-    emergency: "112",
-    police: "112",
-    medical: "112",
+    countryName: "Spain", langCode: "es-ES", langName: "Spanish",
+    currency: "EUR", exchangeRate: 0.92, plugType: "C, F", voltage: "230 V / 50 Hz",
+    emergency: "112", police: "112", medical: "112",
     visa: "Schengen Visa rules apply.",
     culture: [
       "Mealtimes are later than average: lunch from 2–4 PM, dinner from 9–11 PM.",
@@ -196,17 +146,9 @@ const DESTINATION_DATA = {
     ],
   },
   italy: {
-    countryName: "Italy",
-    langCode: "it-IT",
-    langName: "Italian",
-    currency: "EUR",
-    currencySymbol: "€",
-    exchangeRate: 0.92,
-    plugType: "C, F, L",
-    voltage: "230 V / 50 Hz",
-    emergency: "112",
-    police: "112",
-    medical: "112",
+    countryName: "Italy", langCode: "it-IT", langName: "Italian",
+    currency: "EUR", exchangeRate: 0.92, plugType: "C, F, L", voltage: "230 V / 50 Hz",
+    emergency: "112", police: "112", medical: "112",
     visa: "Schengen Visa rules apply.",
     culture: [
       "Only order cappuccinos in the morning; ordering one after a meal is non-traditional.",
@@ -225,17 +167,9 @@ const DESTINATION_DATA = {
     ],
   },
   thailand: {
-    countryName: "Thailand",
-    langCode: "th-TH",
-    langName: "Thai",
-    currency: "THB",
-    currencySymbol: "฿",
-    exchangeRate: 36.70, // 1 USD = 36.7 THB
-    plugType: "A, B, C, O",
-    voltage: "220 V / 50 Hz",
-    emergency: "191 (Police) / 1669 (Medical)",
-    police: "191",
-    medical: "1669",
+    countryName: "Thailand", langCode: "th-TH", langName: "Thai",
+    currency: "THB", exchangeRate: 36.70, plugType: "A, B, C, O", voltage: "220 V / 50 Hz",
+    emergency: "191 (Police) / 1669 (Medical)", police: "191", medical: "1669",
     visa: "Visa-free entry or Visa on Arrival available for many citizenships.",
     culture: [
       "Never touch anyone's head; it is considered the most sacred part of the body.",
@@ -244,43 +178,35 @@ const DESTINATION_DATA = {
     ],
     phrases: [
       { english: "Hello", local: "สวัสดี (Sawasdee - krap/ka)", pronunciation: "sah-wahd-dee (krub/kah)" },
-      { english: "Thank you", local: "ขอบคุณ (Khob khun - krap/ka)", pronunciation: "khob-khoon (krub/kah)" },
-      { english: "Please / Request", local: "กรุณา (Karuna)", pronunciation: "kah-roo-nah" },
-      { english: "Excuse me / Sorry", local: "ขอโทษ (Kho thot)", pronunciation: "khor-thoht" },
+      { english: "Thank you", local: "ขอบคุณ (Khob khun)", pronunciation: "khob-khoon (krub/kah)" },
+      { english: "Please", local: "กรุณา (Karuna)", pronunciation: "kah-roo-nah" },
+      { english: "Excuse me", local: "ขอโทษ (Kho thot)", pronunciation: "khor-thoht" },
       { english: "How much is this?", local: "นี่เท่าไหร่ (Nee tao rai?)", pronunciation: "nee-tao-rye" },
       { english: "Where is the bathroom?", local: "ห้องน้ำอยู่ที่ไหน (Hong nam yoo tee nai?)", pronunciation: "hong-nahm yoo tee-nye" },
-      { english: "Do you speak English?", local: "พูดภาษาอังกฤษได้ไหม (Poot pasa ang-grid dai mai?)", pronunciation: "poot pah-sah-ang-grid-dye-my" },
+      { english: "Do you speak English?", local: "พูดภาษาอังกฤษได้ไหม", pronunciation: "poot pah-sah-ang-grid-dye-my" },
       { english: "Help!", local: "ช่วยด้วย! (Chuay duay!)", pronunciation: "choo-ay-doo-ay" },
     ],
   },
 };
 
-// Currencies database for converter selection
+// ── Currencies list ───────────────────────────────────────────────────────────
 const CURRENCIES = [
-  { code: "USD", symbol: "$", name: "US Dollar" },
-  { code: "EUR", symbol: "€", name: "Euro" },
-  { code: "GBP", symbol: "£", name: "British Pound" },
-  { code: "INR", symbol: "₹", name: "Indian Rupee" },
-  { code: "JPY", symbol: "¥", name: "Japanese Yen" },
-  { code: "THB", symbol: "฿", name: "Thai Baht" },
+  { code: "USD", symbol: "$",   name: "US Dollar" },
+  { code: "EUR", symbol: "€",   name: "Euro" },
+  { code: "GBP", symbol: "£",   name: "British Pound" },
+  { code: "INR", symbol: "₹",   name: "Indian Rupee" },
+  { code: "JPY", symbol: "¥",   name: "Japanese Yen" },
+  { code: "THB", symbol: "฿",   name: "Thai Baht" },
   { code: "CAD", symbol: "CA$", name: "Canadian Dollar" },
-  { code: "AUD", symbol: "A$", name: "Australian Dollar" },
-  { code: "SGD", symbol: "S$", name: "Singapore Dollar" }
+  { code: "AUD", symbol: "A$",  name: "Australian Dollar" },
+  { code: "SGD", symbol: "S$",  name: "Singapore Dollar" },
 ];
 
-// Default generic fallback
+// ── Fallback ──────────────────────────────────────────────────────────────────
 const DEFAULT_DATA = {
-  countryName: "Global",
-  langCode: "en-US",
-  langName: "English",
-  currency: "USD",
-  currencySymbol: "$",
-  exchangeRate: 1.0,
-  plugType: "Universal Support Needed",
-  voltage: "110-240 V",
-  emergency: "112 or 911",
-  police: "112",
-  medical: "112",
+  countryName: "Global", langCode: "en-US", langName: "English",
+  currency: "USD", exchangeRate: 1.0, plugType: "Universal", voltage: "110-240 V",
+  emergency: "112 or 911", police: "112", medical: "112",
   visa: "Check the local country's consulate website prior to travel.",
   culture: [
     "Always respect local customs, religious symbols, and cultural landmarks.",
@@ -299,452 +225,408 @@ const DEFAULT_DATA = {
   ],
 };
 
+// ── Component ─────────────────────────────────────────────────────────────────
 export function ToolkitPage() {
   const [trips, setTrips] = useState([]);
   const [selectedTrip, setSelectedTrip] = useState(null);
   const [loading, setLoading] = useState(true);
   const { addNotification } = useNotification();
 
-  // Currencies Selector State
   const [baseCurrency, setBaseCurrency] = useState("USD");
   const [targetCurrency, setTargetCurrency] = useState("EUR");
   const [calcBaseAmount, setCalcBaseAmount] = useState("100");
   const [calcTargetAmount, setCalcTargetAmount] = useState("");
-
-  // Audio/Speech State
   const [speakingIndex, setSpeakingIndex] = useState(null);
 
   useEffect(() => {
     tripAPI.getAll()
       .then((res) => {
         setTrips(res.data || []);
-        if (res.data && res.data.length > 0) {
-          setSelectedTrip(res.data[0]);
-        }
+        if (res.data?.length > 0) setSelectedTrip(res.data[0]);
       })
-      .catch((err) => {
-        console.error("Failed to load trips for toolkit:", err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
-  // Determine current destination guidelines
   const getDestinationInfo = () => {
     if (!selectedTrip) return DEFAULT_DATA;
-    const destLower = selectedTrip.destination.toLowerCase();
-
-    if (destLower.includes("france") || destLower.includes("paris")) return DESTINATION_DATA.france;
-    if (destLower.includes("japan") || destLower.includes("tokyo") || destLower.includes("kyoto") || destLower.includes("osaka")) return DESTINATION_DATA.japan;
-    if (destLower.includes("india") || destLower.includes("delhi") || destLower.includes("goa") || destLower.includes("mumbai")) return DESTINATION_DATA.india;
-    if (destLower.includes("london") || destLower.includes("united kingdom") || destLower.includes("scotland") || destLower.includes("uk")) return DESTINATION_DATA.uk;
-    if (destLower.includes("spain") || destLower.includes("barcelona") || destLower.includes("madrid")) return DESTINATION_DATA.spain;
-    if (destLower.includes("italy") || destLower.includes("rome") || destLower.includes("venice") || destLower.includes("florence")) return DESTINATION_DATA.italy;
-    if (destLower.includes("thailand") || destLower.includes("bangkok") || destLower.includes("phuket")) return DESTINATION_DATA.thailand;
-    if (destLower.includes("usa") || destLower.includes("united states") || destLower.includes("york") || destLower.includes("miami")) return DESTINATION_DATA.usa;
-
+    const d = selectedTrip.destination.toLowerCase();
+    if (d.includes("france") || d.includes("paris"))           return DESTINATION_DATA.france;
+    if (d.includes("japan") || d.includes("tokyo") || d.includes("kyoto") || d.includes("osaka")) return DESTINATION_DATA.japan;
+    if (d.includes("india") || d.includes("delhi") || d.includes("goa") || d.includes("mumbai")) return DESTINATION_DATA.india;
+    if (d.includes("london") || d.includes("united kingdom") || d.includes("uk") || d.includes("scotland")) return DESTINATION_DATA.uk;
+    if (d.includes("spain") || d.includes("barcelona") || d.includes("madrid")) return DESTINATION_DATA.spain;
+    if (d.includes("italy") || d.includes("rome") || d.includes("venice") || d.includes("florence")) return DESTINATION_DATA.italy;
+    if (d.includes("thailand") || d.includes("bangkok") || d.includes("phuket")) return DESTINATION_DATA.thailand;
+    if (d.includes("usa") || d.includes("united states") || d.includes("york") || d.includes("miami")) return DESTINATION_DATA.usa;
     return DEFAULT_DATA;
   };
 
   const info = getDestinationInfo();
 
-  // Reset target currency to trip destination's default currency when selectedTrip changes
   useEffect(() => {
     if (selectedTrip) {
-      const destCurrency = info.currency || "EUR";
-      setTargetCurrency(destCurrency);
+      setTargetCurrency(info.currency || "EUR");
       setBaseCurrency("USD");
     }
   }, [selectedTrip]);
 
-  // Retrieve current active exchange rate between baseCurrency and targetCurrency
   const getExchangeRate = () => {
     let rates = window.EXCHANGE_RATES;
     if (!rates) {
-      try {
-        const cached = localStorage.getItem('usd_exchange_rates');
-        if (cached) rates = JSON.parse(cached);
-      } catch {}
+      try { const c = localStorage.getItem("usd_exchange_rates"); if (c) rates = JSON.parse(c); } catch {}
     }
-    if (!rates) {
-      rates = { USD: 1, EUR: 0.92, JPY: 156.0, INR: 83.5, GBP: 0.79, CAD: 1.37, AUD: 1.51, THB: 36.5, SGD: 1.35 };
-    }
-    const rateFromUSD = rates[baseCurrency] || 1;
-    const rateToUSD = rates[targetCurrency] || 1;
-    return rateToUSD / rateFromUSD;
+    if (!rates) rates = { USD: 1, EUR: 0.92, JPY: 156.0, INR: 83.5, GBP: 0.79, CAD: 1.37, AUD: 1.51, THB: 36.5, SGD: 1.35 };
+    return (rates[targetCurrency] || 1) / (rates[baseCurrency] || 1);
   };
 
   const currentRate = getExchangeRate();
 
-  // Update conversion calculations when amount, currencies, or rates change
   useEffect(() => {
-    const amount = parseFloat(calcBaseAmount);
-    if (!isNaN(amount)) {
-      setCalcTargetAmount((amount * currentRate).toFixed(2));
-    } else {
-      setCalcTargetAmount("");
-    }
+    const amt = parseFloat(calcBaseAmount);
+    setCalcTargetAmount(isNaN(amt) ? "" : (amt * currentRate).toFixed(2));
   }, [calcBaseAmount, baseCurrency, targetCurrency]);
 
-  const handleBaseChange = (value) => {
-    setCalcBaseAmount(value);
-    const amount = parseFloat(value);
-    if (!isNaN(amount)) {
-      setCalcTargetAmount((amount * currentRate).toFixed(2));
-    } else {
-      setCalcTargetAmount("");
-    }
+  const handleBaseChange = (v) => {
+    setCalcBaseAmount(v);
+    const a = parseFloat(v);
+    setCalcTargetAmount(isNaN(a) ? "" : (a * currentRate).toFixed(2));
   };
-
-  const handleTargetChange = (value) => {
-    setCalcTargetAmount(value);
-    const amount = parseFloat(value);
-    if (!isNaN(amount)) {
-      setCalcBaseAmount((amount / currentRate).toFixed(2));
-    } else {
-      setCalcBaseAmount("");
-    }
+  const handleTargetChange = (v) => {
+    setCalcTargetAmount(v);
+    const a = parseFloat(v);
+    setCalcBaseAmount(isNaN(a) ? "" : (a / currentRate).toFixed(2));
   };
-
   const swapDirections = () => {
-    const tempCode = baseCurrency;
-    const tempAmount = calcBaseAmount;
     setBaseCurrency(targetCurrency);
-    setTargetCurrency(tempCode);
+    setTargetCurrency(baseCurrency);
     setCalcBaseAmount(calcTargetAmount);
-    setCalcTargetAmount(tempAmount);
+    setCalcTargetAmount(calcBaseAmount);
   };
 
-  // Text-To-Speech Pronunciation
-  const speakText = (text, phraseIndex) => {
-    if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-      const textToSpeak = text.split("(")[0].trim();
-      const utterance = new SpeechSynthesisUtterance(textToSpeak);
-      utterance.lang = info.langCode;
-
-      utterance.onstart = () => {
-        setSpeakingIndex(phraseIndex);
-      };
-
-      utterance.onend = () => {
-        setSpeakingIndex(null);
-      };
-
-      utterance.onerror = () => {
-        setSpeakingIndex(null);
-        addNotification("Speaker Alert", "Audio speech engine not ready. Please try again.", "info");
-      };
-
-      window.speechSynthesis.speak(utterance);
-    } else {
+  const speakText = (text, idx) => {
+    if (!("speechSynthesis" in window)) {
       addNotification("Unavailable", "Speech Synthesis is not supported in this browser.", "error");
+      return;
     }
+    window.speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(text.split("(")[0].trim());
+    utt.lang = info.langCode;
+    utt.onstart = () => setSpeakingIndex(idx);
+    utt.onend   = () => setSpeakingIndex(null);
+    utt.onerror = () => { setSpeakingIndex(null); addNotification("Speaker Alert", "Audio speech engine not ready.", "info"); };
+    window.speechSynthesis.speak(utt);
   };
 
+  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <Layout>
-      <div className="py-6 space-y-8 animate-fade-in-up">
-        {/* Centered Header & Trip Selector */}
-        <div className="text-center space-y-4 max-w-2xl mx-auto mb-8">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700">
-            <Wrench className="h-3.5 w-3.5 animate-pulse" />
-            <span className="text-[10px] font-bold uppercase tracking-wider">Odyssey Utilities</span>
-          </div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Travel Toolkit & Advisory</h1>
-          <p className="text-sm text-slate-500 max-w-md mx-auto">
-            Access visa requirements, cultural customs, emergency contacts, copy native voice pronunciations, and calculate real-time currencies.
-          </p>
+      <div className="animate-fade-in-up">
 
-          {!loading && trips.length > 0 && (
-            <div className="pt-2 flex flex-col items-center gap-2">
-              <label htmlFor="trip-selector" className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                Currently Viewing Trip Details
-              </label>
-              <div className="relative">
-                <select
-                  id="trip-selector"
-                  value={selectedTrip ? selectedTrip._id : ""}
-                  onChange={(e) => {
-                    const found = trips.find(t => t._id === e.target.value);
-                    if (found) setSelectedTrip(found);
-                  }}
-                  className="bg-white border border-slate-200 rounded-2xl px-6 py-3.5 text-base font-extrabold text-slate-800 outline-none focus:border-indigo-550 transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-indigo-100 cursor-pointer min-w-[300px] text-center appearance-none pr-8"
-                >
-                  {trips.map((trip) => (
-                    <option key={trip._id} value={trip._id}>
-                      ✈️ {trip.destination.split(",")[0]} ({new Date(trip.startDate).toLocaleDateString(undefined, {month: 'short', year: 'numeric'})})
-                    </option>
-                  ))}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-500">
-                  <span className="text-xs">▼</span>
+        {/* ══ HERO HEADER ══════════════════════════════════════════════════════ */}
+        <div className="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-violet-950 px-8 py-12 shadow-2xl">
+          <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-violet-500/20 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-16 -left-16 h-56 w-56 rounded-full bg-indigo-500/20 blur-3xl" />
+
+          <div className="relative z-10 flex flex-col items-center text-center gap-3">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-[10px] font-extrabold uppercase tracking-widest text-white/80 backdrop-blur-md">
+              <Wrench className="h-3 w-3" />
+              Odyssey Utilities
+            </span>
+
+            <h1 className="text-4xl font-black tracking-tight text-white drop-shadow-lg">
+              Travel Toolkit
+            </h1>
+            <p className="max-w-xs text-sm leading-relaxed text-white/50">
+              Visa info · emergency contacts · plug specs · native phrases with audio · currency converter
+            </p>
+
+            {/* Trip selector — sits in the hero */}
+            {!loading && trips.length > 0 && (
+              <div className="mt-3">
+                <p className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-white/35">
+                  Active destination
+                </p>
+                <div className="relative inline-block">
+                  <select
+                    id="trip-selector"
+                    value={selectedTrip?._id ?? ""}
+                    onChange={(e) => {
+                      const t = trips.find(t => t._id === e.target.value);
+                      if (t) setSelectedTrip(t);
+                    }}
+                    className="appearance-none rounded-2xl border border-white/20 bg-white/10 py-3 pl-5 pr-10 text-sm font-bold text-white backdrop-blur-md outline-none cursor-pointer transition hover:bg-white/15 focus:bg-white/20 min-w-[260px] text-center"
+                  >
+                    {trips.map(trip => (
+                      <option key={trip._id} value={trip._id} className="bg-slate-900 text-white">
+                        ✈️  {trip.destination.split(",")[0]}  ·  {new Date(trip.startDate).toLocaleDateString(undefined, { month: "short", year: "numeric" })}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[11px] text-white/40">▾</span>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
-        {/* If no trips planned */}
+        {/* ══ EMPTY STATE ══════════════════════════════════════════════════════ */}
         {!loading && trips.length === 0 && (
-          <div className="wander-card p-12 text-center max-w-2xl mx-auto space-y-4">
-            <div className="h-16 w-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto shadow-xs">
-              <Wrench className="h-8 w-8" />
+          <div className="flex flex-col items-center justify-center gap-5 py-24 text-center">
+            <div className="h-16 w-16 rounded-2xl bg-indigo-50 flex items-center justify-center">
+              <Wrench className="h-7 w-7 text-indigo-500" />
             </div>
-            <h2 className="text-xl font-bold text-slate-900">No active trips found</h2>
-            <p className="text-sm text-slate-500 max-w-md mx-auto">
-              Please generate or plan a trip first. Once you have a trip, this page will dynamically load visa requirements, currency exchanges, local translation voice notes, and socket instructions.
-            </p>
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">No trips found</h2>
+              <p className="mt-1 max-w-xs text-sm text-slate-500">Plan a trip first — this page will fill with destination-specific intelligence.</p>
+            </div>
             <Link to="/create-trip">
-              <button className="btn-primary px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-1.5 mx-auto">
-                <Sparkles className="h-4 w-4" />
-                Plan a Trip Now
+              <button className="btn-primary flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold">
+                <Sparkles className="h-4 w-4" /> Plan a Trip
               </button>
             </Link>
           </div>
         )}
 
-        {/* Loading skeleton */}
+        {/* ══ SKELETON ═════════════════════════════════════════════════════════ */}
         {loading && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="h-64 bg-slate-100 animate-pulse rounded-2xl col-span-2"></div>
-            <div className="h-64 bg-slate-100 animate-pulse rounded-2xl"></div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            {[0, 1, 2].map(i => (
+              <div key={i} className={`animate-pulse rounded-3xl bg-slate-100 ${i < 2 ? "h-52 lg:col-span-1" : "h-72"} ${i === 0 ? "lg:col-span-2" : ""}`} />
+            ))}
           </div>
         )}
 
-        {/* Main Dashboard Layout */}
+        {/* ══ MAIN GRID ════════════════════════════════════════════════════════ */}
         {!loading && selectedTrip && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-            
-            {/* Left/Middle Columns: Guidelines & Survival phrases */}
-            <div className="lg:col-span-2 space-y-6">
-              
-              {/* Destination Advisory Card */}
-              <div className="wander-card p-6 space-y-6">
-                <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-                  <div className="h-10 w-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Globe className="h-5 w-5" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
+
+            {/* ── LEFT COL: Advisory + Translator ──────────────────────────── */}
+            <div className="lg:col-span-2 space-y-5">
+
+              {/* ── ADVISORY CARD ── */}
+              <div className="rounded-3xl border border-slate-100 bg-white shadow-sm overflow-hidden">
+
+                {/* Card header */}
+                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100/80">
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-md shadow-indigo-200/60">
+                      <Globe className="h-4.5 w-4.5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Destination Guide</p>
+                      <h2 className="text-base font-extrabold text-slate-900 leading-tight">{info.countryName}</h2>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-base font-extrabold text-slate-900">{info.countryName} Advisory Guide</h2>
-                    <p className="text-[11px] text-slate-400">Important requirements and local etiquette</p>
+                  <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-bold text-slate-500">
+                    {info.langName}
+                  </span>
+                </div>
+
+                {/* Info tiles */}
+                <div className="p-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+                  {/* Visa */}
+                  <div className="rounded-2xl bg-amber-50 border border-amber-100/80 p-4 flex flex-col gap-2.5">
+                    <div className="flex items-center gap-2">
+                      <div className="h-7 w-7 rounded-xl bg-amber-200/60 flex items-center justify-center">
+                        <Info className="h-3.5 w-3.5 text-amber-700" />
+                      </div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-700">Visa</span>
+                    </div>
+                    <p className="text-xs leading-relaxed text-amber-900/80 flex-1">{info.visa}</p>
+                  </div>
+
+                  {/* Emergency */}
+                  <div className="rounded-2xl bg-rose-50 border border-rose-100/80 p-4 flex flex-col gap-2.5">
+                    <div className="flex items-center gap-2">
+                      <div className="h-7 w-7 rounded-xl bg-rose-200/60 flex items-center justify-center">
+                        <PhoneCall className="h-3.5 w-3.5 text-rose-700" />
+                      </div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-rose-700">Emergency</span>
+                    </div>
+                    <p className="text-xs font-bold text-rose-900 flex-1">{info.emergency}</p>
+                    <div className="flex gap-3 text-[11px] font-mono text-rose-700/60 mt-auto pt-1 border-t border-rose-100">
+                      <span>Police · {info.police}</span>
+                      <span>Medical · {info.medical}</span>
+                    </div>
+                  </div>
+
+                  {/* Electricity */}
+                  <div className="rounded-2xl bg-indigo-50 border border-indigo-100/80 p-4 flex flex-col gap-2.5">
+                    <div className="flex items-center gap-2">
+                      <div className="h-7 w-7 rounded-xl bg-indigo-200/60 flex items-center justify-center">
+                        <Zap className="h-3.5 w-3.5 text-indigo-700" />
+                      </div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-700">Electricity</span>
+                    </div>
+                    <p className="text-[11px] text-indigo-900/70 flex-1">{info.voltage}</p>
+                    <div className="flex gap-1 flex-wrap mt-auto">
+                      {info.plugType.split(",").map(t => (
+                        <span key={t} className="rounded-lg bg-indigo-100 px-2 py-0.5 text-[10px] font-extrabold text-indigo-700">
+                          Type {t.trim()}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {/* Visas and Emergency */}
-                  <div className="space-y-4">
-                    <div className="flex gap-3">
-                      <div className="h-8 w-8 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <Info className="h-4.5 w-4.5 text-amber-600" />
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">Visa Guidelines</h4>
-                        <p className="text-xs text-slate-600 leading-relaxed">{info.visa}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-3">
-                      <div className="h-8 w-8 bg-rose-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <PhoneCall className="h-4.5 w-4.5 text-rose-600" />
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">Emergency Numbers</h4>
-                        <p className="text-xs text-slate-600 leading-relaxed font-semibold">General Emergency: {info.emergency}</p>
-                        <div className="flex gap-4 mt-1 text-[11px] text-slate-500 font-mono">
-                          <span>Police: {info.police}</span>
-                          <span>Medical: {info.medical}</span>
-                        </div>
-                      </div>
-                    </div>
+                {/* Cultural etiquette */}
+                <div className="border-t border-slate-100 px-6 py-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <BookOpen className="h-3.5 w-3.5 text-emerald-600" />
+                    <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Cultural Etiquette</span>
                   </div>
-
-                  {/* Electricity & Sockets */}
-                  <div className="space-y-4">
-                    <div className="flex gap-3">
-                      <div className="h-8 w-8 bg-indigo-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <Zap className="h-4.5 w-4.5 text-indigo-600" />
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">Electricity Specs</h4>
-                        <p className="text-xs text-slate-600 leading-relaxed">
-                          Plug Type: <strong className="text-slate-900 font-bold">{info.plugType}</strong>
-                        </p>
-                        <p className="text-[11px] text-slate-500">Voltage: {info.voltage}</p>
-                        <div className="mt-2 flex gap-1 flex-wrap">
-                          {info.plugType.split(",").map((type) => (
-                            <span key={type} className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-bold border border-slate-200">
-                              Type {type.trim()}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Cultural Customs */}
-                <div className="border-t border-slate-150/60 pt-4">
-                  <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <BookOpen className="h-4 w-4 text-emerald-600" />
-                    Cultural Etiquette (Do's & Don'ts)
-                  </h4>
                   <ul className="space-y-2">
                     {info.culture.map((tip, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-xs text-slate-600 leading-relaxed">
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0" />
-                        <span>{tip}</span>
+                      <li key={idx} className="flex items-start gap-2.5">
+                        <span className="mt-[7px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-emerald-400" />
+                        <p className="text-xs leading-relaxed text-slate-600">{tip}</p>
                       </li>
                     ))}
                   </ul>
                 </div>
               </div>
 
-              {/* Survival Translator Card */}
-              <div className="wander-card p-6 space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              {/* ── SURVIVAL TRANSLATOR ── */}
+              <div className="rounded-3xl border border-slate-100 bg-white shadow-sm overflow-hidden">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100/80">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Languages className="h-5 w-5" />
+                    <div className="h-9 w-9 rounded-2xl bg-violet-600 flex items-center justify-center shadow-md shadow-violet-200/60">
+                      <Languages className="h-4.5 w-4.5 text-white" />
                     </div>
                     <div>
-                      <h2 className="text-base font-extrabold text-slate-900">Survival Translator</h2>
-                      <p className="text-[11px] text-slate-400">Survival vocabulary pronounced aloud</p>
+                      <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Phrase Guide</p>
+                      <h2 className="text-base font-extrabold text-slate-900 leading-tight">Survival Translator</h2>
                     </div>
                   </div>
-                  <span className="px-2.5 py-1 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold">
+                  <span className="rounded-full bg-violet-50 border border-violet-200 px-3 py-1 text-[11px] font-bold text-violet-600">
                     {info.langName}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {info.phrases.map((phrase, idx) => (
-                    <div
-                      key={idx}
-                      className="p-3.5 rounded-2xl bg-slate-50/50 hover:bg-slate-50 border border-slate-150/50 hover:border-indigo-200 transition-all flex items-center justify-between group"
-                    >
-                      <div className="space-y-1">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{phrase.english}</p>
-                        <p className="text-sm font-extrabold text-slate-800 font-sans tracking-wide">{phrase.local}</p>
-                        <p className="text-[11px] text-indigo-500 font-medium italic">Pronunciation: {phrase.pronunciation}</p>
-                      </div>
-
-                      <button
-                        onClick={() => speakText(phrase.local, idx)}
-                        className={`h-9 w-9 rounded-xl flex items-center justify-center transition-all ${
-                          speakingIndex === idx
-                            ? "bg-indigo-600 text-white animate-bounce shadow-md"
-                            : "bg-white hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 shadow-sm border border-slate-200/80 group-hover:scale-105"
+                <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {info.phrases.map((phrase, idx) => {
+                    const active = speakingIndex === idx;
+                    return (
+                      <div
+                        key={idx}
+                        className={`group flex items-center justify-between rounded-2xl border p-4 transition-all duration-200 ${
+                          active
+                            ? "border-violet-300 bg-violet-50 shadow-md shadow-violet-100/50"
+                            : "border-slate-100 bg-slate-50/60 hover:border-violet-200 hover:bg-violet-50/30"
                         }`}
-                        title="Listen Pronunciation"
                       >
-                        <Volume2 className={`h-4.5 w-4.5 ${speakingIndex === idx ? "animate-pulse" : ""}`} />
-                      </button>
-                    </div>
-                  ))}
+                        <div className="min-w-0 pr-3 space-y-0.5">
+                          <p className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400">{phrase.english}</p>
+                          <p className={`text-[13px] font-black leading-snug ${active ? "text-violet-800" : "text-slate-800"}`}>
+                            {phrase.local}
+                          </p>
+                          <p className="text-[10px] italic text-slate-400 truncate">{phrase.pronunciation}</p>
+                        </div>
+                        <button
+                          onClick={() => speakText(phrase.local, idx)}
+                          title="Hear pronunciation"
+                          className={`flex-shrink-0 h-9 w-9 rounded-xl flex items-center justify-center transition-all ${
+                            active
+                              ? "bg-violet-600 text-white shadow-lg shadow-violet-300/60 scale-110"
+                              : "bg-white border border-slate-200 text-slate-400 hover:text-violet-600 hover:border-violet-300 group-hover:scale-105"
+                          }`}
+                        >
+                          <Volume2 className={`h-4 w-4 ${active ? "animate-pulse" : ""}`} />
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
 
-            {/* Right Column: Currency Converter */}
-            <div className="space-y-6">
-              
-              {/* Currency Calculator Card */}
-              <div className="wander-card p-6 space-y-6">
-                <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-                  <div className="h-10 w-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <TrendingUp className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h2 className="text-base font-extrabold text-slate-900">Currency Calculator</h2>
-                    <p className="text-[11px] text-slate-400">Local travel conversion calculations</p>
+            {/* ── RIGHT COL: Currency Converter ─────────────────────────────── */}
+            <div>
+              <div className="rounded-3xl border border-slate-100 bg-white shadow-sm overflow-hidden sticky top-6">
+
+                {/* Gradient header */}
+                <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 px-6 py-6">
+                  <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-white/10 blur-2xl" />
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <TrendingUp className="h-3.5 w-3.5 text-white/70" />
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-white/60">Live Rates</span>
+                    </div>
+                    <h2 className="text-xl font-black text-white">Currency Converter</h2>
+                    <p className="mt-1 text-[11px] text-white/55">
+                      1 {baseCurrency} = <strong className="text-white/90 font-black">{currentRate.toFixed(4)}</strong> {targetCurrency}
+                    </p>
                   </div>
                 </div>
 
-                {/* Conversion Form */}
-                <div className="space-y-4 relative">
-                  
-                  {/* Base Currency Box */}
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-150 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <label htmlFor="base-currency-select" className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                        Convert From
-                      </label>
+                <div className="p-5 space-y-2">
+                  {/* From */}
+                  <div className="rounded-2xl border border-slate-150 bg-slate-50 px-4 py-3.5">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">From</span>
                       <select
                         id="base-currency-select"
                         value={baseCurrency}
-                        onChange={(e) => setBaseCurrency(e.target.value)}
-                        className="bg-transparent text-xs font-bold text-indigo-600 border-none outline-none cursor-pointer"
+                        onChange={e => setBaseCurrency(e.target.value)}
+                        className="text-xs font-extrabold text-emerald-600 bg-transparent border-none outline-none cursor-pointer"
                       >
-                        {CURRENCIES.map(c => (
-                          <option key={c.code} value={c.code}>{c.code} - {c.name}</option>
-                        ))}
+                        {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code} — {c.name}</option>)}
                       </select>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg font-bold text-slate-500">
-                        {CURRENCIES.find(c => c.code === baseCurrency)?.symbol || "$"}
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-xl font-black text-slate-300">
+                        {CURRENCIES.find(c => c.code === baseCurrency)?.symbol ?? "$"}
                       </span>
                       <input
-                        type="number"
-                        placeholder="0.00"
-                        value={calcBaseAmount}
-                        onChange={(e) => handleBaseChange(e.target.value)}
-                        className="bg-transparent border-none text-xl font-extrabold text-slate-800 outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        type="number" placeholder="0" value={calcBaseAmount}
+                        onChange={e => handleBaseChange(e.target.value)}
+                        className="w-full bg-transparent text-3xl font-black text-slate-900 outline-none border-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       />
                     </div>
                   </div>
 
-                  {/* Swap Button */}
-                  <div className="absolute left-1/2 top-[80px] -translate-x-1/2 -translate-y-1/2 z-10">
+                  {/* Swap */}
+                  <div className="flex justify-center">
                     <button
                       onClick={swapDirections}
-                      className="h-8 w-8 rounded-full bg-white text-indigo-650 shadow-md border border-slate-200 hover:border-indigo-300 hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
-                      title="Swap Directions"
+                      className="h-8 w-8 rounded-full border border-slate-200 bg-white shadow-md text-slate-400 hover:text-emerald-600 hover:border-emerald-300 hover:scale-110 active:scale-95 transition-all flex items-center justify-center"
                     >
-                      <ArrowRightLeft className="h-4 w-4 rotate-90" />
+                      <ArrowRightLeft className="h-3.5 w-3.5 rotate-90" />
                     </button>
                   </div>
 
-                  {/* Target Currency Box */}
-                  <div className="p-4 rounded-2xl bg-indigo-50/40 border border-indigo-100 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <label htmlFor="target-currency-select" className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">
-                        Convert To
-                      </label>
+                  {/* To */}
+                  <div className="rounded-2xl border border-emerald-100 bg-emerald-50/50 px-4 py-3.5">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-500">To</span>
                       <select
                         id="target-currency-select"
                         value={targetCurrency}
-                        onChange={(e) => setTargetCurrency(e.target.value)}
-                        className="bg-transparent text-xs font-bold text-indigo-650 border-none outline-none cursor-pointer"
+                        onChange={e => setTargetCurrency(e.target.value)}
+                        className="text-xs font-extrabold text-emerald-700 bg-transparent border-none outline-none cursor-pointer"
                       >
-                        {CURRENCIES.map(c => (
-                          <option key={c.code} value={c.code}>{c.code} - {c.name}</option>
-                        ))}
+                        {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code} — {c.name}</option>)}
                       </select>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg font-bold text-indigo-655 font-bold">
-                        {CURRENCIES.find(c => c.code === targetCurrency)?.symbol || "€"}
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-xl font-black text-emerald-300">
+                        {CURRENCIES.find(c => c.code === targetCurrency)?.symbol ?? "€"}
                       </span>
                       <input
-                        type="number"
-                        placeholder="0.00"
-                        value={calcTargetAmount}
-                        onChange={(e) => handleTargetChange(e.target.value)}
-                        className="bg-transparent border-none text-xl font-extrabold text-slate-800 outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        type="number" placeholder="0" value={calcTargetAmount}
+                        onChange={e => handleTargetChange(e.target.value)}
+                        className="w-full bg-transparent text-3xl font-black text-emerald-800 outline-none border-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       />
                     </div>
                   </div>
 
-                  {/* Conversion Details */}
-                  <div className="p-3 bg-slate-50/80 rounded-xl text-center text-xs text-slate-550 border border-slate-150">
-                    Rate: <strong className="text-slate-800">1 {baseCurrency} = {currentRate.toFixed(4)} {targetCurrency}</strong>
-                  </div>
+                  <p className="text-center text-[10px] text-slate-400 pt-2">
+                    Rates are indicative and may vary.
+                  </p>
                 </div>
               </div>
-
             </div>
 
           </div>
