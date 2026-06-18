@@ -255,6 +255,19 @@ const DESTINATION_DATA = {
   },
 };
 
+// Currencies database for converter selection
+const CURRENCIES = [
+  { code: "USD", symbol: "$", name: "US Dollar" },
+  { code: "EUR", symbol: "€", name: "Euro" },
+  { code: "GBP", symbol: "£", name: "British Pound" },
+  { code: "INR", symbol: "₹", name: "Indian Rupee" },
+  { code: "JPY", symbol: "¥", name: "Japanese Yen" },
+  { code: "THB", symbol: "฿", name: "Thai Baht" },
+  { code: "CAD", symbol: "CA$", name: "Canadian Dollar" },
+  { code: "AUD", symbol: "A$", name: "Australian Dollar" },
+  { code: "SGD", symbol: "S$", name: "Singapore Dollar" }
+];
+
 // Default generic fallback
 const DEFAULT_DATA = {
   countryName: "Global",
@@ -292,10 +305,11 @@ export function ToolkitPage() {
   const [loading, setLoading] = useState(true);
   const { addNotification } = useNotification();
 
-  // Currency Converter State
+  // Currencies Selector State
+  const [baseCurrency, setBaseCurrency] = useState("USD");
+  const [targetCurrency, setTargetCurrency] = useState("EUR");
   const [calcBaseAmount, setCalcBaseAmount] = useState("100");
   const [calcTargetAmount, setCalcTargetAmount] = useState("");
-  const [isBaseToTarget, setIsBaseToTarget] = useState(true);
 
   // Audio/Speech State
   const [speakingIndex, setSpeakingIndex] = useState(null);
@@ -335,25 +349,49 @@ export function ToolkitPage() {
 
   const info = getDestinationInfo();
 
-  // Reset/sync currency conversions when destination info changes
+  // Reset target currency to trip destination's default currency when selectedTrip changes
   useEffect(() => {
-    if (info) {
-      const rate = info.exchangeRate;
-      const amount = parseFloat(calcBaseAmount);
-      if (!isNaN(amount)) {
-        setCalcTargetAmount((amount * rate).toFixed(2));
-      } else {
-        setCalcTargetAmount("");
-      }
+    if (selectedTrip) {
+      const destCurrency = info.currency || "EUR";
+      setTargetCurrency(destCurrency);
+      setBaseCurrency("USD");
     }
-  }, [selectedTrip, info]);
+  }, [selectedTrip]);
 
-  // Handle Currency Changes
+  // Retrieve current active exchange rate between baseCurrency and targetCurrency
+  const getExchangeRate = () => {
+    let rates = window.EXCHANGE_RATES;
+    if (!rates) {
+      try {
+        const cached = localStorage.getItem('usd_exchange_rates');
+        if (cached) rates = JSON.parse(cached);
+      } catch {}
+    }
+    if (!rates) {
+      rates = { USD: 1, EUR: 0.92, JPY: 156.0, INR: 83.5, GBP: 0.79, CAD: 1.37, AUD: 1.51, THB: 36.5, SGD: 1.35 };
+    }
+    const rateFromUSD = rates[baseCurrency] || 1;
+    const rateToUSD = rates[targetCurrency] || 1;
+    return rateToUSD / rateFromUSD;
+  };
+
+  const currentRate = getExchangeRate();
+
+  // Update conversion calculations when amount, currencies, or rates change
+  useEffect(() => {
+    const amount = parseFloat(calcBaseAmount);
+    if (!isNaN(amount)) {
+      setCalcTargetAmount((amount * currentRate).toFixed(2));
+    } else {
+      setCalcTargetAmount("");
+    }
+  }, [calcBaseAmount, baseCurrency, targetCurrency]);
+
   const handleBaseChange = (value) => {
     setCalcBaseAmount(value);
     const amount = parseFloat(value);
     if (!isNaN(amount)) {
-      setCalcTargetAmount((amount * info.exchangeRate).toFixed(2));
+      setCalcTargetAmount((amount * currentRate).toFixed(2));
     } else {
       setCalcTargetAmount("");
     }
@@ -363,24 +401,26 @@ export function ToolkitPage() {
     setCalcTargetAmount(value);
     const amount = parseFloat(value);
     if (!isNaN(amount)) {
-      setCalcBaseAmount((amount / info.exchangeRate).toFixed(2));
+      setCalcBaseAmount((amount / currentRate).toFixed(2));
     } else {
       setCalcBaseAmount("");
     }
   };
 
   const swapDirections = () => {
-    setIsBaseToTarget(!isBaseToTarget);
+    const tempCode = baseCurrency;
+    const tempAmount = calcBaseAmount;
+    setBaseCurrency(targetCurrency);
+    setTargetCurrency(tempCode);
+    setCalcBaseAmount(calcTargetAmount);
+    setCalcTargetAmount(tempAmount);
   };
 
   // Text-To-Speech Pronunciation
   const speakText = (text, phraseIndex) => {
     if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel(); // Stop any currently speaking audio
-      
-      // Extract local text before any brackets/parenthesis if JPY or THB
+      window.speechSynthesis.cancel();
       const textToSpeak = text.split("(")[0].trim();
-
       const utterance = new SpeechSynthesisUtterance(textToSpeak);
       utterance.lang = info.langCode;
 
@@ -405,36 +445,43 @@ export function ToolkitPage() {
 
   return (
     <Layout>
-      <div className="py-6 space-y-6 animate-fade-in-up">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-1.5 mb-0.5">
-              <Wrench className="h-4.5 w-4.5 text-indigo-600 animate-pulse" />
-              <p className="text-xs font-bold text-indigo-600 uppercase tracking-wider">Odyssey Utilities</p>
-            </div>
-            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Travel Toolkit & Advisory</h1>
+      <div className="py-6 space-y-8 animate-fade-in-up">
+        {/* Centered Header & Trip Selector */}
+        <div className="text-center space-y-4 max-w-2xl mx-auto mb-8">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700">
+            <Wrench className="h-3.5 w-3.5 animate-pulse" />
+            <span className="text-[10px] font-bold uppercase tracking-wider">Odyssey Utilities</span>
           </div>
-          
-          {/* Trip Selector Dropdown */}
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Travel Toolkit & Advisory</h1>
+          <p className="text-sm text-slate-500 max-w-md mx-auto">
+            Access visa requirements, cultural customs, emergency contacts, copy native voice pronunciations, and calculate real-time currencies.
+          </p>
+
           {!loading && trips.length > 0 && (
-            <div className="flex flex-col gap-1">
-              <label htmlFor="trip-selector" className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Select active trip</label>
-              <select
-                id="trip-selector"
-                value={selectedTrip ? selectedTrip._id : ""}
-                onChange={(e) => {
-                  const found = trips.find(t => t._id === e.target.value);
-                  if (found) setSelectedTrip(found);
-                }}
-                className="bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-slate-700 outline-none focus:border-indigo-400 transition-colors shadow-xs"
-              >
-                {trips.map((trip) => (
-                  <option key={trip._id} value={trip._id}>
-                    {trip.destination.split(",")[0]} ({new Date(trip.startDate).toLocaleDateString(undefined, {month: 'short', year: 'numeric'})})
-                  </option>
-                ))}
-              </select>
+            <div className="pt-2 flex flex-col items-center gap-2">
+              <label htmlFor="trip-selector" className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                Currently Viewing Trip Details
+              </label>
+              <div className="relative">
+                <select
+                  id="trip-selector"
+                  value={selectedTrip ? selectedTrip._id : ""}
+                  onChange={(e) => {
+                    const found = trips.find(t => t._id === e.target.value);
+                    if (found) setSelectedTrip(found);
+                  }}
+                  className="bg-white border border-slate-200 rounded-2xl px-6 py-3.5 text-base font-extrabold text-slate-800 outline-none focus:border-indigo-550 transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-indigo-100 cursor-pointer min-w-[300px] text-center appearance-none pr-8"
+                >
+                  {trips.map((trip) => (
+                    <option key={trip._id} value={trip._id}>
+                      ✈️ {trip.destination.split(",")[0]} ({new Date(trip.startDate).toLocaleDateString(undefined, {month: 'short', year: 'numeric'})})
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-500">
+                  <span className="text-xs">▼</span>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -617,25 +664,40 @@ export function ToolkitPage() {
 
                 {/* Conversion Form */}
                 <div className="space-y-4 relative">
-                  {/* Base Currency Box (USD) */}
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-150">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                      {isBaseToTarget ? "From (USD)" : `To (${info.currency})`}
-                    </label>
+                  
+                  {/* Base Currency Box */}
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-150 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <label htmlFor="base-currency-select" className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        Convert From
+                      </label>
+                      <select
+                        id="base-currency-select"
+                        value={baseCurrency}
+                        onChange={(e) => setBaseCurrency(e.target.value)}
+                        className="bg-transparent text-xs font-bold text-indigo-600 border-none outline-none cursor-pointer"
+                      >
+                        {CURRENCIES.map(c => (
+                          <option key={c.code} value={c.code}>{c.code} - {c.name}</option>
+                        ))}
+                      </select>
+                    </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-lg font-bold text-slate-500">{isBaseToTarget ? "$" : info.currencySymbol}</span>
+                      <span className="text-lg font-bold text-slate-500">
+                        {CURRENCIES.find(c => c.code === baseCurrency)?.symbol || "$"}
+                      </span>
                       <input
                         type="number"
                         placeholder="0.00"
-                        value={isBaseToTarget ? calcBaseAmount : calcTargetAmount}
-                        onChange={(e) => isBaseToTarget ? handleBaseChange(e.target.value) : handleTargetChange(e.target.value)}
+                        value={calcBaseAmount}
+                        onChange={(e) => handleBaseChange(e.target.value)}
                         className="bg-transparent border-none text-xl font-extrabold text-slate-800 outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       />
                     </div>
                   </div>
 
                   {/* Swap Button */}
-                  <div className="absolute left-1/2 top-[72px] -translate-x-1/2 -translate-y-1/2 z-10">
+                  <div className="absolute left-1/2 top-[80px] -translate-x-1/2 -translate-y-1/2 z-10">
                     <button
                       onClick={swapDirections}
                       className="h-8 w-8 rounded-full bg-white text-indigo-650 shadow-md border border-slate-200 hover:border-indigo-300 hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
@@ -646,25 +708,39 @@ export function ToolkitPage() {
                   </div>
 
                   {/* Target Currency Box */}
-                  <div className="p-4 rounded-2xl bg-indigo-50/40 border border-indigo-100">
-                    <label className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider block mb-1">
-                      {isBaseToTarget ? `To (${info.currency})` : "From (USD)"}
-                    </label>
+                  <div className="p-4 rounded-2xl bg-indigo-50/40 border border-indigo-100 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <label htmlFor="target-currency-select" className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">
+                        Convert To
+                      </label>
+                      <select
+                        id="target-currency-select"
+                        value={targetCurrency}
+                        onChange={(e) => setTargetCurrency(e.target.value)}
+                        className="bg-transparent text-xs font-bold text-indigo-650 border-none outline-none cursor-pointer"
+                      >
+                        {CURRENCIES.map(c => (
+                          <option key={c.code} value={c.code}>{c.code} - {c.name}</option>
+                        ))}
+                      </select>
+                    </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-lg font-bold text-indigo-655">{isBaseToTarget ? info.currencySymbol : "$"}</span>
+                      <span className="text-lg font-bold text-indigo-655 font-bold">
+                        {CURRENCIES.find(c => c.code === targetCurrency)?.symbol || "€"}
+                      </span>
                       <input
                         type="number"
                         placeholder="0.00"
-                        value={isBaseToTarget ? calcTargetAmount : calcBaseAmount}
-                        onChange={(e) => isBaseToTarget ? handleTargetChange(e.target.value) : handleBaseChange(e.target.value)}
+                        value={calcTargetAmount}
+                        onChange={(e) => handleTargetChange(e.target.value)}
                         className="bg-transparent border-none text-xl font-extrabold text-slate-800 outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       />
                     </div>
                   </div>
 
                   {/* Conversion Details */}
-                  <div className="p-3 bg-slate-50/80 rounded-xl text-center text-xs text-slate-500 border border-slate-150">
-                    Rate: <strong className="text-slate-800">1 USD = {info.exchangeRate} {info.currency}</strong>
+                  <div className="p-3 bg-slate-50/80 rounded-xl text-center text-xs text-slate-550 border border-slate-150">
+                    Rate: <strong className="text-slate-800">1 {baseCurrency} = {currentRate.toFixed(4)} {targetCurrency}</strong>
                   </div>
                 </div>
               </div>
