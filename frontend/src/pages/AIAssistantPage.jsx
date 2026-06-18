@@ -173,10 +173,10 @@ export function AIAssistantPage() {
             <div className="p-4 border-t border-slate-100 bg-slate-50/30 flex-shrink-0">
               <form
                 onSubmit={(e) => { e.preventDefault(); send(); }}
-                className="relative flex items-center"
+                className="relative flex items-center w-full max-w-3xl mx-auto"
               >
                 {/* Sparkles search icon on the left */}
-                <span className="absolute left-4 text-slate-400">
+                <span className="absolute left-4 text-indigo-500">
                   <Sparkles className="h-4 w-4 text-indigo-500 animate-pulse" />
                 </span>
 
@@ -186,7 +186,7 @@ export function AIAssistantPage() {
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask about destinations, budgets, itineraries..."
                   disabled={loading}
-                  className="w-full h-12 pl-11 pr-14 rounded-2xl border border-slate-200 bg-white text-sm text-slate-800 placeholder:text-slate-400/80 shadow-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all disabled:opacity-50"
+                  className="w-full h-12 pl-11 pr-14 rounded-2xl border-2 border-slate-200 bg-white text-sm text-slate-800 placeholder:text-slate-400/80 shadow-md shadow-slate-100/50 outline-none focus:border-indigo-500 focus:ring-0 transition-all disabled:opacity-50"
                 />
 
                 {/* Send/Search button inside the pill container on the right */}
@@ -195,8 +195,8 @@ export function AIAssistantPage() {
                   disabled={loading || !input.trim()}
                   className={`absolute right-1.5 h-9 w-9 rounded-xl flex items-center justify-center transition-all ${
                     !input.trim() || loading
-                      ? "bg-slate-100 text-slate-400 cursor-not-allowed opacity-80"
-                      : "bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 shadow-md shadow-indigo-200/50 cursor-pointer"
+                      ? "bg-indigo-50 text-indigo-300 cursor-not-allowed"
+                      : "bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 shadow-md shadow-indigo-200/40 cursor-pointer"
                   }`}
                 >
                   <Send className="h-3.5 w-3.5" />
