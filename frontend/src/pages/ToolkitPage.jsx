@@ -338,10 +338,15 @@ export function ToolkitPage() {
     }
     window.speechSynthesis.cancel();
 
-    // Find best matching voice for the target language
+    // Find best matching voice for the target language (case-insensitive & handles both hyphens/underscores)
     const voices = voicesRef.current.length ? voicesRef.current : window.speechSynthesis.getVoices();
-    const matchedVoice = voices.find(v => v.lang === info.langCode)
-      || voices.find(v => v.lang.startsWith(info.langCode.split("-")[0]));
+    const targetLangLower = info.langCode.toLowerCase();
+    const targetLangPrefix = info.langCode.split("-")[0].toLowerCase();
+
+    const matchedVoice = voices.find(v => {
+      const vLang = v.lang.toLowerCase().replace("_", "-");
+      return vLang === targetLangLower || vLang.split("-")[0] === targetLangPrefix;
+    });
 
     let textToSpeak = "";
     let lang = info.langCode;
@@ -349,6 +354,7 @@ export function ToolkitPage() {
     if (matchedVoice) {
       // Clean local text (e.g. remove romanization inside parenthesis)
       textToSpeak = phrase.local.split("(")[0].trim();
+      lang = matchedVoice.lang;
     } else {
       // Fallback: Speak phonetic pronunciation using an English/default voice
       textToSpeak = phrase.pronunciation;
@@ -361,7 +367,7 @@ export function ToolkitPage() {
     if (matchedVoice) {
       utt.voice = matchedVoice;
     } else {
-      const enVoice = voices.find(v => v.lang.startsWith("en"));
+      const enVoice = voices.find(v => v.lang.toLowerCase().startsWith("en"));
       if (enVoice) utt.voice = enVoice;
     }
 
