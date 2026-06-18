@@ -30,6 +30,20 @@ const TYPE_COLORS = {
   other: '#64748b',
 }
 
+const createSvgIcon = (number, color, scale) => {
+  const size = scale * 2;
+  const fontSize = scale >= 20 ? 14 : 11;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <circle cx="${scale}" cy="${scale}" r="${scale - 2}" fill="${color}" stroke="#fff" stroke-width="2"/>
+    <text x="${scale}" y="${scale}" fill="white" font-family="system-ui, sans-serif" font-size="${fontSize}px" font-weight="bold" text-anchor="middle" dominant-baseline="central" dy=".1em">${number}</text>
+  </svg>`;
+  return {
+    url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+    scaledSize: new window.google.maps.Size(size, size),
+    anchor: new window.google.maps.Point(scale, scale),
+  };
+}
+
 export function TripMap({ trip, selectedLocation, onLocationSelect, className = '' }) {
   const mapRef = useRef(null)
   const mapInstance = useRef(null)
@@ -117,22 +131,14 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
             position,
             map: mapInstance.current,
             title: loc.name,
-            label: { text: String(index + 1), color: 'white', fontSize: '11px', fontWeight: 'bold' },
-            icon: {
-              path: maps.SymbolPath.CIRCLE,
-              scale: 14,
-              fillColor: color,
-              fillOpacity: 1,
-              strokeColor: '#fff',
-              strokeWeight: 2,
-              labelOrigin: new maps.Point(0, 0),
-            },
+            icon: createSvgIcon(String(index + 1), color, 14),
             animation: maps.Animation.DROP,
           })
 
           // Store location data on marker for later use
           marker._locData = loc
           marker._defaultColor = color
+          marker._indexNumber = index + 1
 
           marker.addListener('click', () => {
             openInfoWindow(maps, marker, loc)
@@ -180,15 +186,7 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
 
     // Reset all markers to default style
     markersRef.current.forEach((m) => {
-      m.setIcon({
-        path: maps.SymbolPath.CIRCLE,
-        scale: 14,
-        fillColor: m._defaultColor,
-        fillOpacity: 1,
-        strokeColor: '#fff',
-        strokeWeight: 2,
-        labelOrigin: new maps.Point(0, 0),
-      })
+      m.setIcon(createSvgIcon(String(m._indexNumber), m._defaultColor, 14))
       m.setZIndex(1)
     })
 
@@ -199,15 +197,7 @@ export function TripMap({ trip, selectedLocation, onLocationSelect, className = 
 
     if (match) {
       // Enlarge the selected marker
-      match.setIcon({
-        path: maps.SymbolPath.CIRCLE,
-        scale: 20,
-        fillColor: match._defaultColor,
-        fillOpacity: 1,
-        strokeColor: '#fff',
-        strokeWeight: 3,
-        labelOrigin: new maps.Point(0, 0),
-      })
+      match.setIcon(createSvgIcon(String(match._indexNumber), match._defaultColor, 20))
       match.setZIndex(999)
       match.setAnimation(maps.Animation.BOUNCE)
       setTimeout(() => match.setAnimation(null), 700)
