@@ -23,6 +23,13 @@ export function formatDateDDMMYYYY(dateInput) {
   return `${day}-${month}-${year}`;
 }
 
+export function formatDateReadable(dateInput) {
+  if (!dateInput) return "";
+  const d = new Date(dateInput);
+  if (isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" }); // e.g. "18 Jun 2026"
+}
+
 export function formatDateBooking(dateInput) {
   if (!dateInput) return "";
   const d = new Date(dateInput);
@@ -214,14 +221,14 @@ export function getFlightBookingUrl(origin, destination, date, travelers = 1) {
  * Generates train booking search redirect URL on MakeMyTrip
  */
 export function getTrainBookingUrl(origin, destination, date) {
-  const formattedDate = formatDateDDMMYYYY(date);
+  const formattedDate = formatDateReadable(date);
   
   // Extract city names
   const cleanOriginVal = String(origin || "").split(',')[0].trim();
   const cleanDestVal = String(destination || "").split(',')[0].trim();
   
-  // To bypass MakeMyTrip session blocking on direct search links, we use a targeted search redirect.
-  const searchQuery = `site:makemytrip.com/railways/ trains from ${cleanOriginVal} to ${cleanDestVal} on ${formattedDate}`;
+  // Optimized natural search query that resolves directly to prefilled MakeMyTrip routes
+  const searchQuery = `MakeMyTrip trains from ${cleanOriginVal} to ${cleanDestVal} on ${formattedDate}`;
   return `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
 }
 
