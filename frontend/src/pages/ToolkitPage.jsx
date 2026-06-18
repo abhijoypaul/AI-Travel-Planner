@@ -239,6 +239,20 @@ export function ToolkitPage() {
   const [speakingIndex, setSpeakingIndex] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const voicesRef = useRef([]);
+
+  // Load and cache voices for synthesis
+  useEffect(() => {
+    if (!("speechSynthesis" in window)) return;
+    const loadVoices = () => {
+      voicesRef.current = window.speechSynthesis.getVoices();
+    };
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    return () => {
+      window.speechSynthesis.onvoiceschanged = null;
+    };
+  }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -323,8 +337,16 @@ export function ToolkitPage() {
       return;
     }
     window.speechSynthesis.cancel();
-    const utt = new SpeechSynthesisUtterance(text.split("(")[0].trim());
+    const textToSpeak = text.split("(")[0].trim();
+    const utt = new SpeechSynthesisUtterance(textToSpeak);
     utt.lang = info.langCode;
+
+    // Find best matching voice for the target language
+    const voices = voicesRef.current.length ? voicesRef.current : window.speechSynthesis.getVoices();
+    const matchedVoice = voices.find(v => v.lang === info.langCode)
+      || voices.find(v => v.lang.startsWith(info.langCode.split("-")[0]));
+    if (matchedVoice) utt.voice = matchedVoice;
+
     utt.onstart = () => setSpeakingIndex(idx);
     utt.onend   = () => setSpeakingIndex(null);
     utt.onerror = () => { setSpeakingIndex(null); addNotification("Speaker Alert", "Audio speech engine not ready.", "info"); };
