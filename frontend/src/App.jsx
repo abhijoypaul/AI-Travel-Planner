@@ -14,7 +14,7 @@ import { ProfilePage } from '@/pages/ProfilePage'
 import { ShareTripPage } from '@/pages/ShareTripPage'
 import { TripsPage } from '@/pages/TripsPage'
 import { ExplorePage } from '@/pages/ExplorePage'
-import { BookingsPage } from '@/pages/BookingsPage'
+import { ToolkitPage } from '@/pages/ToolkitPage'
 import { AIAssistantPage } from '@/pages/AIAssistantPage'
 import { SavedPlacesPage } from '@/pages/SavedPlacesPage'
 import { ItineraryPage } from '@/pages/ItineraryPage'
@@ -49,7 +49,8 @@ export default function App() {
             {/* Protected — sidebar nav */}
             <Route path="/trips" element={<ProtectedRoute><TripsPage /></ProtectedRoute>} />
             <Route path="/explore" element={<ProtectedRoute><ExplorePage /></ProtectedRoute>} />
-            <Route path="/bookings" element={<ProtectedRoute><BookingsPage /></ProtectedRoute>} />
+            <Route path="/toolkit" element={<ProtectedRoute><ToolkitPage /></ProtectedRoute>} />
+            <Route path="/bookings" element={<ProtectedRoute><ToolkitPage /></ProtectedRoute>} />
             <Route path="/ai-assistant" element={<ProtectedRoute><AIAssistantPage /></ProtectedRoute>} />
             <Route path="/saved" element={<ProtectedRoute><SavedPlacesPage /></ProtectedRoute>} />
             <Route path="/itinerary" element={<ProtectedRoute><ItineraryPage /></ProtectedRoute>} />

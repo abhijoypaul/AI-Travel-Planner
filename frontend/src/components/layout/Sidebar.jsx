@@ -3,7 +3,7 @@ import {
   LayoutDashboard,
   Map,
   Compass,
-  Ticket,
+  Wrench,
   MessageSquare,
   Bookmark,
   CalendarDays,
@@ -19,7 +19,7 @@ const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
   { icon: Map, label: 'Trips', path: '/trips' },
   { icon: Compass, label: 'Explore', path: '/explore' },
-  { icon: Ticket, label: 'Bookings', path: '/bookings' },
+  { icon: Wrench, label: 'Travel Toolkit', path: '/toolkit' },
   { icon: MessageSquare, label: 'AI Assistant', path: '/ai-assistant' },
   { icon: Bookmark, label: 'Saved Places', path: '/saved' },
 ]
