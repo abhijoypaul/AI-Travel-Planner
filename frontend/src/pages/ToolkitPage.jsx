@@ -745,22 +745,6 @@ export function ToolkitPage() {
                 </div>
               </div>
 
-              {/* Extra Widget for Travel Resources */}
-              <div className="wander-card p-5 relative overflow-hidden bg-gradient-to-br from-indigo-600 to-violet-700 text-white border-none shadow-md">
-                <div className="absolute right-[-20px] top-[-20px] h-32 w-32 rounded-full bg-white/10 blur-2xl" />
-                <div className="absolute left-[-20px] bottom-[-20px] h-24 w-24 rounded-full bg-violet-400/20 blur-2xl" />
-                
-                <h3 className="text-sm font-extrabold mb-1">Need Booking Help?</h3>
-                <p className="text-[11px] text-white/80 leading-relaxed mb-4">
-                  Easily resolve flights, trains, and hotel accommodations directly inside your itineraries.
-                </p>
-                <Link to="/trips">
-                  <button className="flex items-center gap-1 bg-white text-indigo-650 hover:bg-slate-50 px-3.5 py-2 rounded-xl text-[11px] font-bold transition-all shadow-sm">
-                    Go to Itineraries
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </button>
-                </Link>
-              </div>
             </div>
 
           </div>
