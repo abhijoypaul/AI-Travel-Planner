@@ -331,21 +331,39 @@ export function ToolkitPage() {
     setCalcTargetAmount(calcBaseAmount);
   };
 
-  const speakText = (text, idx) => {
+  const speakText = (phrase, idx) => {
     if (!("speechSynthesis" in window)) {
       addNotification("Unavailable", "Speech Synthesis is not supported in this browser.", "error");
       return;
     }
     window.speechSynthesis.cancel();
-    const textToSpeak = text.split("(")[0].trim();
-    const utt = new SpeechSynthesisUtterance(textToSpeak);
-    utt.lang = info.langCode;
 
     // Find best matching voice for the target language
     const voices = voicesRef.current.length ? voicesRef.current : window.speechSynthesis.getVoices();
     const matchedVoice = voices.find(v => v.lang === info.langCode)
       || voices.find(v => v.lang.startsWith(info.langCode.split("-")[0]));
-    if (matchedVoice) utt.voice = matchedVoice;
+
+    let textToSpeak = "";
+    let lang = info.langCode;
+
+    if (matchedVoice) {
+      // Clean local text (e.g. remove romanization inside parenthesis)
+      textToSpeak = phrase.local.split("(")[0].trim();
+    } else {
+      // Fallback: Speak phonetic pronunciation using an English/default voice
+      textToSpeak = phrase.pronunciation;
+      lang = "en-US";
+    }
+
+    const utt = new SpeechSynthesisUtterance(textToSpeak);
+    utt.lang = lang;
+
+    if (matchedVoice) {
+      utt.voice = matchedVoice;
+    } else {
+      const enVoice = voices.find(v => v.lang.startsWith("en"));
+      if (enVoice) utt.voice = enVoice;
+    }
 
     utt.onstart = () => setSpeakingIndex(idx);
     utt.onend   = () => setSpeakingIndex(null);
@@ -594,7 +612,7 @@ export function ToolkitPage() {
                           <p className="text-[10px] italic text-slate-400 truncate">{phrase.pronunciation}</p>
                         </div>
                         <button
-                          onClick={() => speakText(phrase.local, idx)}
+                          onClick={() => speakText(phrase, idx)}
                           title="Hear pronunciation"
                           className={`flex-shrink-0 h-9 w-9 rounded-xl flex items-center justify-center transition-all ${
                             active
