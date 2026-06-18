@@ -239,16 +239,12 @@ export function ToolkitPage() {
   const [speakingIndex, setSpeakingIndex] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const audioRef = useRef(null);
 
-  // Stop synthesis and audio on unmount
+  // Stop synthesis on unmount
   useEffect(() => {
     return () => {
       if ("speechSynthesis" in window) {
         window.speechSynthesis.cancel();
-      }
-      if (audioRef.current) {
-        audioRef.current.pause();
       }
     };
   }, []);
@@ -331,47 +327,54 @@ export function ToolkitPage() {
   };
 
   const speakText = (text, idx) => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
+    if (!("speechSynthesis" in window)) {
+      addNotification("Unavailable", "Speech Synthesis is not supported in this browser.", "error");
+      return;
     }
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.resume();
     setSpeakingIndex(idx);
 
     const textToSpeak = text.split("(")[0].trim();
-    const shortLang = info.langCode.split("-")[0].toLowerCase();
-    
-    // Google Translate TTS expects 2-character language codes (e.g., 'hi', 'th', 'ja')
-    const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${shortLang}&client=gtx&q=${encodeURIComponent(textToSpeak)}`;
+    const utt = new SpeechSynthesisUtterance(textToSpeak);
 
-    // Create audio element with no-referrer policy to bypass Google's hotlinking/referrer blocks
-    const audio = document.createElement("audio");
-    audio.referrerPolicy = "no-referrer";
-    audio.src = url;
-    audioRef.current = audio;
+    // Get list of voices dynamically
+    const voices = window.speechSynthesis.getVoices();
+    const targetLangLower = info.langCode.toLowerCase();
+    const targetLangPrefix = info.langCode.split("-")[0].toLowerCase();
 
-    audio.onended = () => {
-      if (audioRef.current === audio) {
-        setSpeakingIndex(null);
-        audioRef.current = null;
-      }
+    // 1. Try to find browser-integrated Google Translate voices first
+    let matchedVoice = voices.find(v => 
+      v.name.toLowerCase().includes("google") && 
+      (v.lang.toLowerCase().replace("_", "-") === targetLangLower || v.lang.toLowerCase().replace("_", "-").startsWith(targetLangPrefix))
+    );
+
+    // 2. Fallback to exact locale match
+    if (!matchedVoice) {
+      matchedVoice = voices.find(v => v.lang.toLowerCase().replace("_", "-") === targetLangLower);
+    }
+
+    // 3. Fallback to general language match
+    if (!matchedVoice) {
+      matchedVoice = voices.find(v => v.lang.toLowerCase().replace("_", "-").startsWith(targetLangPrefix));
+    }
+
+    if (matchedVoice) {
+      utt.voice = matchedVoice;
+      utt.lang = matchedVoice.lang;
+    } else {
+      utt.lang = info.langCode;
+    }
+
+    utt.onstart = () => setSpeakingIndex(idx);
+    utt.onend   = () => setSpeakingIndex(null);
+    utt.onerror = (e) => {
+      console.error("SpeechSynthesis error:", e);
+      setSpeakingIndex(null);
+      addNotification("Speaker Alert", "Audio speech engine not ready.", "info");
     };
 
-    audio.onerror = (e) => {
-      console.error("Google TTS error:", e);
-      if (audioRef.current === audio) {
-        setSpeakingIndex(null);
-        audioRef.current = null;
-        addNotification("Speaker Alert", "Audio pronunciation could not be loaded.", "error");
-      }
-    };
-
-    audio.play().catch((err) => {
-      console.error("Audio playback error:", err);
-      if (audioRef.current === audio) {
-        setSpeakingIndex(null);
-        audioRef.current = null;
-      }
-    });
+    window.speechSynthesis.speak(utt);
   };
 
   // ── Render ────────────────────────────────────────────────────────────────
